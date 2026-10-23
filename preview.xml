@@ -65,7 +65,7 @@
   <worldbody>
     <light pos="0 0 5" dir="0 0 -1" directional="true" />
     <body name="boat" pos="0 0 0" quat="1 0 0 0">
-      <inertial mass="13" pos="-0.05024515902 0.0004067058155 -0.04459714124" fullinertia="0.3500353389 26.53774362 26.71406484 0.001160412512 -0.171818171 0.000229477304" />
+      <inertial mass="13" pos="-0.05024515902 0.0004067058155 -0.04459714124" fullinertia="0.3500353389 34.6173606503 34.7936818703 0.00132584801411 -0.196313619901 0.000229477304" />
       <body name="seat" pos="0.16095420895 0.0003146764083 0.05626727181" quat="1 0 0 0">
         <joint name="seat_slide" type="slide" axis="1 0 0" range="-.25 .25" ref="0.028" pos="-0.028 0 0" />
         <inertial mass="0.8" pos="-0.004781257567 -0.0002368406802 -0.0007251519868" fullinertia="0.007980680323 0.00271748056 0.010383506 -1.296995406e-06 -1.078959602e-06 3.343574376e-07" />
@@ -277,7 +277,7 @@
         <body name="port_oar" quat="0.99105566808 -0.132248759438 -0.0177016564268 0.00236214995569" pos="0 0 0">
           <joint name="port_elevation" axis="0.999362143215 -1.51384110393e-15 -0.0357114366746" range="-0.436332313 0.436332313" ref="0.048842053983" pos="0 0 0" />
           <joint name="port_feather" axis="1.38777878078e-15 1 -8.32667268469e-16" range="-1.745329252 1.745329252" ref="-0.0357190315406" pos="0 0 0" />
-          <inertial mass="1.4" pos="0.00175148204399 0.803685664823 -0.0057393250618" fullinertia="1.14901912227 0.00197538976241 1.14778102989 -0.000732152901672 2.76915028537e-05 0.00884443868406" />
+          <inertial mass="1.5" pos="0 0.55 0" fullinertia="2.74625 0.00211648903115 2.74625 0 0 0" />
           <geom name="port_shaft_visual" type="mesh" mesh="port_shaft" rgba=".055 .065 .075 1" contype="0" conaffinity="0" />
           <geom name="port_grip_visual" type="mesh" mesh="port_grip" rgba=".35 .85 .055 1" contype="0" conaffinity="0" />
           <geom name="port_blade_visual" type="mesh" mesh="port_blade" rgba=".92 .94 .95 1" contype="0" conaffinity="0" />
@@ -292,7 +292,7 @@
         <body name="starboard_oar" quat="0.988545477046 0.149873391662 -0.0175701562991 -0.00266381160778" pos="0 0 0">
           <joint name="starboard_elevation" axis="0.999368387431 1.31192313341e-15 -0.0355362660417" range="-0.436332313 0.436332313" ref="-0.013230948506" pos="0 0 0" />
           <joint name="starboard_feather" axis="1.60114976833e-15 -1 -7.77156117238e-16" range="-1.745329252 1.745329252" ref="0.0355437496499" pos="0 0 0" />
-          <inertial mass="1.4" pos="0.00175148204399 -0.803685664823 -0.0057393250618" fullinertia="1.14901912227 0.00197538976241 1.14778102989 0.000732152901672 2.76915028537e-05 -0.00884443868406" />
+          <inertial mass="1.5" pos="0 -0.55 0" fullinertia="2.74625 0.00211648903115 2.74625 0 0 0" />
           <geom name="starboard_shaft_visual" type="mesh" mesh="starboard_shaft" rgba=".055 .065 .075 1" contype="0" conaffinity="0" />
           <geom name="starboard_grip_visual" type="mesh" mesh="starboard_grip" rgba=".35 .85 .055 1" contype="0" conaffinity="0" />
           <geom name="starboard_blade_visual" type="mesh" mesh="starboard_blade" rgba=".92 .94 .95 1" contype="0" conaffinity="0" />
