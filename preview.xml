@@ -16,14 +16,14 @@
     <mesh name="fin" file="boat_meshes/fin.stl" />
     <mesh name="gate_port" file="boat_meshes/gate_port.stl" />
     <mesh name="gate_starboard" file="boat_meshes/gate_starboard.stl" />
-    <mesh name="port_blade" file="boat_meshes/port_blade_third_thickness.stl" />
+    <mesh name="port_blade" file="boat_meshes/port_blade_5mm.stl" />
     <mesh name="port_grip" file="boat_meshes/port_grip.stl" />
     <mesh name="port_shaft" file="boat_meshes/port_shaft.stl" />
     <mesh name="rails" file="boat_meshes/rails.stl" />
     <mesh name="rigger" file="boat_meshes/rigger.stl" />
     <mesh name="seat" file="boat_meshes/seat.stl" />
     <mesh name="shell_white" file="boat_meshes/shell_white.stl" />
-    <mesh name="starboard_blade" file="boat_meshes/starboard_blade_third_thickness.stl" />
+    <mesh name="starboard_blade" file="boat_meshes/starboard_blade_5mm.stl" />
     <mesh name="starboard_grip" file="boat_meshes/starboard_grip.stl" />
     <mesh name="starboard_shaft" file="boat_meshes/starboard_shaft.stl" />
     <texture name="background" type="skybox" builtin="gradient" rgb1=".18 .18 .18" rgb2=".10 .10 .10" width="512" height="512" />
