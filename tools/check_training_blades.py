@@ -12,7 +12,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from hydrodynamics.training import TrainingParameters,blade_traction
-from tools.compare_trajectory_experiments import kinematics,force_observation,to_nt,to_xy
+from tools.trajectory_data import kinematics,force_observation,to_nt,to_xy
 
 
 def main():

@@ -7,14 +7,14 @@ from dataclasses import asdict
 import numpy as np
 import mujoco
 from .models import ROOT, wet_triangles, triangle_geometry, hydrostatic_wrench
-from .mujoco_adapter import RowingHydrodynamics
+from .scene import SceneGeometry, ForceAccumulator
 from .training import (TrainingParameters,TrainingHullResistance,sample_episode,
                        blade_traction,fin_force)
 
 
-class TrainingRowingHydrodynamics(RowingHydrodynamics):
+class TrainingRowingHydrodynamics(SceneGeometry):
     def __init__(self,model,repository=ROOT,water=None,parameters=None,blade_mode='harmonic'):
-        super().__init__(model,repository,water,blade_model='normal',added_mass_rotation=False)
+        super().__init__(model,repository,water)
         if blade_mode not in ('harmonic','normal'):raise ValueError('Unknown blade mode')
         self.blade_mode=blade_mode
         self.set_parameters(parameters or TrainingParameters())
@@ -45,17 +45,10 @@ class TrainingRowingHydrodynamics(RowingHydrodynamics):
         if (not np.isfinite(w.level) or not np.isfinite(w.density) or w.density<=0
                 or np.asarray(w.current).shape!=(3,) or not np.all(np.isfinite(w.current))):
             raise ValueError('Invalid water configuration')
-        q=np.zeros(self.model.nv);loads=[]
+        load=ForceAccumulator(self.model,data)
         self.last_diagnostics={'hull_outside_reference':False,'hull_outside_target_speed':False,
             'relative_dissipative_power_W':0.,'partial_blades':0,
             'model_status':'uncalibrated_training_approximation'}
-        def load(body,force,torque,point,label):
-            force=np.asarray(force);torque=np.asarray(torque);point=np.asarray(point)
-            mujoco.mj_applyFT(self.model,data,force,torque,point,body,q)
-            loads.append({'body':body,'label':label,'force_N':force,
-                          'torque_Nm':torque,'point_m':point})
-        def distributed(body,points,forces,origin,label):
-            load(body,forces.sum(axis=0),np.cross(points-origin,forces).sum(axis=0),origin,label)
         def power(forces,velocity):
             self.last_diagnostics['relative_dissipative_power_W']+=float(np.sum(forces*velocity))
 
@@ -84,7 +77,7 @@ class TrainingRowingHydrodynamics(RowingHydrodynamics):
             normal=n-(n@rot[:,0])[:,None]*rot[:,0]
             vn=np.sum(vel*normal,axis=1)
             ff=(-.25*w.density*p.hull_crossflow_cd*area*abs(vn)*vn)[:,None]*normal
-            distributed(self.boat,c,ff,origin,'hull_crossflow');power(ff,vel)
+            load.distributed(self.boat,c,ff,origin,'hull_crossflow');power(ff,vel)
 
         fin_world=self.world(data,self.boat,self.fin)
         f,t,_=hydrostatic_wrench(fin_world,origin,w.level,w.density)
@@ -112,8 +105,8 @@ class TrainingRowingHydrodynamics(RowingHydrodynamics):
             vel=v+np.cross(om,c-origin)-w.current
             chord=rot[:,1]*np.sign(surface[:,:,1].mean())
             ff=blade_traction(vel,rot[:,0],chord,area,p,w.density,self.blade_mode)
-            distributed(body,c,ff,origin,'blade_'+self.blade_mode);power(ff,vel)
-        return q,loads,[]
+            load.distributed(body,c,ff,origin,'blade_'+self.blade_mode);power(ff,vel)
+        return load.q,load.loads,[]
 
     def forward(self,data,external_qforce=None,added_mass=False):
         if added_mass:raise ValueError('Training profile does not include validated added mass')
@@ -121,7 +114,11 @@ class TrainingRowingHydrodynamics(RowingHydrodynamics):
             ext=np.asarray(external_qforce)
             if ext.shape!=(self.model.nv,) or not np.all(np.isfinite(ext)):
                 raise ValueError('Invalid external generalized force')
-        result=super().forward(data,external_qforce,added_mass=False)
+        mujoco.mj_forward(self.model,data)
+        q,loads,_=self.force_terms(data)
+        data.qfrc_applied[:]=q if external_qforce is None else q+external_qforce
+        mujoco.mj_forward(self.model,data)
+        result={'loads':loads,'added_mass_residual_N':0.,'added_mass_forces_N':[]}
         result['diagnostics']=self.last_diagnostics.copy()
         return result
 

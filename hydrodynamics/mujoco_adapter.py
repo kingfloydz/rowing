@@ -8,25 +8,15 @@ This legacy scene adapter is NOT the validated hydrodynamic core. In particular
 CAD-transferred polars/mass and Cd=1 lateral closures remain exploratory.
 Use reference_models.py for scoped empirical references and core.py for theory.
 """
-from dataclasses import dataclass
-from pathlib import Path
 import numpy as np
 import mujoco
 from scipy.optimize import root
+from .scene import Water, SceneGeometry, ForceAccumulator
 from .polars import BladePolar
 from .unsteady import rotating_added_mass_wrench
-from .models import (ROOT, RHO, load_parameters, load_closed_surface, projected_blade,
+from .models import (ROOT, load_parameters,
                      wet_triangles, triangle_geometry, hydrostatic_wrench,
                      normal_plate_force, plate_added_mass)
-
-
-@dataclass
-class Water:
-    level: float = 0.0
-    density: float = RHO
-    current: tuple = (0.,0.,0.)
-    hull_crossflow_cd: float = 1.0  # uncalibrated damping closure
-    fin_normal_cd: float = 1.0     # uncalibrated damping closure
 
 
 def solve_normal_added_mass(model,data,base,B,mass,bias):
@@ -96,48 +86,25 @@ def couple_unbounded_inertia(model,data,external_qforce,body,point,inertia,curre
             'fluid_domain':'unbounded_potential_flow','geometry_id':inertia.geometry_id}
 
 
-class RowingHydrodynamics:
+class RowingHydrodynamics(SceneGeometry):
     def __init__(self, model, repository=ROOT, water=None, blade_model='normal', added_mass_rotation=False):
-        self.model=model; self.repo=Path(repository);self.water=water or Water()
+        super().__init__(model,repository,water)
         if blade_model not in ('normal','caplan_flat'):
             raise ValueError('blade_model must be normal or caplan_flat')
         self.blade_model=blade_model
         self.polar=BladePolar.caplan_flat(self.repo/'data/caplan2007_flat_polar.csv') if blade_model=='caplan_flat' else None
         self.added_mass_rotation=added_mass_rotation
         self.hull_law,self.blade_law,self.parameters=load_parameters(self.repo/'data/parameters.json')
-        self.boat=int(model.body('boat').id)
-        self.hull,self.hull_metadata=load_closed_surface(self.repo/'boat_meshes/shell_white.stl')
-        self.fin,_=load_closed_surface(self.repo/'boat_meshes/fin.stl')
-        self.blades=[]
-        for side in ['port','starboard']:
-            surface,meta=projected_blade(self.repo/f'boat_meshes/{side}_blade_3mm.stl')
-            volume,_=load_closed_surface(self.repo/f'boat_meshes/{side}_blade_3mm.stl')
-            self.blades.append((int(model.body(side+'_oar').id),surface,volume,meta))
-        self.metadata={'hull':self.hull_metadata,'blades':{side:entry[3] for side,entry in zip(['port','starboard'],self.blades)}}
         self.metadata['model_status']={
             'profile':'exploratory_legacy_scene', 'validated_for_current_CAD':False,
             'unresolved':['hull_shape_transfer','blade_free_surface_history',
                           'lateral_and_fin_coefficients','variable_wetted_added_mass'],
             'recommended_reference':'HYDRODYNAMICS_CORE.md'}
 
-    def world(self,data,body,triangles):
-        return triangles@data.xmat[body].reshape(3,3).T+data.xpos[body]
-
-    def jacobian(self,data,body,point):
-        jp=np.zeros((3,self.model.nv));jr=np.zeros_like(jp)
-        mujoco.mj_jac(self.model,data,jp,jr,np.asarray(point),body)
-        return jp,jr
-
-    def motion(self,data,body):
-        jp,jr=self.jacobian(data,body,data.xpos[body])
-        return jp@data.qvel,jr@data.qvel
-
     def force_terms(self,data,rotational_added_mass=False):
         """Call after mj_forward or mj_step1. Does not modify qfrc_applied."""
-        w=self.water; q=np.zeros(self.model.nv);loads=[];added=[]
-        def load(body,force,torque,point,label):
-            mujoco.mj_applyFT(self.model,data,np.asarray(force),np.asarray(torque),np.asarray(point),body,q)
-            loads.append({'body':body,'label':label,'force_N':np.asarray(force),'torque_Nm':np.asarray(torque),'point_m':np.asarray(point)})
+        w=self.water; added=[]
+        load=ForceAccumulator(self.model,data)
         origin=data.xpos[self.boat]; rot=data.xmat[self.boat].reshape(3,3)
         hull=self.world(data,self.boat,self.hull)
         f,t,s=hydrostatic_wrench(hull,origin,w.level,w.density)
@@ -159,7 +126,7 @@ class RowingHydrodynamics:
             normal=n@rot;normal[:,0]=0;velocity[:,0]=0
             vn=np.sum(velocity*normal,axis=1)
             forces=(-.25*w.density*w.hull_crossflow_cd*area*abs(vn)*vn)[:,None]*normal@rot.T
-            load(self.boat,forces.sum(axis=0),np.cross(centres-origin,forces).sum(axis=0),origin,'hull_crossflow')
+            load.distributed(self.boat,centres,forces,origin,'hull_crossflow')
         # Fin normal drag only. Axial skin drag already absorbed into hull law.
         fin=wet_triangles(self.world(data,self.boat,self.fin),w.level)
         if len(fin):
@@ -168,7 +135,7 @@ class RowingHydrodynamics:
             n=n-(n@rot[:,0])[:,None]*rot[:,0]
             vn=np.sum(vel*n,axis=1)
             ff=(-.25*w.density*w.fin_normal_cd*area*abs(vn)*vn)[:,None]*n
-            load(self.boat,ff.sum(axis=0),np.cross(c-origin,ff).sum(axis=0),origin,'fin_transverse_drag')
+            load.distributed(self.boat,c,ff,origin,'fin_transverse_drag')
         for body,surface,volume,meta in self.blades:
             origin=data.xpos[body];rot=data.xmat[body].reshape(3,3)
             world=self.world(data,body,surface)
@@ -193,7 +160,7 @@ class RowingHydrodynamics:
                 chord=rot[:,1]*np.sign(surface[:,:,1].mean())
                 forces=self.polar.force(velocity,normal,chord,area,w.density)
                 label='blade_caplan_static_polar'
-            load(body,forces.sum(axis=0),np.cross(centres-origin,forces).sum(axis=0),origin,label)
+            load.distributed(body,centres,forces,origin,label)
             centre=np.average(centres,axis=0,weights=area)
             jp,_=self.jacobian(data,body,centre)
             jd=np.zeros_like(jp);mujoco.mj_jacDot(self.model,data,jd,None,centre,body)
@@ -205,7 +172,7 @@ class RowingHydrodynamics:
                 fa,ta=rotating_added_mass_wrench(vp,np.zeros(3),normal,omega,ma)
                 load(body,fa,ta,centre,'blade_added_mass_rotation')
             added.append({'B':normal@jp,'mass':ma,'bias':float(normal@jd@data.qvel)})
-        return q,loads,added
+        return load.q,load.loads,added
 
     def forward(self,data,external_qforce=None,added_mass=True):
         """Solve blade normal acceleration/force simultaneously, with constraints.
@@ -226,10 +193,3 @@ class RowingHydrodynamics:
         B=np.array([a['B'] for a in terms]);mass=np.array([a['mass'] for a in terms]);bias=np.array([a['bias'] for a in terms])
         f,error=solve_normal_added_mass(self.model,data,base,B,mass,bias)
         return {'loads':loads,'added_mass_residual_N':error,'added_mass_forces_N':f.tolist()}
-
-    def step(self,data,external_qforce=None,added_mass=True):
-        if self.model.opt.integrator==mujoco.mjtIntegrator.mjINT_RK4:
-            raise ValueError('Use Euler/implicitfast; external hydro forces are updated once per timestep.')
-        result=self.forward(data,external_qforce,added_mass)
-        mujoco.mj_step2(self.model,data)
-        return result

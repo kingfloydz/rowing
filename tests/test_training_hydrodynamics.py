@@ -1,6 +1,4 @@
 """Physics and extrapolation tests for the opt-in training model."""
-import json
-from pathlib import Path
 import numpy as np
 import pytest
 import mujoco

@@ -71,7 +71,7 @@ Day 节点内保持原 PCHIP 数据，未重新拟合。当前船长下对应速
 
 ## 5. 按回合域随机化
 
-调用 `reset_episode(seed)`，参数在该回合内固定，不在每个时间步随机。名义参数、范围见 `data/training_parameters.json`。倍率为对数均匀分布，其余为均匀分布；这是鲁棒性试验先验，不是实验后验。
+调用 `reset_episode(seed)`，参数在该回合内固定，不在每个时间步随机。名义参数、范围统一定义于 `hydrodynamics/training.py` 的 `TrainingParameters` 和 `EPISODE_RANGES`；`results/training/verification.json` 保存生成结果时的参数快照。倍率为对数均匀分布，其余为均匀分布；这是鲁棒性试验先验，不是实验后验。
 
 | 参数 | 名义 | 初始范围 |
 |---|---:|---:|
@@ -149,3 +149,5 @@ python tools/check_training_blades.py
 - ITTC-1957、平板层流及有限翼理论：相应极限下的基础关系；过渡、失速和外推均明确另列为工程假设。
 
 后续高精度层仍需当前船体阻力校核、匹配船型的辐射/附加惯性、桨叶自由液面与尾流联合闭合。训练先验的可执行性不取代这些工作。
+
+代码结构：`training.py` 定义训练力模型与随机化先验，`training_adapter.py` 负责训练场景耦合；`scene.py` 统一管理几何、运动学和力汇总。训练适配器不再继承旧实验适配器，也不加载旧桨叶系数。实验轨迹重建统一使用 `tools/trajectory_data.py`，无拟合验证不依赖历史优化脚本。
