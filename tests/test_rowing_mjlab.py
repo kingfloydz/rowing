@@ -92,7 +92,7 @@ def test_compact_history_exact_across_resets_and_rollout_boundary():
     from rsl_rl.storage import RolloutStorage
     from rowing_mjlab.storage import HistoryStorage
     n,steps,d=3,7,5
-    history=torch.randn(n,122,d)
+    history=torch.randn(n,126,d)
     obs=TensorDict({'actor':history.clone(),'privileged':torch.randn(n,27)},batch_size=[n])
     storage=HistoryStorage(n,steps,obs,[2],'cpu')
     expected=[]
@@ -108,10 +108,10 @@ def test_compact_history_exact_across_resets_and_rollout_boundary():
             storage.add_transition(tr)
             new=torch.randn(n,d)
             history=torch.cat((history[:,1:],new[:,None]),dim=1)
-            history[tr.dones]=new[tr.dones,None].expand(-1,122,-1)
+            history[tr.dones]=new[tr.dones,None].expand(-1,126,-1)
         actual=storage.reconstruct(torch.arange(n*steps))['actor']
         torch.testing.assert_close(actual,torch.stack(expected).flatten(0,1),rtol=0,atol=0)
-        assert storage.timeline.numel()<steps*n*122*d/4
+        assert storage.timeline.numel()<steps*n*126*d/4
         storage.clear()
 
 
@@ -119,7 +119,7 @@ def test_actor_privilege_isolation_and_independent_critic():
     from tensordict import TensorDict
     from rowing_mjlab.networks import TemporalModel
     torch.set_num_threads(2)
-    obs=TensorDict({'actor':torch.randn(2,122,107),'privileged':torch.randn(2,27)},batch_size=[2])
+    obs=TensorDict({'actor':torch.randn(2,126,107),'privileged':torch.randn(2,27)},batch_size=[2])
     groups={'actor':['actor'],'critic':['actor','privileged']}
     actor=TemporalModel(obs,groups,'actor',29,hidden_dims=[32],activation='elu',obs_normalization=True,
         distribution_cfg={'class_name':'GaussianDistribution','init_std':.3,'std_type':'scalar'})
@@ -142,7 +142,7 @@ def test_mjlab_reset_head_constraints_termination_and_privileged_layout():
     env=ManagerBasedRlEnv(env_cfg(2,play=True),device='cpu')
     try:
         obs,_=env.reset()
-        assert obs['actor'].shape==(2,122,107)
+        assert obs['actor'].shape==(2,126,107)
         assert obs['privileged'].shape==(2,27)
         m=env.sim.mj_model;s=env.rowing
         assert m.nu==31 and m.neq==4
@@ -167,6 +167,6 @@ def test_mjlab_reset_head_constraints_termination_and_privileged_layout():
         env.step(torch.zeros(2,29))
         assert env.reset_time_outs.all()
         obs,_=env.reset(env_ids=torch.tensor([0]))
-        torch.testing.assert_close(obs['actor'][0],obs['actor'][0,-1:].expand(122,-1))
+        torch.testing.assert_close(obs['actor'][0],obs['actor'][0,-1:].expand(126,-1))
     finally:
         env.close()

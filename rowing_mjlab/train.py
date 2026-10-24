@@ -32,6 +32,7 @@ def main():
     from mjlab.rl.runner import MjlabOnPolicyRunner
     from mjlab.utils.torch import configure_torch_backends
     from .config import env_cfg,rl_cfg
+    from .networks import HISTORY_LENGTH
     configure_torch_backends()
     cfg = env_cfg(args.num_envs)
     cfg.seed = args.seed
@@ -53,7 +54,7 @@ def main():
             runner.load(str(args.resume))
         metadata = {'num_envs':args.num_envs,'device':args.device,'seed':args.seed,
                     'physics_dt':env.physics_dt,'control_dt':env.step_dt,
-                    'history_frames':121,'latent_dim':24,'privileged_dim':27,
+                    'history_frames':HISTORY_LENGTH,'latent_dim':24,'privileged_dim':27,
                     'hydro_faces':env.rowing.hydro.face_count,'water_level_m':float(env.rowing.hydro.water.numpy()[0,0]),
                     'settings':asdict(agent)}
         (log_dir/'settings.json').write_text(json.dumps(metadata,indent=2),encoding='utf8')

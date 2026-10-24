@@ -70,7 +70,7 @@ reset 后从与仓库六桨角归一化距离最小的公共相位开始，左�
 
 因果残差 TCN 结构参考
 [head_transport/networks.py](https://github.com/kingfloydz/head_transport/blob/main/head_load_velocity/networks.py)。
-历史为过去 **121 帧**，加当前帧共 **122 帧**；50 Hz 下覆盖约 2.42 s。
+历史为过去 **125 帧**，加当前帧共 **126 帧**；50 Hz 下覆盖约 2.50 s。
 64 通道、kernel=5、dilation=(1,2,4,8,16)，最大感受野 125 帧。
 末帧特征与时间平均特征拼接后，128→64→24 得到 latent。
 Actor/Critic 分别持有独立编码器和归一化统计；MLP 均为 256→128→128。
@@ -127,7 +127,7 @@ callback 同时进入 mjlab 的 step/forward CUDA Graph，包含精确三角形�
 线性压力/二次力矩积分。每线程积累 32 面元，再按刚体归约；没有每环境 Python 循环、
 CPU 几何传输或全局原子累加。几何及 PCHIP 系数仅启动时在 CPU 准备。
 
-历史存储采用一次 121 帧前缀 + 每步新观测，PPO minibatch 用索引重建 122 帧窗口。
+历史存储采用一次 125 帧前缀 + 每步新观测，PPO minibatch 用索引重建 126 帧窗口。
 跨 reset 的索引钳制到新回合首帧，跨 rollout 复制实际历史前缀，不混入旧回合。
 不缓存用于梯度更新的旧 latent，每次 PPO 更新重新编码原始观测。
 24 步 rollout 时，相比重复存储每步完整窗口，Actor 观测存储约减少 17 倍

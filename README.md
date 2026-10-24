@@ -4,7 +4,7 @@
 
 ## mjlab GPU 双桨模仿训练
 
-训练入口和安装说明见 [TRAINING_MJLAB.md](TRAINING_MJLAB.md)。实现 H2 非头部 29 关节策略、头部固定目标 PD、船体六自由度、双手刚性握持、骨盆座椅铰链，以及每物理子步更新的 Warp 水动力。Actor 使用 121 帧机载历史和 24 维 latent；Critic 增加不含世界位置的 27 维特权观测。
+训练入口和安装说明见 [TRAINING_MJLAB.md](TRAINING_MJLAB.md)。实现 H2 非头部 29 关节策略、头部固定目标 PD、船体六自由度、双手刚性握持、骨盆座椅铰链，以及每物理子步更新的 Warp 水动力。Actor 使用 125 帧机载历史和 24 维 latent；Critic 增加不含世界位置的 27 维特权观测。
 
 ```bash
 python -m pip install -r requirements-training.txt

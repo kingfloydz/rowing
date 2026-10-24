@@ -11,6 +11,7 @@ from mjlab.sensor import ContactSensorCfg, ContactMatch
 from mjlab.utils.noise import UniformNoiseCfg
 from .asset import entity_cfg
 from . import mdp
+from .networks import SEQUENCE_LENGTH
 
 
 def env_cfg(num_envs=2048,play=False):
@@ -31,7 +32,7 @@ def env_cfg(num_envs=2048,play=False):
                     noise=UniformNoiseCfg(n_min=-0.01,n_max=0.01)),
                 'action':ObservationTermCfg(func=mdp.last_action),
                 'command':ObservationTermCfg(func=mdp.onboard_command),
-            },history_length=122,flatten_history_dim=False,enable_corruption=not play),
+            },history_length=SEQUENCE_LENGTH,flatten_history_dim=False,enable_corruption=not play),
             'privileged':ObservationGroupCfg(terms={'state':ObservationTermCfg(func=mdp.privileged)},
                                              enable_corruption=False),
         },

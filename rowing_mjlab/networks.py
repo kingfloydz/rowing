@@ -1,4 +1,4 @@
-"""Causal residual TCN structure from kingfloydz/head_transport, extended to 121/24.
+"""Causal residual TCN structure from kingfloydz/head_transport, extended to 125/24.
 
 Actor consumes onboard history only. Critic has its own encoder/normalizers and
 27 current privileged features; no world position is consumed by either model.
@@ -10,7 +10,7 @@ from torch.nn import functional as F
 from rsl_rl.models import MLPModel
 from rsl_rl.modules import EmpiricalNormalization
 
-HISTORY_LENGTH = 121
+HISTORY_LENGTH = 125
 SEQUENCE_LENGTH = HISTORY_LENGTH+1
 LATENT_DIM = 24
 PRIVILEGED_DIM = 27
@@ -43,7 +43,7 @@ class TemporalModel(MLPModel):
     def _get_obs_dim(self,obs,obs_groups,obs_set):
         self.privileged = obs_set == 'critic'
         if obs['actor'].shape[-2] != SEQUENCE_LENGTH:
-            raise ValueError('Expected 121 past frames plus the current frame')
+            raise ValueError('Expected 125 past frames plus the current frame')
         if self.privileged and obs['privileged'].shape[-1] != PRIVILEGED_DIM:
             raise ValueError('Critic requires exactly 27 privileged scalars')
         return ['actor'],obs['actor'].shape[-1]
