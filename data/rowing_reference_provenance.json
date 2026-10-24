@@ -1,0 +1,8 @@
+{
+  "source_url": "https://ojs.ub.uni-konstanz.de/cpa/article/download/6500/5867",
+  "source_sha256": "199b8f380f0432aa29add1d1eeadbf357b72d1c4f52dd68feb9c1437a272e914",
+  "description": "Digitized RowIMU single-oar curves mirrored, retargeted to this CAD with -6 degree shaft elevation offset. Not measured bilateral motion.",
+  "period_s": 2.3076923076923075,
+  "units": "rad",
+  "water_level_m_at_repository_reset": -0.12027640288595698
+}

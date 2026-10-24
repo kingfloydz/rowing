@@ -1,0 +1,177 @@
+"""mjlab action, observation, reward, reset and startup terms."""
+from dataclasses import dataclass
+import json
+import torch
+import warp as wp
+from mjlab.managers.action_manager import ActionTerm, ActionTermCfg
+from hydrodynamics.models import ROOT
+from .asset import OAR_NAMES, h2_names
+from .hydro import WarpHydrodynamics
+from .reference import OarReference
+
+
+class RowingState:
+    def __init__(self,env):
+        self.env = env
+        model = env.sim.mj_model
+        device = env.device
+        self.h2_names = h2_names()
+        self.policy_names = tuple(n for n in self.h2_names if not n.startswith('head_'))
+        def joints(names,field):
+            return torch.tensor([getattr(model,field)[model.joint('rowing/'+n).id]
+                                 for n in names],device=device,dtype=torch.long)
+        self.h2_q = joints(self.h2_names,'jnt_qposadr')
+        self.h2_v = joints(self.h2_names,'jnt_dofadr')
+        self.policy_q = joints(self.policy_names,'jnt_qposadr')
+        self.policy_v = joints(self.policy_names,'jnt_dofadr')
+        self.oar_q = joints(OAR_NAMES,'jnt_qposadr')
+        self.boat = int(model.body('rowing/boat').id)
+        self.imu = int(model.body('rowing/imu_in_pelvis').id)
+        self.q0 = torch.tensor(model.qpos0.copy(),device=device,dtype=torch.float32)
+        self.controlled_local = torch.tensor([self.h2_names.index(n) for n in self.policy_names],device=device)
+        joint_ids = [model.joint('rowing/'+n).id for n in self.h2_names]
+        policy_ids = [model.joint('rowing/'+n).id for n in self.policy_names]
+        self.limits = torch.tensor(model.jnt_range[joint_ids].copy(),device=device,dtype=torch.float32)
+        self.torque_limits = torch.tensor(model.jnt_actfrcrange[policy_ids,1].copy(),device=device,dtype=torch.float32)
+        self.ref = OarReference(device)
+        self.initial_oars = self.q0[self.oar_q]
+        self.phase0 = self.ref.nearest(self.initial_oars)
+        self.hydro = WarpHydrodynamics(model,env.num_envs,device,prefix='rowing/')
+        provenance = json.loads((ROOT/'data/rowing_reference_provenance.json').read_text())
+        wp.to_torch(self.hydro.water)[:,0] = provenance['water_level_m_at_repository_reset']
+        self.loads = wp.to_torch(self.hydro.loads)
+        # Resolve entity-local indices independently from model joint order.
+        entity = env.scene['rowing']
+        self.entity_joint_ids,_ = entity.find_joints(self.h2_names,preserve_order=True)
+
+    def reference(self):
+        return self.ref.target(self.env.episode_length_buf*self.env.step_dt,self.phase0,self.initial_oars)
+
+
+@dataclass(kw_only=True)
+class RowingActionCfg(ActionTermCfg):
+    scale: float = 1.0  # Fraction of available joint travel on each side of q0.
+
+    def build(self,env):
+        return RowingAction(self,env)
+
+
+class RowingAction(ActionTerm):
+    def __init__(self,cfg,env):
+        super().__init__(cfg,env)
+        env.rowing = RowingState(env)
+        self.state = env.rowing
+        self._raw = torch.zeros(env.num_envs,self.action_dim,device=env.device)
+        self.targets = self.state.q0[self.state.h2_q].expand(env.num_envs,-1).clone()
+
+    @property
+    def action_dim(self):
+        return len(self.state.policy_names) if hasattr(self,'state') else 29
+
+    @property
+    def raw_action(self):
+        return self._raw
+
+    def process_actions(self,actions):
+        self._raw.copy_(actions)
+        s = self.state
+        a = actions.clamp(-1,1)*self.cfg.scale
+        q0 = s.q0[s.policy_q]
+        limits = s.limits[s.controlled_local]
+        travel = torch.where(a >= 0,limits[:,1]-q0,q0-limits[:,0])
+        self.targets[:,s.controlled_local] = q0+a*travel
+        self.targets.clamp_(s.limits[:,0],s.limits[:,1])
+        # Head columns retain the repository target; no policy action reaches them.
+
+    def apply_actions(self):
+        self._entity.set_joint_position_target(self.targets,joint_ids=self.state.entity_joint_ids)
+
+    def reset(self,env_ids=None):
+        ids = slice(None) if env_ids is None else env_ids
+        self._raw[ids] = 0
+        self.targets[ids] = self.state.q0[self.state.h2_q]
+
+
+def install_hydrodynamics(env,env_ids=None):
+    if env.sim.wp_model.callback.control is not None:
+        raise RuntimeError('A control callback already exists; do not silently replace it')
+    env.sim.wp_model.callback.control = env.rowing.hydro
+    wp.load_module(module='rowing_mjlab.hydro',device=env.device)
+    # Re-capture so step AND forward graphs include current-state hydrodynamics.
+    env.sim.create_graph()
+
+
+def onboard_proprio(env):
+    s,d = env.rowing,env.sim.data
+    rotation = d.xmat[:,s.imu].reshape(-1,3,3)
+    gyro = torch.bmm(rotation.transpose(1,2),d.cvel[:,s.imu,:3,None]).squeeze(-1)
+    gravity = -rotation[:,2,:]
+    return torch.cat((d.qpos[:,s.h2_q]-s.q0[s.h2_q],d.qvel[:,s.h2_v],gyro,gravity),dim=-1)
+
+
+def onboard_command(env):
+    phase,rate,blend,target = env.rowing.reference()
+    return torch.cat((torch.sin(2*torch.pi*phase)[:,None],torch.cos(2*torch.pi*phase)[:,None],
+                      rate[:,None],target,blend[:,None]),dim=-1)
+
+
+def last_action(env):
+    return env.action_manager.action
+
+
+def privileged(env):
+    s,d = env.rowing,env.sim.data
+    rotation = d.xmat[:,s.boat].reshape(-1,3,3)
+    cv = d.cvel[:,s.boat]
+    # cvel translation is at root subtree COM; move to boat body COM.
+    v = cv[:,3:]+torch.cross(cv[:,:3],d.xipos[:,s.boat]-d.subtree_com[:,s.boat],dim=-1)
+    local_v = torch.bmm(rotation.transpose(1,2),v[...,None]).squeeze(-1)
+    return torch.cat((local_v,s.loads.flatten(1),d.qpos[:,s.oar_q]),dim=-1)
+
+
+def track_oars(env):
+    s = env.rowing
+    target = s.reference()[-1]
+    error = ((env.sim.data.qpos[:,s.oar_q]-target)/s.ref.sigma).reshape(-1,2,3)
+    scores = torch.exp(-error.square().mean(1))
+    return 0.40*scores[:,0]+0.35*scores[:,1]+0.25*scores[:,2]
+
+
+def joint_velocity_cost(env):
+    return (env.sim.data.qvel[:,env.rowing.policy_v]/10.0).square().mean(-1)
+
+
+def joint_torque_cost(env):
+    s = env.rowing
+    return (env.sim.data.qfrc_actuator[:,s.policy_v]/s.torque_limits).square().mean(-1)
+
+
+def action_rate_cost(env):
+    return (env.action_manager.action-env.action_manager.prev_action).square().mean(-1)
+
+
+def collision_cost(env):
+    found = env.scene['forbidden_contact'].data.found
+    return found.reshape(env.num_envs,-1).any(-1).float()
+
+
+def capsized(env):
+    # Use current root qpos, not pre-integration xmat, for the hard 60-degree limit.
+    q = env.sim.data.qpos[:,3:7]  # wxyz, boat is the sole free root
+    w,x,y,z = q.unbind(-1)
+    roll = torch.atan2(2*(w*x+y*z),1-2*(x*x+y*y))
+    return roll.abs() > torch.pi/3
+
+
+def invalid_state(env):
+    return ~(torch.isfinite(env.sim.data.qpos).all(-1)&torch.isfinite(env.sim.data.qvel).all(-1))
+
+
+def tracking_rmse_deg(env):
+    s = env.rowing
+    return torch.rad2deg((env.sim.data.qpos[:,s.oar_q]-s.reference()[-1]).square().mean(-1).sqrt())
+
+
+def torque_saturation(env):
+    s = env.rowing
+    return (env.sim.data.qfrc_actuator[:,s.policy_v].abs() >= .98*s.torque_limits).float().mean(-1)

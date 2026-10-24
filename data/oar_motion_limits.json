@@ -1,0 +1,122 @@
+{
+  "kind": "Engineering simulation limits; not measured hardware stops",
+  "physical_angles_deg": {
+    "sweep": [
+      -80.0,
+      50.0
+    ],
+    "elevation": [
+      -25.0,
+      10.0
+    ],
+    "feather": [
+      -10.0,
+      110.0
+    ]
+  },
+  "joint_margin_deg": 2.0,
+  "rounding_deg": 5.0,
+  "basis": {
+    "sweep": "World Rowing 2020 practical rigging: experienced sculling catch 55-72+ deg, finish 40-45 deg. -80..50 is a chosen margin, not a quoted hard stop.",
+    "elevation": "RowIMU Fig6 trajectory plus initial user-selected -8deg offset, subsequently adjusted to -6deg; same envelope retained, expanded to -25..10. Engineering envelope, not manufacturer data.",
+    "feather": "RowIMU Fig7 covers feathered (~0) to squared (~90+) blade; -10..110 is chosen clearance, not a manufacturer stop."
+  },
+  "sources": [
+    "https://worldrowing.com/wp-content/uploads/2020/10/Practical-Boat-Rigging-Gianni-Postilione-Conny-Draper.pdf",
+    "https://ojs.ub.uni-konstanz.de/cpa/article/view/6500/5867"
+  ],
+  "caveat": "Box bounds enclose sampled physical orientations. Independent joint limits do not enforce the exact physical-angle envelope or guarantee robot reachability/collision clearance.",
+  "mapping": "MuJoCo forward kinematics includes body quaternions, axes and ref; initial assembly pose is retained.",
+  "joints": {
+    "port_sweep": {
+      "range_deg": [
+        -40.0,
+        100.0
+      ],
+      "range_rad": [
+        -0.6981317007977318,
+        1.7453292519943295
+      ],
+      "sampled_min_max_deg": [
+        -34.99999999803137,
+        95.00000000197976
+      ],
+      "orientation_error_max_rad": 8.510467700414534e-16
+    },
+    "port_elevation": {
+      "range_deg": [
+        -10.0,
+        30.0
+      ],
+      "range_rad": [
+        -0.17453292519943295,
+        0.5235987755982988
+      ],
+      "sampled_min_max_deg": [
+        -7.000000004642621,
+        27.99999999535746
+      ],
+      "orientation_error_max_rad": 8.510467700414534e-16
+    },
+    "port_feather": {
+      "range_deg": [
+        -25.0,
+        105.0
+      ],
+      "range_rad": [
+        -0.4363323129985824,
+        1.8325957145940461
+      ],
+      "sampled_min_max_deg": [
+        -20.00000000002891,
+        99.99999999997289
+      ],
+      "orientation_error_max_rad": 8.510467700414534e-16
+    },
+    "starboard_sweep": {
+      "range_deg": [
+        -100.0,
+        40.0
+      ],
+      "range_rad": [
+        -1.7453292519943295,
+        0.6981317007977318
+      ],
+      "sampled_min_max_deg": [
+        -95.00000000510795,
+        34.99999999489298
+      ],
+      "orientation_error_max_rad": 7.346021541990297e-16
+    },
+    "starboard_elevation": {
+      "range_deg": [
+        -30.0,
+        10.0
+      ],
+      "range_rad": [
+        -0.5235987755982988,
+        0.17453292519943295
+      ],
+      "sampled_min_max_deg": [
+        -27.999999995487315,
+        7.000000004512853
+      ],
+      "orientation_error_max_rad": 7.346021541990297e-16
+    },
+    "starboard_feather": {
+      "range_deg": [
+        -25.0,
+        105.0
+      ],
+      "range_rad": [
+        -0.4363323129985824,
+        1.8325957145940461
+      ],
+      "sampled_min_max_deg": [
+        -19.99999999999867,
+        100.00000000000145
+      ],
+      "orientation_error_max_rad": 7.346021541990297e-16
+    }
+  }
+}
