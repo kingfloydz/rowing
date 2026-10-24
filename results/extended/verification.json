@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-24",
+  "pytest": "12 passed",
+  "pytest_last_runtime_s": 4.45,
+  "original_xml_mesh_diff": "empty",
+  "report_local_links_exist": true,
+  "comparison_figures_visually_checked": 6,
+  "published_regression_joint_support_guard": "passed"
+}

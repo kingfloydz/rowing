@@ -1,0 +1,10 @@
+{
+  "steps": 50,
+  "sim_time_s": 0.10000000000000007,
+  "wall_time_s": 1.1518937000073493,
+  "max_implicit_residual_N": 8.6529894360865e-11,
+  "finite_state": true,
+  "blade_model": "caplan_flat",
+  "added_mass_rotation": true,
+  "note": "CPU reference; 0.1 s numerical check, not validation of sustained rowing or experimental force accuracy."
+}

@@ -1,0 +1,78 @@
+{
+  "profile": "training_0_4_m_s",
+  "validated_for_current_CAD": false,
+  "nominal": {
+    "friction_scale": 1.0,
+    "residual_scale": 1.0,
+    "residual_tilt": 0.0,
+    "high_fn_power": 2.0,
+    "hull_crossflow_cd": 1.0,
+    "blade_cd_max": 2.0,
+    "blade_cl_max": 0.9,
+    "blade_skin_cd": 0.01,
+    "blade_scale": 1.0,
+    "normal_blend": 0.5,
+    "fin_efficiency": 0.8,
+    "fin_normal_cd": 1.2,
+    "viscosity": 1e-06
+  },
+  "episode_ranges": {
+    "friction_scale": [
+      0.8,
+      1.2
+    ],
+    "residual_scale": [
+      0.5,
+      2.0
+    ],
+    "residual_tilt": [
+      -0.3,
+      0.3
+    ],
+    "high_fn_power": [
+      0.0,
+      4.0
+    ],
+    "hull_crossflow_cd": [
+      0.6,
+      1.6
+    ],
+    "blade_cd_max": [
+      1.5,
+      2.5
+    ],
+    "blade_cl_max": [
+      0.6,
+      1.2
+    ],
+    "blade_skin_cd": [
+      0.005,
+      0.025
+    ],
+    "blade_scale": [
+      0.8,
+      1.2
+    ],
+    "normal_blend": [
+      0.0,
+      1.0
+    ],
+    "fin_efficiency": [
+      0.6,
+      0.95
+    ],
+    "fin_normal_cd": [
+      0.8,
+      1.8
+    ],
+    "viscosity": [
+      8e-07,
+      1.3e-06
+    ]
+  },
+  "interpretation": "Engineering priors, not empirical confidence intervals",
+  "target_speed_m_s": [
+    0,
+    4
+  ]
+}

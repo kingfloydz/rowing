@@ -1,0 +1,152 @@
+{
+  "hydrostatic_trim": {
+    "pose_z_roll_pitch_SI": [
+      0.11938471737212325,
+      0.015806565687192426,
+      4.673750587719023e-05
+    ],
+    "roll_pitch_deg": [
+      0.9056495024724298,
+      0.002677861831730881
+    ],
+    "residual_Fz_Mroll_Mpitch_SI": [
+      -5.356448617988008e-11,
+      -2.0238923842813523e-11,
+      9.08162434143378e-13
+    ],
+    "stiffness_coordinates": [
+      "heave_m",
+      "roll_rad",
+      "pitch_rad"
+    ],
+    "stiffness_matrix": [
+      [
+        12415.571773021948,
+        19.40492368668334,
+        -927.2768265920827
+      ],
+      [
+        19.404923682963933,
+        -332.0851634661297,
+        0.003320179061486167
+      ],
+      [
+        -927.2768542383013,
+        0.003320153285635285,
+        27996.131337337603
+      ]
+    ],
+    "stiffness_antisymmetry_max": 2.7646218654808763e-05,
+    "stiffness_step_difference_max": 0.00022322905715554953,
+    "heave_relaxed_rotational_stiffness_Nm": [
+      [
+        -332.11549240064016,
+        1.4526079268959682
+      ],
+      [
+        1.4526079446075775,
+        27926.876183045093
+      ]
+    ],
+    "rotational_stiffness_eigenvalues_Nm": [
+      -332.1155670696104,
+      27926.876257714066
+    ],
+    "locally_hydrostatically_stable_at_fixed_posture": false,
+    "limitations": [
+      "fixed robot and oar posture, not actively balanced",
+      "same separate closed CAD components; overlap union not resolved",
+      "flat-water hydrostatics only; shaft/fin displacement omitted",
+      "no experimental trim or stability validation"
+    ],
+    "total_mass_kg": 92.3764016049845
+  },
+  "support": {
+    "CAD_reference_wet_length_m": 5.877656847856297,
+    "source_Fn_range": [
+      0.21046632530886236,
+      0.4537882534374341
+    ],
+    "same_Fn_speed_range_m_s": [
+      1.5981562434931307,
+      3.4457984164003483
+    ],
+    "note": "Fn overlap alone does not validate transfer to this CAD geometry. Frequency scenarios are not observed motions."
+  },
+  "balanced_experiment_metrics": [
+    {
+      "study": "Grift2019_transfer",
+      "scope": "full_window",
+      "model": "history_2026_transfer",
+      "n_conditions": 11,
+      "equal_condition_mean_rmse_N": 0.4808236037268727,
+      "equal_condition_rms_rmse_N": 0.4931446302365486,
+      "pooled_rmse_N": 0.49314463023654853
+    },
+    {
+      "study": "Grift2019_transfer",
+      "scope": "full_window",
+      "model": "inviscid_added_mass",
+      "n_conditions": 11,
+      "equal_condition_mean_rmse_N": 0.47714525607426955,
+      "equal_condition_rms_rmse_N": 0.48565059379043046,
+      "pooled_rmse_N": 0.48565059379043046
+    },
+    {
+      "study": "Grift2019_transfer",
+      "scope": "acceleration_core",
+      "model": "history_2026_transfer",
+      "n_conditions": 11,
+      "equal_condition_mean_rmse_N": 0.43153142185962795,
+      "equal_condition_rms_rmse_N": 0.47153063724969674,
+      "pooled_rmse_N": 0.35856187422075636
+    },
+    {
+      "study": "Grift2019_transfer",
+      "scope": "acceleration_core",
+      "model": "inviscid_added_mass",
+      "n_conditions": 11,
+      "equal_condition_mean_rmse_N": 0.3779212265700252,
+      "equal_condition_rms_rmse_N": 0.42304251205859555,
+      "pooled_rmse_N": 0.5042299218173648
+    }
+  ],
+  "scoped_reference_revalidation": [
+    {
+      "study": "Day2011",
+      "quantity": "resistance_N",
+      "n": 6,
+      "rmse": 0.12567921293851345,
+      "max_change_from_previous_prediction": 7.105427357601002e-15
+    },
+    {
+      "study": "Grift2019",
+      "quantity": "Cd",
+      "n": 60,
+      "rmse": 0.03533877409161933,
+      "max_change_from_previous_prediction": 2.220446049250313e-16
+    },
+    {
+      "study": "Caplan2007",
+      "quantity": "Cd",
+      "n": 17,
+      "rmse": 0.03090388854192156,
+      "max_change_from_previous_prediction": 6.661338147750939e-16
+    },
+    {
+      "study": "Caplan2007",
+      "quantity": "Cl",
+      "n": 17,
+      "rmse": 0.023775104776794714,
+      "max_change_from_previous_prediction": 2.220446049250313e-16
+    },
+    {
+      "study": "Reijtenbagh2026",
+      "quantity": "excess_force_N",
+      "n": 4844,
+      "rmse": 0.48343218819072076,
+      "max_change_from_previous_prediction": 3.1530333899354446e-14
+    }
+  ],
+  "no_experimental_parameters_refitted": true
+}

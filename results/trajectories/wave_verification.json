@@ -1,0 +1,126 @@
+{
+  "steady_maximum_fn": 0.5520542648247401,
+  "n_experimental_points": 99,
+  "n_clipped": 1,
+  "formula_curve_audit": [
+    {
+      "fn": 0.3,
+      "n": 159,
+      "published_theory_curve_rmse": 0.9863793260301607
+    },
+    {
+      "fn": 0.57,
+      "n": 186,
+      "published_theory_curve_rmse": 0.09910373765178777
+    }
+  ],
+  "note": "Appendix E calculation does not exactly reproduce the plotted theory, particularly Fn0.3. Cause unresolved. No quantitative CFD-level accuracy claim.",
+  "response_table_scope": "Only geometrically similar Dode NACA0017 hulls at the two measured Fn; no extrapolation, no transfer to rowing CAD.",
+  "metrics": [
+    {
+      "subset": "all_visible",
+      "model": "qs_prediction",
+      "n": 98,
+      "a0_rmse": 1.1108981381290775,
+      "normalized_wave_increment_rmse": 0.05863461524585765
+    },
+    {
+      "subset": "all_visible",
+      "model": "equation_prediction",
+      "n": 98,
+      "a0_rmse": 1.3249568973705872,
+      "normalized_wave_increment_rmse": 0.0787609530440635
+    },
+    {
+      "subset": "all_visible",
+      "model": "response_table_prediction",
+      "n": 92,
+      "a0_rmse": 0.7266079616553844,
+      "normalized_wave_increment_rmse": 0.015322665456588993
+    },
+    {
+      "subset": "heldout_visible",
+      "model": "qs_prediction",
+      "n": 74,
+      "a0_rmse": 1.1494806231416554,
+      "normalized_wave_increment_rmse": 0.05085999606479245
+    },
+    {
+      "subset": "heldout_visible",
+      "model": "equation_prediction",
+      "n": 74,
+      "a0_rmse": 1.3998134455669116,
+      "normalized_wave_increment_rmse": 0.08178845304557095
+    },
+    {
+      "subset": "heldout_visible",
+      "model": "response_table_prediction",
+      "n": 68,
+      "a0_rmse": 0.8451613138275761,
+      "normalized_wave_increment_rmse": 0.017822711492353774
+    },
+    {
+      "subset": "heldout_eps_ge_20",
+      "model": "qs_prediction",
+      "n": 49,
+      "a0_rmse": 0.9966846393901554,
+      "normalized_wave_increment_rmse": 0.06169520239037804
+    },
+    {
+      "subset": "heldout_eps_ge_20",
+      "model": "equation_prediction",
+      "n": 49,
+      "a0_rmse": 1.3065323729982397,
+      "normalized_wave_increment_rmse": 0.099885268315048
+    },
+    {
+      "subset": "heldout_eps_ge_20",
+      "model": "response_table_prediction",
+      "n": 44,
+      "a0_rmse": 0.38408661618063217,
+      "normalized_wave_increment_rmse": 0.019881472752088156
+    },
+    {
+      "subset": "heldout_hull_B",
+      "model": "qs_prediction",
+      "n": 13,
+      "a0_rmse": 0.6936964578320628,
+      "normalized_wave_increment_rmse": 0.06243268120488564
+    },
+    {
+      "subset": "heldout_hull_B",
+      "model": "equation_prediction",
+      "n": 13,
+      "a0_rmse": 1.4803152007821514,
+      "normalized_wave_increment_rmse": 0.13322836807039362
+    },
+    {
+      "subset": "heldout_hull_B",
+      "model": "response_table_prediction",
+      "n": 9,
+      "a0_rmse": 0.2453531766533312,
+      "normalized_wave_increment_rmse": 0.02208178589879981
+    },
+    {
+      "subset": "common_holdout_support",
+      "model": "qs_prediction",
+      "n": 68,
+      "a0_rmse": 1.1863628331152445,
+      "normalized_wave_increment_rmse": 0.05069421334597143
+    },
+    {
+      "subset": "common_holdout_support",
+      "model": "equation_prediction",
+      "n": 68,
+      "a0_rmse": 1.4298124748963716,
+      "normalized_wave_increment_rmse": 0.0813306061336087
+    },
+    {
+      "subset": "common_holdout_support",
+      "model": "response_table_prediction",
+      "n": 68,
+      "a0_rmse": 0.8451613138275761,
+      "normalized_wave_increment_rmse": 0.017822711492353774
+    }
+  ]
+}

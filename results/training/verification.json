@@ -1,0 +1,144 @@
+{
+  "target_speed_m_s": [
+    0,
+    4
+  ],
+  "geometry_source": "results/scene_audit.json",
+  "robot": "H2 + Dex1, not final G1",
+  "length_m": 5.877656847856297,
+  "wetted_area_m2": 2.367059515063472,
+  "day_Fn_mapped_speed_m_s": [
+    1.5981562434931307,
+    3.4457984164003483
+  ],
+  "nominal_parameters": {
+    "friction_scale": 1.0,
+    "residual_scale": 1.0,
+    "residual_tilt": 0.0,
+    "high_fn_power": 2.0,
+    "hull_crossflow_cd": 1.0,
+    "blade_cd_max": 2.0,
+    "blade_cl_max": 0.9,
+    "blade_skin_cd": 0.01,
+    "blade_scale": 1.0,
+    "normal_blend": 0.5,
+    "fin_efficiency": 0.8,
+    "fin_normal_cd": 1.2,
+    "viscosity": 1e-06
+  },
+  "randomization_ranges": {
+    "friction_scale": [
+      0.8,
+      1.2
+    ],
+    "residual_scale": [
+      0.5,
+      2.0
+    ],
+    "residual_tilt": [
+      -0.3,
+      0.3
+    ],
+    "high_fn_power": [
+      0.0,
+      4.0
+    ],
+    "hull_crossflow_cd": [
+      0.6,
+      1.6
+    ],
+    "blade_cd_max": [
+      1.5,
+      2.5
+    ],
+    "blade_cl_max": [
+      0.6,
+      1.2
+    ],
+    "blade_skin_cd": [
+      0.005,
+      0.025
+    ],
+    "blade_scale": [
+      0.8,
+      1.2
+    ],
+    "normal_blend": [
+      0.0,
+      1.0
+    ],
+    "fin_efficiency": [
+      0.6,
+      0.95
+    ],
+    "fin_normal_cd": [
+      0.8,
+      1.8
+    ],
+    "viscosity": [
+      8e-07,
+      1.3e-06
+    ]
+  },
+  "randomization_interpretation": "Engineering priors, NOT confidence bounds",
+  "samples": 512,
+  "current_CAD_experimental_validation": false,
+  "rows": [
+    {
+      "speed_m_s": 0,
+      "nominal_N": 0.0,
+      "friction_N": 0.0,
+      "residual_N": 0.0,
+      "prior_p05_N": 0.0,
+      "prior_p95_N": 0.0
+    },
+    {
+      "speed_m_s": 0.5,
+      "nominal_N": 1.1336621221125993,
+      "friction_N": 1.124865940811121,
+      "residual_N": 0.008796181301478448,
+      "prior_p05_N": 0.934964226100759,
+      "prior_p95_N": 1.347052164923028
+    },
+    {
+      "speed_m_s": 1,
+      "nominal_N": 4.094800309560537,
+      "friction_N": 3.9493817713482775,
+      "residual_N": 0.14541853821225995,
+      "prior_p05_N": 3.3927473953042435,
+      "prior_p95_N": 4.87501754923309
+    },
+    {
+      "speed_m_s": 2,
+      "nominal_N": 14.89293299022514,
+      "friction_N": 13.977352065889901,
+      "residual_N": 0.9155809243352387,
+      "prior_p05_N": 12.318958069658763,
+      "prior_p95_N": 17.74001871974113
+    },
+    {
+      "speed_m_s": 3,
+      "nominal_N": 35.197288705752285,
+      "friction_N": 29.373317914282637,
+      "residual_N": 5.82397079146965,
+      "prior_p05_N": 28.7721501254069,
+      "prior_p95_N": 43.25777940660856
+    },
+    {
+      "speed_m_s": 3.5,
+      "nominal_N": 46.59717071607613,
+      "friction_N": 38.97919841211103,
+      "residual_N": 7.617972303965091,
+      "prior_p05_N": 38.13271179487049,
+      "prior_p95_N": 57.21655063377277
+    },
+    {
+      "speed_m_s": 4,
+      "nominal_N": 60.45269266067794,
+      "friction_N": 49.8181857670902,
+      "residual_N": 10.634506893587735,
+      "prior_p05_N": 49.855191516121636,
+      "prior_p95_N": 75.51728900918327
+    }
+  ]
+}

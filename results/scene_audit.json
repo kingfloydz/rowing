@@ -1,0 +1,87 @@
+{
+  "repository_commit": "aaa31478ccb7eac62993865e3c4aac64313eeccf",
+  "robot": "H2 + Dex1 (not G1)",
+  "nq": 46,
+  "nv": 45,
+  "nu": 0,
+  "total_mass_kg": 92.3764016049845,
+  "water_level_world_z_m": 0,
+  "level_pose_heave_m": 0.11939430382011769,
+  "draft_m": 0.1127665177369273,
+  "waterline_length_m": 5.877656847856297,
+  "hull_wetted_area_m2": 2.367059515063472,
+  "total_buoyancy_N": 906.2124997448511,
+  "weight_N": 906.212499744898,
+  "heave_balance_error_N": -4.6838977141305804e-11,
+  "buoyancy_moment_about_system_com_Nm": [
+    -5.249518366951769,
+    1.3293929319498872,
+    1.7702684535890157e-14
+  ],
+  "system_com_m": [
+    0.004071184460874451,
+    0.005957995749335571,
+    0.42184165015361585
+  ],
+  "surge_speed_m_s": [
+    1.0,
+    2.0,
+    3.0,
+    4.0
+  ],
+  "transferred_hull_resistance_N": [
+    3.9781797661866065,
+    14.89293299022514,
+    35.197288705752285,
+    59.9160367152838
+  ],
+  "geometry": {
+    "hull": {
+      "closed_components": 2,
+      "omitted_faces": 1,
+      "enclosed_volume_m3": 0.24288170370221723,
+      "bounds_m": [
+        [
+          -3.073474407196045,
+          -0.22270219027996063,
+          -0.23216082155704498
+        ],
+        [
+          3.3056728839874268,
+          0.22291192412376404,
+          0.05346120521426201
+        ]
+      ]
+    },
+    "blades": {
+      "port": {
+        "area_m2": 0.07558129232393829,
+        "span_m": 0.4810737371444702,
+        "equivalent_chord_m": 0.15710957902746753,
+        "max_vertical_chord_m": 0.20060280710458755,
+        "thickness_m": 0.0030000002589076757
+      },
+      "starboard": {
+        "area_m2": 0.07558129232393829,
+        "span_m": 0.4810737371444702,
+        "equivalent_chord_m": 0.15710957902746753,
+        "max_vertical_chord_m": 0.20060280710458755,
+        "thickness_m": 0.0030000002589076757
+      }
+    }
+  },
+  "warning": "Heave balance at original level attitude only, not full trim/roll equilibrium. CAD hull transfer is unvalidated.",
+  "smoke_run": {
+    "steps": 50,
+    "sim_time_s": 0.10000000000000007,
+    "wall_time_s": 0.5590808000124525,
+    "max_implicit_added_mass_residual_N": 1.9412027540965937e-11,
+    "final_boat_position_m": [
+      0.09625254150426221,
+      -0.0010079780246957104,
+      0.1342684455936596
+    ],
+    "finite_state": true,
+    "meaning": "Short numerical integration check, not controller or long-term stability validation."
+  }
+}

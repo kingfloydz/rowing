@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-24",
+  "pytest": "35 passed",
+  "pytest_runtime_s": 4.13,
+  "new_tests": 15,
+  "original_tests": 20,
+  "reference_revalidation": "5 quantities; no refit; max prediction change < 1e-10",
+  "source_XML_STL_diff": "empty",
+  "git_diff_check": "passed",
+  "compileall": "passed",
+  "trim_curve_visually_checked": true,
+  "source_hashes": {
+    "hydrodynamics/core.py": "74efc36921aab62e281b70e778019b0644b5c1e6ca1e6674f1ff75737489f189",
+    "hydrodynamics/reference_models.py": "614cebb8728ee78ea874e7489113691f208bb9d4c149d9a14ac0d06074d6f031",
+    "hydrodynamics/mujoco_adapter.py": "57e48e057ecc384449bbec3b28ede92129feeff200b7bbe12c50a76ba5bcf04e",
+    "tests/test_core_hydrodynamics.py": "607a5882795e3f11a4478a9d4f7a12e0196a3c1aa3fb9b0879daa074de8b63f1",
+    "tools/check_core_hydrodynamics.py": "006c6537a574249d3df1f619ff7322a26a19f52c86dc9cf9a35114ae1558cf0a",
+    "HYDRODYNAMICS_CORE.md": "ddcbdef93c343d0bb8b77e49b1a13276d72caba15c3afbb0b81f3cc21ed0cf73",
+    "data/core_model_registry.json": "9b0877f927cf984d2632ab4c4dd8e55d21482638d445b5da836aa3b80b41fba5"
+  },
+  "scope": "Mechanics and reference-domain verification, not full CAD fluid validation"
+}

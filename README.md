@@ -2,6 +2,25 @@
 
 包含最新的 H2、Dex1 夹爪、滑座、船体与双桨模型及所需 STL。单位为米、千克、秒，角度为弧度。
 
+## 0–4 m/s 训练近似入口（2026-10-24）
+
+新增可执行的低阶训练模型，见 [HYDRODYNAMICS_TRAINING.md](HYDRODYNAMICS_TRAINING.md)。使用 `TrainingRowingHydrodynamics`，支持低速/高 Fn 连续延拓、按回合域随机化、船体横流、尾鳍与分布桨叶载荷。该模型未对当前 CAD 标定，不代表真实流体载荷上界；保留严格实验参考和旧场景适配器供对照。
+
+结果位于 `results/training/`，包含船阻先验范围与真实轨迹桨叶力律的无重拟合对比。当前场景仍是 H2+Dex1，不是最终 G1，且未配置驱动器或训练策略。
+
+## 水动力研究入口（2026-10-24）
+
+当前推荐的模型组织、理论依据、适用条件及未闭合部分见 [HYDRODYNAMICS_CORE.md](HYDRODYNAMICS_CORE.md)。其中区分了通用力学内核、限定几何/运动的实验参考与研究候选；尚不存在对当前 CAD 全部运动已验证的水动力模型。
+
+`hydrodynamics/core.py` 和 `hydrodynamics/reference_models.py` 提供新的理论及参考入口。历史 `RowingHydrodynamics` 场景适配器保留用于复现实验，明确标记为探索模型，不能据其数值稳定宣称物理精度。XML/STL 未因本轮水动力整理而改动。
+
+```bash
+python -m pytest -q
+python tools/check_core_hydrodynamics.py
+```
+
+新结果位于 `results/core/`。现有几何与固定机器人姿态下的浮态计算出现负横摇恢复刚度；这是需要核验几何、重心及主动平衡的计算结果，不是实物稳定性测量。
+
 ## 运行
 
 ```bash

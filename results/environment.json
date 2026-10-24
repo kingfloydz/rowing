@@ -1,0 +1,16 @@
+{
+  "python": "3.12.4 (tags/v3.12.4:8e8a4ba, Jun  6 2024, 19:30:16) [MSC v.1940 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "numpy": "2.5.2",
+    "scipy": "1.18.0",
+    "pandas": "2.2.2",
+    "matplotlib": "3.9.1",
+    "mujoco": "3.11.0",
+    "trimesh": "4.12.2",
+    "shapely": "2.1.1",
+    "pytest": "9.1.1"
+  },
+  "tests": "python -m pytest tests/test_hydrodynamics.py -q: 7 passed",
+  "extraction_note": "PDF extraction was run separately with bundled Python + pdfplumber/Pillow. Comparisons use the versioned CSV files."
+}

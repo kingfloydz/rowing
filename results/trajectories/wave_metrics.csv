@@ -1,0 +1,16 @@
+subset,model,n,a0_rmse,normalized_wave_increment_rmse
+all_visible,qs_prediction,98,1.1108981381290775,0.05863461524585765
+all_visible,equation_prediction,98,1.3249568973705872,0.0787609530440635
+all_visible,response_table_prediction,92,0.7266079616553844,0.015322665456588993
+heldout_visible,qs_prediction,74,1.1494806231416554,0.05085999606479245
+heldout_visible,equation_prediction,74,1.3998134455669116,0.08178845304557095
+heldout_visible,response_table_prediction,68,0.8451613138275761,0.017822711492353774
+heldout_eps_ge_20,qs_prediction,49,0.9966846393901554,0.06169520239037804
+heldout_eps_ge_20,equation_prediction,49,1.3065323729982397,0.099885268315048
+heldout_eps_ge_20,response_table_prediction,44,0.38408661618063217,0.019881472752088156
+heldout_hull_B,qs_prediction,13,0.6936964578320628,0.06243268120488564
+heldout_hull_B,equation_prediction,13,1.4803152007821514,0.13322836807039362
+heldout_hull_B,response_table_prediction,9,0.2453531766533312,0.02208178589879981
+common_holdout_support,qs_prediction,68,1.1863628331152445,0.05069421334597143
+common_holdout_support,equation_prediction,68,1.4298124748963716,0.0813306061336087
+common_holdout_support,response_table_prediction,68,0.8451613138275761,0.017822711492353774

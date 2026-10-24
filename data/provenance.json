@@ -1,0 +1,34 @@
+{
+  "notice": "Published figure digitization; these are NOT raw experimental records.",
+  "grift2019": {
+    "doi": "10.1017/jfm.2019.102",
+    "license": "CC BY 4.0",
+    "url": "https://www.cambridge.org/core/services/aop-cambridge-core/content/view/EB6F8190B82EF385B98BFA5D70C3EB10/S0022112019001022a.pdf/drag_force_on_an_accelerating_submerged_plate.pdf",
+    "geometry_m": [
+      0.2,
+      0.1,
+      0.005
+    ],
+    "rho_kg_m3": 1000,
+    "mass_kg": 0.4,
+    "time_axis_point_bound": 0.001073283819173142,
+    "force_axis_point_bound_N": 0.003213698066639243,
+    "steady_depth_assignment": "Marker/grid systematic offset ~0.24 mm. Model groups nearest integer-mm nominal depths, tolerance 0.5 mm. Extracted CSV retains original vector coordinates.",
+    "limitations": "Vector curve is already filtered/decimated in publication. Quantization bounds are not experimental uncertainty. Digitization cannot recover sensor sampling or covariance."
+  },
+  "day2011": {
+    "doi": "10.1177/1475090211406775",
+    "url": "https://strathprints.strath.ac.uk/35941/1/IMechE_An_experimental_study_of_unsteady_hydro.pdf",
+    "waterline_length_m": 7.937,
+    "waterline_beam_m": 0.28,
+    "draft_m": 0.105,
+    "displacement_kg": 118.4,
+    "wetted_area_m2": 2.34,
+    "limitations": "Different hull from repository. Orange free-transition diamonds only. Pixel calibration at 150 dpi; approximate +/-2 pixels, not original measurement error."
+  },
+  "hashes": {
+    "grift2019.pdf": "75492862551651502c41f146184cb0836a844c75a0a080a2ec3b1f15eb00c58f",
+    "day2011.pdf": "8d63e1c7b66af291cc7b4c07e6ea515f726b37f73729ed9581f18c89aa4ea201",
+    "day_fig11.png": "2290f07bd79df1b4b5c1757682631227c910b7dd64fe0305717337f5d9fac4b5"
+  }
+}

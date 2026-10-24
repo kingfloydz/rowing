@@ -1,0 +1,5 @@
+study,scope,model,n_conditions,equal_condition_mean_rmse_N,equal_condition_rms_rmse_N,pooled_rmse_N
+Grift2019_transfer,full_window,history_2026_transfer,11,0.4808236037268727,0.4931446302365486,0.49314463023654853
+Grift2019_transfer,full_window,inviscid_added_mass,11,0.47714525607426955,0.48565059379043046,0.48565059379043046
+Grift2019_transfer,acceleration_core,history_2026_transfer,11,0.43153142185962795,0.47153063724969674,0.35856187422075636
+Grift2019_transfer,acceleration_core,inviscid_added_mass,11,0.3779212265700252,0.42304251205859555,0.5042299218173648

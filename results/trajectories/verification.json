@@ -1,0 +1,191 @@
+{
+  "training": "Grift2021 Fig9b beta0 kappa0.75 whole drive",
+  "parameters": {
+    "static_transfer": {
+      "drag_scale": 1,
+      "lift_scale": 1,
+      "circulation_lag_chords": 0,
+      "added_mass_scale": 0
+    },
+    "static_calibrated": {
+      "drag_scale": 1.2254933074133614,
+      "lift_scale": 0.8369060406465856,
+      "circulation_lag_chords": 0.0,
+      "added_mass_scale": 0.0
+    },
+    "inertia_calibrated": {
+      "drag_scale": 1.2310751134902458,
+      "lift_scale": 0.7993379032322111,
+      "circulation_lag_chords": 0.0,
+      "added_mass_scale": 0.07021480812221903
+    },
+    "lag_inertia_calibrated": {
+      "drag_scale": 1.2310751134902458,
+      "lift_scale": 0.7993379032322111,
+      "circulation_lag_chords": 0.0,
+      "added_mass_scale": 0.07021480812221903
+    },
+    "wake_momentum_calibrated": {
+      "drag_scale": 3.8048216312135983,
+      "lift_scale": 2.590127760851254,
+      "wake_mass_coefficient": 1.3293355561130757,
+      "wake_decay_chords": 0.7513950932623045,
+      "added_mass_scale": 5.005784215411859e-16
+    },
+    "curved_static_transfer": {
+      "drag_scale": 1,
+      "lift_scale": 1,
+      "circulation_lag_chords": 0,
+      "added_mass_scale": 0
+    }
+  },
+  "kinematics_audits": [
+    {
+      "beta_deg": 0,
+      "kappa": 0.75,
+      "duration_kappa1_s": 0.888917827781894,
+      "velocity_compatibility_rmse_m_s": 0.001523599777764699,
+      "alpha_compatibility_rmse_deg": 0.02475262430299747
+    },
+    {
+      "beta_deg": 0,
+      "kappa": 0.5,
+      "duration_kappa1_s": 0.888917827781894,
+      "velocity_compatibility_rmse_m_s": 0.001523599777764699,
+      "alpha_compatibility_rmse_deg": 0.02475262430299679
+    },
+    {
+      "beta_deg": 0,
+      "kappa": 1.0,
+      "duration_kappa1_s": 0.888917827781894,
+      "velocity_compatibility_rmse_m_s": 0.001523599777764699,
+      "alpha_compatibility_rmse_deg": 0.02475262430299679,
+      "basis_check_force_rmse_N": 0.03482875394793383
+    },
+    {
+      "beta_deg": 15,
+      "kappa": 1.0,
+      "duration_kappa1_s": 0.8889245763280857,
+      "velocity_compatibility_rmse_m_s": 0.0016824055412313567,
+      "alpha_compatibility_rmse_deg": 0.023461738419363175,
+      "basis_check_force_rmse_N": 0.026741203353504408
+    }
+  ],
+  "wake_fit_log": [
+    {
+      "cost": 1575.526547658739,
+      "parameters": [
+        3.7878371026172686,
+        2.57739505690021,
+        1.3396448809808534,
+        0.7590978807504436,
+        3.5086707151106327e-13
+      ],
+      "nfev": 9,
+      "success": true
+    },
+    {
+      "cost": 1575.5256913467945,
+      "parameters": [
+        3.8048216312135983,
+        2.590127760851254,
+        1.3293355561130757,
+        0.7513950932623045,
+        5.005784215411859e-16
+      ],
+      "nfev": 13,
+      "success": true
+    }
+  ],
+  "hull": {
+    "excursion_fit_rmse_m": 0.0006118525353760113,
+    "rowing_speed_perturbation_min": -1.374548001446773,
+    "rowing_speed_perturbation_max": 0.863390145129617,
+    "fraction_above_steady_calibration": {
+      "sinusoidal": 0.4987506246876562,
+      "rowing": 0.6111944027986007
+    },
+    "caveat": "No hull memory coefficient fitted from mean data; ITTC residual above calibrated speed clamps.",
+    "rows": [
+      {
+        "motion": "sinusoidal",
+        "surface": "free_transition",
+        "closure": "quadratic",
+        "predicted_increase_percent": 2.098923431233546,
+        "measured_increase_percent": 1.8,
+        "error_percentage_points": 0.2989234312335458
+      },
+      {
+        "motion": "sinusoidal",
+        "surface": "studs_400mm",
+        "closure": "quadratic",
+        "predicted_increase_percent": 2.098923431233546,
+        "measured_increase_percent": 1.9,
+        "error_percentage_points": 0.19892343123354594
+      },
+      {
+        "motion": "sinusoidal",
+        "surface": "free_transition",
+        "closure": "ittc_residual",
+        "predicted_increase_percent": 1.3192674699837426,
+        "measured_increase_percent": 1.8,
+        "error_percentage_points": -0.4807325300162575
+      },
+      {
+        "motion": "sinusoidal",
+        "surface": "studs_400mm",
+        "closure": "ittc_residual",
+        "predicted_increase_percent": 1.3192674699837426,
+        "measured_increase_percent": 1.9,
+        "error_percentage_points": -0.5807325300162574
+      },
+      {
+        "motion": "rowing",
+        "surface": "free_transition",
+        "closure": "quadratic",
+        "predicted_increase_percent": 2.874010424206719,
+        "measured_increase_percent": 3.0,
+        "error_percentage_points": -0.12598957579328118
+      },
+      {
+        "motion": "rowing",
+        "surface": "studs_400mm",
+        "closure": "quadratic",
+        "predicted_increase_percent": 2.874010424206719,
+        "measured_increase_percent": 2.4,
+        "error_percentage_points": 0.4740104242067189
+      },
+      {
+        "motion": "rowing",
+        "surface": "free_transition",
+        "closure": "ittc_residual",
+        "predicted_increase_percent": 1.560794696783141,
+        "measured_increase_percent": 3.0,
+        "error_percentage_points": -1.439205303216859
+      },
+      {
+        "motion": "rowing",
+        "surface": "studs_400mm",
+        "closure": "ittc_residual",
+        "predicted_increase_percent": 1.560794696783141,
+        "measured_increase_percent": 2.4,
+        "error_percentage_points": -0.8392053032168589
+      }
+    ]
+  },
+  "numerical_sensitivity": [
+    {
+      "beta_deg": 0,
+      "rk4_4_vs_8_substeps_rmse_N": 0.00024137397118198292,
+      "smoothing_window_9_prediction_difference_rmse_N": 0.00030860411463536926,
+      "smoothing_window_25_prediction_difference_rmse_N": 0.001831668763416756
+    },
+    {
+      "beta_deg": 15,
+      "rk4_4_vs_8_substeps_rmse_N": 0.00025837575511508687,
+      "smoothing_window_9_prediction_difference_rmse_N": 0.00031121917975532873,
+      "smoothing_window_25_prediction_difference_rmse_N": 0.0018702070346676765
+    }
+  ],
+  "tests": "17 passed: all prior tests plus energy, consistency and wave quadrature tests"
+}

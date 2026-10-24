@@ -1,0 +1,40 @@
+{
+  "doi": "10.1080/02640414.2010.485646",
+  "source_path": "Leroyer2010.pdf",
+  "sha256": "02e17ff84536abca1626f298923ac77f8c84bf6e5ea40eb3e3cf0db31ef20401",
+  "method": "manual native raster seeds with local ink snap",
+  "axes": {
+    "fx": {
+      "pdf_page": 10,
+      "image_index": 0,
+      "x_zero": 59.0,
+      "x_180": 458.0,
+      "y_zero": 41.0,
+      "pixels_per_newton": 4.1
+    },
+    "fy": {
+      "pdf_page": 9,
+      "image_index": 0,
+      "x_zero": 59.0,
+      "x_180": 458.0,
+      "y_zero": 154.0,
+      "pixels_per_newton": 3.08
+    }
+  },
+  "reading_uncertainty": "Conservative +/-3 native pixels per ordinate; not a statistical confidence interval.",
+  "experiment_accuracy": "Paper reports force accuracy better than 0.5 N and about +/-3% measurement uncertainty.",
+  "data_family": "Barre1998 Nantes towing-tank database, shared with Barre/Kobus2010. Independent campaign NOT established.",
+  "condition": {
+    "rotation_rate_rad_s": 3.0,
+    "boat_speed_m_s": 2.91,
+    "advance_number_printed": 0.742,
+    "lever_m": 1.308,
+    "chord_m": 0.3,
+    "height_m": 0.14,
+    "area_m2": 0.042,
+    "top_edge_depth_m": 0.0
+  },
+  "lever_note": "Le=1.308 m is explicit in Leroyer2008 Fig2, and gives Leroyer2010 Table I centre normal speed 1.014 m/s. Printed eta=.742 is rounded; eta=2.91/(3*1.308) used.",
+  "scope": "One simplified permanently immersed stroke; not measured human rowing or catch/release validation.",
+  "sample_count": "31 paired angle samples, 62 force ordinates, one condition. CFD curves are not experimental observations."
+}

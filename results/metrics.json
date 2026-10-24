@@ -1,0 +1,75 @@
+{
+  "hull_held_out": {
+    "rmse": 0.12567921293851123,
+    "mae": 0.07894886242238226,
+    "nrmse_mean_percent": 0.44496846399933326,
+    "mape_percent": 0.21931060111821943,
+    "n": 6,
+    "ct_rmse": 9.19976834447572e-06,
+    "interpretation": "Held-out speed interpolation on literature hull; not validation of repository CAD."
+  },
+  "blade_depth_held_out": {
+    "rmse": 0.03533877409161937,
+    "mae": 0.024737237328721014,
+    "nrmse_mean_percent": 2.5009883817453624,
+    "mape_percent": 1.7259356712729386,
+    "n_markers": 60,
+    "n_depths": 30,
+    "interpretation": "Interpolation across omitted depths; broadside plate, not arbitrary angle."
+  },
+  "unsteady_held_out": {
+    "quasi_steady": {
+      "rmse": 0.5129324470459066,
+      "mae": 0.3502673948241451,
+      "nrmse_mean_percent": 33.31934973872081,
+      "mape_percent": 20.553822913120033
+    },
+    "constant_added_mass": {
+      "rmse": 0.3610886340684882,
+      "mae": 0.2774753612194065,
+      "nrmse_mean_percent": 23.455795308905778,
+      "mape_percent": 16.840122127658518
+    },
+    "entrainment_tail": {
+      "rmse": 0.14818571213044135,
+      "mae": 0.11294792754586705,
+      "nrmse_mean_percent": 9.625929490698967,
+      "mape_percent": 7.57875113166436
+    }
+  },
+  "unsteady_held_out_full_window": {
+    "quasi_steady": {
+      "rmse": 0.6649701704431152,
+      "mae": 0.4320130196862117,
+      "nrmse_mean_percent": 41.2970482935139,
+      "mape_percent": 23.31846673047746
+    },
+    "constant_added_mass": {
+      "rmse": 0.4726382487683754,
+      "mae": 0.3259267425648839,
+      "nrmse_mean_percent": 29.352541591065474,
+      "mape_percent": 19.795202924362147
+    },
+    "entrainment_tail": {
+      "rmse": 0.2589560353854962,
+      "mae": 0.1448338173395655,
+      "nrmse_mean_percent": 16.08210469363687,
+      "mape_percent": 10.244596505732014
+    }
+  },
+  "unsteady_calibration": {
+    "training_trial": "fig10b_4",
+    "entrainment_kg_s": 4.287100232657417,
+    "tail_amplitude": 0.8450852327180622,
+    "tail_scale": 3.5877793714172848,
+    "cd_at_h_0_1": 1.4565635000000001,
+    "added_mass_kg": 1.3194689145077132,
+    "note": "Start-from-rest benchmark only. Tail is a fitted envelope, not paper equation for h=0.1."
+  },
+  "notes": [
+    "Figure-digitized data, not raw sensor records. No experimental uncertainty inferred from pixel precision.",
+    "Primary dynamic metrics exclude first 0.07 s and +/-0.07 s about acceleration stop; full-window RMSE also reported.",
+    "Fig10b_2 excluded because it shares the a=.82,V=.30 condition with Fig10a_0.",
+    "Dynamic forces include plate mass 0.4 kg times imposed acceleration. Online hydrodynamics must not add robot/oar dry mass again."
+  ]
+}
