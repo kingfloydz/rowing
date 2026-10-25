@@ -34,6 +34,32 @@ python -m pytest tests -q
 不等于 CUDA 运行或吞吐验证。`benchmark.json` 输出环境步/秒和 Torch 峰值显存；
 Warp 显存不在 Torch 统计里，需要同时观察 GPU 总显存。编译耗时不计入稳态吞吐。
 
+## Viser 策略回放
+
+回放只需单个进程，不使用 torchrun。默认一个环境、确定性 Actor、关闭观测噪声，
+保留水动力、125 帧历史、reset、第一圈半速、30 秒截断与翻船终止。
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python3 -m rowing_mjlab.play \
+  --checkpoint-file logs/rowing_multigpu/run01/rank_0/model_1000.pt \
+  --device cuda:0 --num-envs 1 --host 0.0.0.0 --port 8080
+```
+
+将 checkpoint 路径替换为实际文件。入口在导入 mjlab 前设置 `MUJOCO_GL=disable`，
+Viser 在浏览器中绘制，不需要服务器 EGL。打开平台映射的 8080 端口，或使用
+`ssh -L 8080:localhost:8080 用户名@服务器` 后访问 `http://localhost:8080`。
+查看器提供暂停、单步、速度和重置操作；Ctrl+C 退出。
+
+仅加载 Actor/归一化参数，不构建 Critic、优化器或 PPO rollout 缓存。
+checkpoint 同目录的 `settings.json` 用于核对历史长度和 Actor 配置；历史长度不符直接报错。
+复制 checkpoint 到其他机器时应一起复制该文件。
+
+```bash
+# 不启动网页服务的有限步推理检查；CPU 可运行，但可能慢于实时
+python3 -m rowing_mjlab.play --checkpoint-file /path/model_1000.pt \
+  --device cpu --smoke-steps 10
+```
+
 ## 场景与约束
 
 - 整套船—H2—桨装配作为一个 mjlab Entity，船体唯一 freejoint，保留全部六自由度。
