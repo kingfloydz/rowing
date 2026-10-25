@@ -6,6 +6,10 @@ from hydrodynamics.models import ROOT
 
 PERIOD = 60.0/26.0
 SIGMA_DEG = (10,4,15,10,4,15)
+# Interior of the digitized drive, excluding catch/extraction transitions.
+# Verified at the repository waterline: both blades >70% wetted surface area
+# over this interval; sweep advances and the blade remains approximately square.
+DRIVE_START_PHASE = (0.05, 0.35)
 
 
 class OarReference:
@@ -28,9 +32,12 @@ class OarReference:
         return ((c[0]*delta+c[1])*delta+c[2])*delta+c[3]
 
     def nearest(self, angles):
-        # Exact saved pose is common across all worlds; compute once at startup.
+        """One shared bilateral phase, nearest in sweep only, inside drive."""
         grid = torch.arange(4096,device=angles.device,dtype=torch.float32)/4096
-        cost = ((self(grid)-angles)/self.sigma).square().mean(-1)
+        sweep = torch.tensor([0,3],device=angles.device)
+        cost = (self(grid).index_select(-1,sweep)-angles.index_select(-1,sweep)).square().mean(-1)
+        valid = (grid >= DRIVE_START_PHASE[0]) & (grid <= DRIVE_START_PHASE[1])
+        cost = cost.masked_fill(~valid,float('inf'))
         return grid[cost.argmin()]
 
     def target(self, elapsed, phase0, reset_angles):

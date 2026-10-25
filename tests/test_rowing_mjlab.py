@@ -30,6 +30,34 @@ def test_reference_start_and_complete_half_speed_cycle():
     torch.testing.assert_close(ref(torch.tensor([0.])),ref(torch.tensor([1.])))
 
 
+def test_reference_shared_drive_start_uses_only_sweep_and_is_wet():
+    import json
+    import trimesh
+    from rowing_mjlab.reference import DRIVE_START_PHASE
+    from hydrodynamics.models import wet_triangles,triangle_geometry
+    ref=OarReference('cpu')
+    m=mujoco.MjModel.from_xml_path(str(ROOT/'scene.xml'));d=mujoco.MjData(m)
+    names=[s+'_'+j for s in ('port','starboard') for j in ('sweep','elevation','feather')]
+    qa=[m.joint(n).qposadr[0] for n in names]
+    q=torch.tensor(m.qpos0[qa],dtype=torch.float32)
+    phase=ref.nearest(q)
+    assert DRIVE_START_PHASE[0]<=phase<=DRIVE_START_PHASE[1]
+    changed=q.clone();changed[[1,2,4,5]]+=10
+    torch.testing.assert_close(ref.nearest(changed),phase,rtol=0,atol=0)
+    grid=torch.arange(4096)/4096
+    valid=grid[(grid>=DRIVE_START_PHASE[0])&(grid<=DRIVE_START_PHASE[1])]
+    cost=(ref(valid)[:,[0,3]]-q[[0,3]]).square().mean(-1)
+    torch.testing.assert_close(phase,valid[cost.argmin()])
+    water=json.loads((ROOT/'data/rowing_reference_provenance.json').read_text())['water_level_m_at_repository_reset']
+    meshes=[trimesh.load_mesh(ROOT/f'boat_meshes/{s}_blade_3mm.stl') for s in ('port','starboard')]
+    for p in [float(phase),*np.linspace(*DRIVE_START_PHASE,31)]:
+        d.qpos[qa]=ref(torch.tensor(p)).numpy();mujoco.mj_kinematics(m,d)
+        for side,mesh in zip(('port','starboard'),meshes):
+            b=m.body(side+'_oar').id;tri=mesh.triangles@d.xmat[b].reshape(3,3).T+d.xpos[b]
+            fraction=triangle_geometry(wet_triangles(tri,water))[0].sum()/mesh.area
+            assert fraction>.70
+
+
 @pytest.fixture(scope='module')
 def hydro_comparison():
     m = mujoco.MjModel.from_xml_path(str(ROOT/'scene.xml'))
@@ -168,7 +196,8 @@ def test_mjlab_reset_head_constraints_termination_and_privileged_layout():
         torch.testing.assert_close(mdp.privileged(env),before)
         env.sim.data.qpos[0,3:7]=torch.tensor([np.cos(np.deg2rad(61)/2),np.sin(np.deg2rad(61)/2),0,0])
         assert mdp.capsized(env).tolist()==[True,False]
-        env.episode_length_buf[:]=1499
+        assert env.max_episode_length==2000
+        env.episode_length_buf[:]=env.max_episode_length-1
         env.step(torch.zeros(2,29))
         assert env.reset_time_outs.all()
         obs,_=env.reset(env_ids=torch.tensor([0]))
@@ -199,3 +228,8 @@ def test_compact_hand_pose_closure_axes_and_grip_placement():
             assert .23<m.body_mass[bid]<.25
             assert mujoco.mj_name2id(m,mujoco.mjtObj.mjOBJ_BODY,h+'_dex1_finger_link_1')==-1
         np.testing.assert_allclose(locations[0],locations[1],atol=1e-9)
+        q={n:np.rad2deg(m.qpos0[m.joint(n).qposadr[0]]) for n in
+           ('port_sweep','starboard_sweep','port_elevation','starboard_elevation','port_feather','starboard_feather')}
+        assert abs(q['port_sweep']+q['starboard_sweep'])<.7
+        assert abs(q['port_elevation']+q['starboard_elevation'])<.2
+        assert abs(q['port_feather']-q['starboard_feather'])<.1

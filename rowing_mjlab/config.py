@@ -16,7 +16,7 @@ from .networks import SEQUENCE_LENGTH
 
 def env_cfg(num_envs=2048,play=False):
     return ManagerBasedRlEnvCfg(
-        decimation=10, episode_length_s=30.0,
+        decimation=10, episode_length_s=40.0,
         scene=SceneCfg(num_envs=num_envs,env_spacing=0.0,entities={'rowing':entity_cfg()},
             sensors=(ContactSensorCfg(name='forbidden_contact',
                 primary=ContactMatch(mode='geom',pattern='h2_collision_.*',entity='rowing'),
@@ -60,6 +60,7 @@ def env_cfg(num_envs=2048,play=False):
 
 def rl_cfg(num_envs=2048):
     from mjlab.rl import RslRlModelCfg, RslRlOnPolicyRunnerCfg, RslRlPpoAlgorithmCfg
+    rollout_steps = 32  # 0.64 s at 50 Hz; 2000/32 = 62.5 rollout blocks per episode.
     model = dict(class_name='rowing_mjlab.networks:TemporalModel',hidden_dims=(512,256,128),
                  activation='elu',obs_normalization=True)
     return RslRlOnPolicyRunnerCfg(
@@ -67,11 +68,11 @@ def rl_cfg(num_envs=2048):
                            'init_std':0.3,'std_type':'scalar'}),
         critic=RslRlModelCfg(**model),
         algorithm=RslRlPpoAlgorithmCfg(class_name='rowing_mjlab.storage:HistoryPPO',
-            num_learning_epochs=4,num_mini_batches=max(1,num_envs*24//512),
+            num_learning_epochs=4,num_mini_batches=max(1,num_envs*rollout_steps//512),
             learning_rate=3e-4,schedule='adaptive',gamma=0.99,lam=0.95,
             entropy_coef=0.005,desired_kl=0.01,max_grad_norm=1.0,
             value_loss_coef=1.0,use_clipped_value_loss=True,clip_param=0.2),
-        experiment_name='h2_rowing_imitation',num_steps_per_env=24,
+        experiment_name='h2_rowing_imitation',num_steps_per_env=rollout_steps,
         max_iterations=10000,save_interval=100,
         obs_groups={'actor':['actor'],'critic':['actor','privileged']},
         logger='tensorboard',clip_actions=1.0,

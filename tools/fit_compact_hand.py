@@ -81,6 +81,14 @@ def solve(root):
         # Stay on the slightly flexed side of maximal extension; no large fold.
         lo[idx]=opt.x;hi[idx]=min(hi[idx],opt.x+np.deg2rad(5))
     x0=np.clip(x0,lo+1e-8,hi-1e-8)
+    previous=m.qpos0[qa].copy()
+    # This refinement is local: no arm or oar joint moves more than five degrees.
+    lo[:-1]=np.maximum(lo[:-1],previous-np.deg2rad(5))
+    hi[:-1]=np.minimum(hi[:-1],previous+np.deg2rad(5))
+    x0=np.clip(x0,lo+1e-8,hi-1e-8)
+    def asymmetry(x):
+        # Opposing hinge signs for sweep/elevation; equal feather coordinates.
+        return np.array([x[14]+x[17],x[15]+x[18],x[16]-x[19]])
     def constraints(x):
         forward(x);eq=[];axes=[];wrists=[]
         for b in bdata:
@@ -96,7 +104,9 @@ def solve(root):
     def objective(x):
         _,_,w=constraints(x)
         elbows=np.array([x[names.index(b['h']+'_elbow_joint')]-t for b,t in zip(bdata,targets)])
-        return float(10*w@w+20*elbows@elbows+.004*np.sum((x[:-1]-x0[:-1])**2)+.5*(x[-1]-.785)**2)
+        symmetry=asymmetry(x)
+        return float(10*w@w+20*elbows@elbows+200*symmetry@symmetry+
+                     np.sum((x[:-1]-previous)**2)+.5*(x[-1]-.785)**2)
     def residual(x):
         eq,ax,w=constraints(x)
         return np.r_[eq*100,np.minimum(ax,0)*300,w*2,(x[:-1]-x0[:-1])*.01]
@@ -118,6 +128,9 @@ def solve(root):
     forward(best.x)
     report=dict(grip_distance_from_oar_origin_m=float(best.x[-1]),objective=float(best.fun),
                 joint_angles_deg=dict(zip(names,np.rad2deg(best.x[:-1]).tolist())),hands={})
+    report['bilateral_mirror_error_before_deg']=np.rad2deg(asymmetry(previous)).tolist()
+    report['bilateral_mirror_error_after_deg']=np.rad2deg(asymmetry(best.x)).tolist()
+    report['max_joint_adjustment_deg']=float(np.rad2deg(abs(best.x[:-1]-previous)).max())
     for b,t in zip(bdata,targets):
         rh=d.xmat[b['hand']].reshape(3,3);ro=d.xmat[b['oar']].reshape(3,3)
         center=d.xpos[b['hand']]+rh@np.array([.029,0,0]);target=d.xpos[b['oar']]+ro@np.array([0,b['sign']*best.x[-1],0])
