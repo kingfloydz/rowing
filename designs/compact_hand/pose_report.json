@@ -1,0 +1,47 @@
+{
+  "grip_distance_from_oar_origin_m": 0.785,
+  "objective": 3.5767443305929953,
+  "joint_angles_deg": {
+    "left_shoulder_pitch_joint": -80.65209844829972,
+    "left_shoulder_roll_joint": 26.391103705840408,
+    "left_shoulder_yaw_joint": -68.19976604975312,
+    "left_elbow_joint": 80.3090437853615,
+    "left_wrist_roll_joint": 53.93142570465271,
+    "left_wrist_pitch_joint": -3.0064449916944342,
+    "left_wrist_yaw_joint": -24.313161463685834,
+    "right_shoulder_pitch_joint": -80.70591933740515,
+    "right_shoulder_roll_joint": -8.978591239951303,
+    "right_shoulder_yaw_joint": 67.57521356860036,
+    "right_elbow_joint": 81.59038577049385,
+    "right_wrist_roll_joint": -66.79377820018713,
+    "right_wrist_pitch_joint": -4.5471600825185545,
+    "right_wrist_yaw_joint": 32.70914826934243,
+    "starboard_sweep": -8.51252218425469,
+    "starboard_elevation": 7.66328080799042,
+    "starboard_feather": 2.0364995848989307,
+    "port_sweep": 12.962986058149415,
+    "port_elevation": -1.5936090235574047,
+    "port_feather": -2.0459434938006544
+  },
+  "hands": {
+    "left": {
+      "position_error_mm": 6.198312232530608e-11,
+      "bore_alignment_deg": 1.2074182697257333e-06,
+      "elbow_axis_change_deg": 4.9500000000023725,
+      "wrist_deflection_deg": 18.647144034721023,
+      "geometric_arm_bend_deg": 19.33922327789607,
+      "elbow_flexion_from_max_extension_deg": 3.718657987242283
+    },
+    "right": {
+      "position_error_mm": 3.66756916576953e-10,
+      "bore_alignment_deg": 0.0,
+      "elbow_axis_change_deg": 4.950000000038053,
+      "wrist_deflection_deg": 27.68402639031922,
+      "geometric_arm_bend_deg": 19.623317332640887,
+      "elbow_flexion_from_max_extension_deg": 4.999999999999995
+    }
+  },
+  "hand_mass_kg": 0.24021505977816524,
+  "density_assumption_kg_m3": 2700,
+  "kinematic_rebase_max_error": 1.1851630787873546e-14
+}

@@ -43,8 +43,9 @@ def build_spec():
     # mjlab applies simulation options on the assembled scene, not this entity.
     root.remove(root.find('option'))
     for weld in root.findall('./equality/weld'):
-        if 'hand_fixed' in weld.get('name',''):
-            # Six-dimensional fixed grasp, with stiff numerical enforcement.
+        if weld.get('name','') in ('left_hand_fixed','right_hand_fixed',
+                                  'left_foot_fixed','right_foot_fixed'):
+            # Six-dimensional hand/foot attachments with stiff enforcement.
             # Two physics timesteps is MuJoCo's positive-solref lower bound.
             weld.set('solref','.004 1')
             weld.set('solimp','.99 .999 .001 .5 2')
@@ -66,6 +67,23 @@ def build_spec():
     for name in robot:
         for index, geom in enumerate(bodies[name].findall('geom')):
             if geom.get('type') == 'mesh':
+                if geom.get('mesh') == 'compact_hand':
+                    # A single convex hull would fill the 34 mm sleeve bore.
+                    # Tangent boxes preserve the bore; rounded rims/root are
+                    # approximated for contact, while the visual mesh is exact.
+                    for k in range(16):
+                        angle=2*np.pi*k/16
+                        pos=(.029+.021*np.cos(angle),.021*np.sin(angle),0.)
+                        ET.SubElement(bodies[name],'geom',name=f'h2_collision_{name}_ring_{k}',
+                            type='box',pos=' '.join(map(str,pos)),
+                            quat=f'{np.cos(angle/2)} 0 0 {np.sin(angle/2)}',
+                            size=f'.004 {.025*np.tan(np.pi/16)} .035',
+                            contype='1',conaffinity='3',group='3',rgba='0 0 0 0',condim='3',density='0')
+                    ET.SubElement(bodies[name],'geom',name=f'h2_collision_{name}_connector',
+                        type='cylinder',pos='.006 0 0',quat='.707106781186548 0 .707106781186548 0',
+                        size='.025 .006',contype='1',conaffinity='3',group='3',
+                        rgba='0 0 0 0',condim='3',density='0')
+                    continue
                 attrs = dict(geom.attrib)
                 attrs.update(name=f'h2_collision_{name}_{index}',contype='1',conaffinity='3',
                              group='3',rgba='0.6 0.6 0.6 0',condim='3',density='0')
@@ -74,7 +92,20 @@ def build_spec():
     # remain untouched. Grip is separate, allowing only its intended hand pair.
     for side in ('port','starboard'):
         for part in ('shaft','grip'):
-            verts = trimesh.load_mesh(ROOT/f'boat_meshes/{side}_{part}.stl').vertices
+            mesh = trimesh.load_mesh(ROOT/f'boat_meshes/{side}_{part}.stl')
+            if part == 'grip':
+                # The grip STL also contains a distant, much wider collar.
+                # A single capsule incorrectly made the handle ~114 mm wide,
+                # causing false wrist contacts after shortening the hands.
+                for k,piece in enumerate(mesh.split(only_watertight=False)):
+                    low,high=piece.bounds;center=(low+high)/2
+                    a,b=center.copy(),center.copy();a[1],b[1]=low[1],high[1]
+                    radius=float(np.linalg.norm(piece.vertices[:,[0,2]]-center[[0,2]],axis=1).max())
+                    ET.SubElement(bodies[side+'_oar'],'geom',name=f'oar_collision_{side}_{part}_{k}',
+                        type='cylinder',fromto=' '.join(map(str,np.r_[a,b])),size=str(radius),
+                        contype='2',conaffinity='1',group='3',rgba='0 0 0 0',density='0')
+                continue
+            verts = mesh.vertices
             low, high = verts.min(0), verts.max(0)
             center = (low+high)/2
             a, b = center.copy(), center.copy()

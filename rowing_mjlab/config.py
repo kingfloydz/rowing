@@ -42,7 +42,6 @@ def env_cfg(num_envs=2048,play=False):
         },
         rewards={
             'oar_tracking':RewardTermCfg(func=mdp.track_oars,weight=1.0),
-            'joint_velocity':RewardTermCfg(func=mdp.joint_velocity_cost,weight=-0.01),
             'joint_torque':RewardTermCfg(func=mdp.joint_torque_cost,weight=-0.001),
             'action_rate':RewardTermCfg(func=mdp.action_rate_cost,weight=-0.005),
             'collision':RewardTermCfg(func=mdp.collision_cost,weight=-0.10),
@@ -61,7 +60,7 @@ def env_cfg(num_envs=2048,play=False):
 
 def rl_cfg(num_envs=2048):
     from mjlab.rl import RslRlModelCfg, RslRlOnPolicyRunnerCfg, RslRlPpoAlgorithmCfg
-    model = dict(class_name='rowing_mjlab.networks:TemporalModel',hidden_dims=(256,128,128),
+    model = dict(class_name='rowing_mjlab.networks:TemporalModel',hidden_dims=(512,256,128),
                  activation='elu',obs_normalization=True)
     return RslRlOnPolicyRunnerCfg(
         actor=RslRlModelCfg(**model,distribution_cfg={'class_name':'GaussianDistribution',

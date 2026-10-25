@@ -137,10 +137,6 @@ def track_oars(env):
     return 0.40*scores[:,0]+0.35*scores[:,1]+0.25*scores[:,2]
 
 
-def joint_velocity_cost(env):
-    return (env.sim.data.qvel[:,env.rowing.policy_v]/10.0).square().mean(-1)
-
-
 def joint_torque_cost(env):
     s = env.rowing
     return (env.sim.data.qfrc_actuator[:,s.policy_v]/s.torque_limits).square().mean(-1)

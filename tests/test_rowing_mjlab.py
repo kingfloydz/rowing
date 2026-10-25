@@ -127,7 +127,7 @@ def test_actor_privilege_isolation_and_independent_critic():
     changed=obs.clone();changed['privileged']+=100
     torch.testing.assert_close(actor(obs),actor(changed),rtol=0,atol=0)
     assert not torch.allclose(critic(obs),critic(changed))
-    assert actor.encoder.context[-1].out_features==24
+    assert actor.encoder.context[-1].out_features==16
     assert not ({id(p) for p in actor.parameters()} & {id(p) for p in critic.parameters()})
     actor(obs).sum().backward()
     assert actor.encoder.input.weight.grad is not None
@@ -146,6 +146,11 @@ def test_mjlab_reset_head_constraints_termination_and_privileged_layout():
         assert obs['privileged'].shape==(2,27)
         m=env.sim.mj_model;s=env.rowing
         assert m.nu==31 and m.neq==4
+        assert 'joint_velocity' not in env.cfg.rewards
+        # Compact hands must not start inside oversized oar collision proxies.
+        initial=mujoco.MjData(m)
+        mujoco.mj_forward(m,initial)
+        assert initial.ncon==0
         assert m.joint('rowing/boat_free').type==mujoco.mjtJoint.mjJNT_FREE
         assert m.joint('rowing/seat_pelvis_hinge').type==mujoco.mjtJoint.mjJNT_HINGE
         torch.testing.assert_close(env.sim.data.qpos[:],s.q0.expand(2,-1))
@@ -170,3 +175,27 @@ def test_mjlab_reset_head_constraints_termination_and_privileged_layout():
         torch.testing.assert_close(obs['actor'][0],obs['actor'][0,-1:].expand(126,-1))
     finally:
         env.close()
+
+
+def test_compact_hand_pose_closure_axes_and_grip_placement():
+    import json
+    baseline=json.loads((ROOT/'designs/compact_hand/pose_baseline.json').read_text())
+    for filename in ('scene.xml','preview.xml'):
+        m=mujoco.MjModel.from_xml_path(str(ROOT/filename));d=mujoco.MjData(m)
+        mujoco.mj_forward(m,d)
+        assert np.max(abs(d.efc_pos[d.efc_type==mujoco.mjtConstraint.mjCNSTR_EQUALITY]))<1e-8
+        locations=[]
+        for h,o,sign in [('left','starboard',1),('right','port',-1)]:
+            bid=m.body(h+'_dex1_base_link').id;oid=m.body(o+'_oar').id
+            rh=d.xmat[bid].reshape(3,3);ro=d.xmat[oid].reshape(3,3)
+            center=d.xpos[bid]+rh@np.array([.029,0,0])
+            local=ro.T@(center-d.xpos[oid])
+            np.testing.assert_allclose(local[[0,2]],0,atol=1e-9)
+            assert abs(rh[:,2]@ro[:,1])>1-1e-10
+            t=sign*local[1];locations.append(t)
+            assert t-.035>.74425 and t+.035<.86216
+            axis=d.xaxis[m.joint(h+'_elbow_joint').id]
+            assert axis@baseline['elbow_axes_world'][h]>np.cos(np.deg2rad(5))
+            assert .23<m.body_mass[bid]<.25
+            assert mujoco.mj_name2id(m,mujoco.mjtObj.mjOBJ_BODY,h+'_dex1_finger_link_1')==-1
+        np.testing.assert_allclose(locations[0],locations[1],atol=1e-9)

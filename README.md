@@ -1,10 +1,10 @@
 # H2 人形机器人单人双桨赛艇 MuJoCo 场景
 
-包含最新的 H2、Dex1 夹爪、滑座、船体与双桨模型及所需 STL。单位为米、千克、秒，角度为弧度。
+包含 H2、紧凑套筒手、滑座、船体与双桨模型及所需 STL。单位为米、千克、秒，角度为弧度。
 
 ## mjlab GPU 双桨模仿训练
 
-训练入口和安装说明见 [TRAINING_MJLAB.md](TRAINING_MJLAB.md)。实现 H2 非头部 29 关节策略、头部固定目标 PD、船体六自由度、双手刚性握持、骨盆座椅铰链，以及每物理子步更新的 Warp 水动力。Actor 使用 125 帧机载历史和 24 维 latent；Critic 增加不含世界位置的 27 维特权观测。
+训练入口和安装说明见 [TRAINING_MJLAB.md](TRAINING_MJLAB.md)。实现 H2 非头部 29 关节策略、头部固定目标 PD、船体六自由度、双手刚性握持、骨盆座椅铰链，以及每物理子步更新的 Warp 水动力。Actor 使用 125 帧机载历史和 16 维 latent；Critic 增加不含世界位置的 27 维特权观测。
 
 ```bash
 python -m pip install -r requirements-training.txt
@@ -17,7 +17,7 @@ python -m rowing_mjlab.train --device cuda:0 --num-envs 2048
 
 新增可执行的低阶训练模型，见 [HYDRODYNAMICS_TRAINING.md](HYDRODYNAMICS_TRAINING.md)。使用 `TrainingRowingHydrodynamics`，支持低速/高 Fn 连续延拓、按回合域随机化、船体横流、尾鳍与分布桨叶载荷。该模型未对当前 CAD 标定，不代表真实流体载荷上界；保留严格实验参考和旧场景适配器供对照。
 
-结果位于 `results/training/`，包含船阻先验范围与真实轨迹桨叶力律的无重拟合对比。当前场景仍是 H2+Dex1，不是最终 G1。原始 XML 无驱动器；mjlab 训练入口在内存中增加驱动器、水动力和碰撞配置。
+结果位于 `results/training/`，包含船阻先验范围与真实轨迹桨叶力律的无重拟合对比。当前场景是 H2+紧凑套筒手，不是 G1。原始 XML 无驱动器；mjlab 训练入口在内存中增加驱动器、水动力和碰撞配置。
 
 ## 水动力研究入口（2026-10-24）
 
@@ -47,9 +47,11 @@ python -m mujoco.viewer --mjcf=preview.xml
 
 桨锁间距 1.58 m，滑座沿船体纵向滑动；骨盆与滑座之间保留 ±30° 俯仰铰链。双桨保留 sweep、elevation、feather 三个转动自由度。
 
-夹爪绕自身纵轴旋转 90°，手指缩短 30 mm；手指关节及相应联动约束保留为 XML 注释，开度固定。原始 XML 中双手与桨以完整六维 weld 连接，使用较软的 `solref="0.04 1"`，双脚与船体固接，全部碰撞关闭。mjlab 训练入口在内存中加强手部约束并启用所需碰撞，详见训练文档。
+双手已替换为内径 34 mm、外径 50 mm、长 70 mm 的圆角套筒，通过直径 50 mm、外露长度 4 mm 的短柱连接手腕，交接处 R5。设计文件、安装参数与完整关节角见 [compact_hand](designs/compact_hand/README.md) 和 [pose_report.json](designs/compact_hand/pose_report.json)。两侧握持中心距各自桨坐标原点均为 0.785 m，整个套筒位于实际桨柄段内。
 
-桨叶沿局部 X 厚度方向的包围尺寸为 **3 mm**，以原厚度中面为中心缩放，长宽及安装位姿保持不变。当前姿态是在此前上抬 0.15 m 后，再向机器人身后移动 0.02 m；握持点保留，左右肘轴方向分别变化约 1.49°、3.76°。这些位移以桨叶三角面面积中心为基准。所有初始姿态已写入 XML，无需额外姿态文件。
+双臂与双桨已联合求解。相对记录的旧姿态，左右肘关节世界轴线方向变化均为 4.95°；肘关节相对几何最大伸展位的弯曲分别为 3.72°、5.00°。连杆偏置使上臂和小臂锚点连线仍存在约 19° 的最小夹角，不应将其误读为同等肘屈曲量。双手与桨、双脚与船体使用六维 weld，统一使用 `solref=".004 1"` 与 `solimp=".99 .999 .001 .5 2"`。
+
+新手按均匀铝材密度 2700 kg/m³ 计算质量与惯量，单手约 0.240 kg，属于材料假设。双臂、双桨新初始姿态已写入两个 XML；关节坐标映射经过重参数化一致性检查，原双桨参考轨迹无需重新数字化。桨叶厚度仍为 3 mm。
 
 质量和惯量含几何近似值，夹爪与桨的连接是等式约束，不是摩擦夹持仿真。已在 MuJoCo 3.11.0 中验证加载、初始约束残差及零重力短时运行；这不代表水动力或控制性能验证。
 
@@ -59,7 +61,7 @@ python -m mujoco.viewer --mjcf=preview.xml
 - Dex1：[well-robotics/rickshaw](https://github.com/well-robotics/rickshaw)，`assets/g1_dex1`，提交 `fbb16ec3c59b2dbf8a2eed6070ad6004be4ba501`。手指在来源网格基础上缩短。来源仓库未见独立根目录 LICENSE，此处不授予额外许可。
 - 赛艇：Carloski 基于 Cpt.Cosmos 的 single-scull-racing-shell-model，CC BY-NC 4.0。来源说明保留于 `boat_source_description.pdf`；本模型进行了统一缩放、网格合并、配色和桨叶减薄。
 
-各第三方资产遵循各自许可，不对整套资产声明统一的开源许可。仓库不包含调姿工具、逆运动学脚本、中间模型、历史备份或调试图片。
+各第三方资产遵循各自许可，不对整套资产声明统一的开源许可。紧凑手的设计及逆运动学工具保留在 `designs/compact_hand/` 和 `tools/fit_compact_hand.py`。
 
 
 ## 文献参考质量与惯量（2026-10-23）

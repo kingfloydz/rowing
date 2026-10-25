@@ -1,4 +1,4 @@
-"""Causal residual TCN structure from kingfloydz/head_transport, extended to 125/24.
+"""Causal residual TCN structure from kingfloydz/head_transport, with 125-frame history and 16-dimensional latent.
 
 Actor consumes onboard history only. Critic has its own encoder/normalizers and
 27 current privileged features; no world position is consumed by either model.
@@ -12,7 +12,8 @@ from rsl_rl.modules import EmpiricalNormalization
 
 HISTORY_LENGTH = 125
 SEQUENCE_LENGTH = HISTORY_LENGTH+1
-LATENT_DIM = 24
+LATENT_DIM = 16
+TCN_CHANNELS = 48
 PRIVILEGED_DIM = 27
 
 
@@ -20,8 +21,8 @@ class CausalBlock(nn.Module):
     def __init__(self,dilation):
         super().__init__()
         self.left_pad = 4*dilation
-        self.conv = nn.Conv1d(64,64,5,dilation=dilation)
-        self.mix = nn.Conv1d(64,64,1)
+        self.conv = nn.Conv1d(TCN_CHANNELS,TCN_CHANNELS,5,dilation=dilation)
+        self.mix = nn.Conv1d(TCN_CHANNELS,TCN_CHANNELS,1)
 
     def forward(self,x):
         return F.elu(x+self.mix(F.elu(self.conv(F.pad(x,(self.left_pad,0))))))
@@ -30,9 +31,9 @@ class CausalBlock(nn.Module):
 class HistoryEncoder(nn.Module):
     def __init__(self,obs_dim):
         super().__init__()
-        self.input = nn.Conv1d(obs_dim,64,1)
+        self.input = nn.Conv1d(obs_dim,TCN_CHANNELS,1)
         self.blocks = nn.Sequential(*(CausalBlock(d) for d in (1,2,4,8,16)))
-        self.context = nn.Sequential(nn.Linear(128,64),nn.ELU(),nn.Linear(64,LATENT_DIM))
+        self.context = nn.Sequential(nn.Linear(2*TCN_CHANNELS,TCN_CHANNELS),nn.ELU(),nn.Linear(TCN_CHANNELS,LATENT_DIM))
 
     def forward(self,history):
         x = self.blocks(self.input(history.transpose(1,2)))
