@@ -49,6 +49,9 @@ CUDA_VISIBLE_DEVICES=0 python3 -m rowing_mjlab.play \
 Viser 在浏览器中绘制，不需要服务器 EGL。打开平台映射的 8080 端口，或使用
 `ssh -L 8080:localhost:8080 用户名@服务器` 后访问 `http://localhost:8080`。
 查看器提供暂停、单步、速度和重置操作；Ctrl+C 退出。
+默认显示半透明水平水面，高度直接读取本次环境的水动力配置（当前约 z=-0.1202764 m）。
+`Water surface` 面板可以开关显示和调整透明度。水面是固定于世界坐标的两个三角形，
+不随船体升沉、横摇而移动，不增加碰撞、流体求解或每步 GPU 数据回读。
 
 仅加载 Actor/归一化参数，不构建 Critic、优化器或 PPO rollout 缓存。
 checkpoint 同目录的 `settings.json` 用于核对历史长度和 Actor 配置；历史长度不符直接报错。

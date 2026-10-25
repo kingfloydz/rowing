@@ -87,9 +87,17 @@ def main():
             return
         import viser
         from mjlab.viewer import ViserPlayViewer
+        from .water_view import add_water_surface
         server = viser.ViserServer(host=args.host,port=args.port,label='H2 rowing policy')
+        water_height = float(env.rowing.hydro.water.numpy()[0,0])
+
+        class RowingPlayViewer(ViserPlayViewer):
+            def setup(self):
+                super().setup()
+                self.water_surface = add_water_surface(server,water_height)
+
         print(f'Viser port {args.port}; open the forwarded port in your browser. Ctrl+C to stop.')
-        ViserPlayViewer(wrapped,policy,viser_server=server).run()
+        RowingPlayViewer(wrapped,policy,viser_server=server).run()
     finally:
         if server is not None:
             server.stop()
