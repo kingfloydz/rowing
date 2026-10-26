@@ -1,9 +1,0 @@
-motion,surface,closure,predicted_increase_percent,measured_increase_percent,error_percentage_points
-sinusoidal,free_transition,quadratic,2.098923431233546,1.8,0.2989234312335458
-sinusoidal,studs_400mm,quadratic,2.098923431233546,1.9,0.19892343123354594
-sinusoidal,free_transition,ittc_residual,1.3192674699837426,1.8,-0.4807325300162575
-sinusoidal,studs_400mm,ittc_residual,1.3192674699837426,1.9,-0.5807325300162574
-rowing,free_transition,quadratic,2.874010424206719,3.0,-0.12598957579328118
-rowing,studs_400mm,quadratic,2.874010424206719,2.4,0.4740104242067189
-rowing,free_transition,ittc_residual,1.560794696783141,3.0,-1.439205303216859
-rowing,studs_400mm,ittc_residual,1.560794696783141,2.4,-0.8392053032168589

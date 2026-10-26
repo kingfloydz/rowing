@@ -1,9 +1,0 @@
-beta_deg,kappa,model,component_RMSE_N,impulse_error_percent,fit_to_this_data,interpretation
-0,0.5,normal,2.512969927492383,-8.386684806769152,False,"Uncalibrated force-law transfer, NOT CAD validation"
-0,0.5,harmonic,2.4635236931893307,-3.741762087875178,False,"Uncalibrated force-law transfer, NOT CAD validation"
-0,0.75,normal,3.7508794954876294,-5.210306433299705,False,"Uncalibrated force-law transfer, NOT CAD validation"
-0,0.75,harmonic,3.6134500629807556,-0.4043369054390289,False,"Uncalibrated force-law transfer, NOT CAD validation"
-0,1.0,normal,3.7418892759884224,0.3531066193317667,False,"Uncalibrated force-law transfer, NOT CAD validation"
-0,1.0,harmonic,3.4405401794383126,5.441148940085627,False,"Uncalibrated force-law transfer, NOT CAD validation"
-15,1.0,normal,3.242756131976563,2.0043940078469324,False,"Uncalibrated force-law transfer, NOT CAD validation"
-15,1.0,harmonic,3.05839547572176,7.555134792781337,False,"Uncalibrated force-law transfer, NOT CAD validation"

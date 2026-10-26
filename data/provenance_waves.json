@@ -1,9 +1,0 @@
-{
-  "doi": "10.1017/jfm.2022.592",
-  "sha256": "2882a57ba8c418d6b3609f495cc48247f83ee78d86267afc2a93f612e5d82ed8",
-  "source": "Fig14, PDF page16: experimental marker centres at vector polyline vertices, checked visually",
-  "omitted": "Hull A epsilon15% is rasterized/overlapped; not digitized. One C epsilon20% vertex above plot boundary excluded from metrics.",
-  "normalization": "A0=(mean Cw-Cw_steady)/(max Cw_steady * epsilon\u00b2), not total force",
-  "independence": "Multiple sizes, frequencies, amplitudes; published averages of repeated measurements, not raw repeats.",
-  "uncertainty": "Fig14 has no individual error bars; uncertainty in A0 is amplified by division by epsilon\u00b2."
-}

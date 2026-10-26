@@ -69,7 +69,7 @@ class RowingReference(OarReference):
         from scipy.interpolate import PchipInterpolator
 
         super().__init__(device)
-        calibration = json.loads((ROOT/'results/foot_reset_adjustment/seat_knee_172/calibration.json').read_text())
+        calibration = json.loads((ROOT/'data/seat_calibration.json').read_text())
         if hashlib.sha256((ROOT/'scene.xml').read_bytes()).hexdigest() != calibration['scene_sha256']:
             raise ValueError('Seat calibration is stale; recalibrate for the current scene')
         prior = np.loadtxt(ROOT/'data/reference9/aligned_priors.csv',delimiter=',',skiprows=1)

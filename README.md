@@ -1,109 +1,93 @@
-# H2 人形机器人单人双桨赛艇 MuJoCo 场景
+# 人形机器人双桨赛艇强化学习
 
-包含 H2、紧凑套筒手、滑座、船体与双桨模型及所需 STL。单位为米、千克、秒，角度为弧度。
+基于 mjlab、MuJoCo Warp 和 RSL-RL 的 H2 人形机器人双桨赛艇仿真。当前任务是划桨动作模仿：跟踪桨角、浸水投影面积、滑座和肘关节参考；尚未实现船速跟踪奖励。机器人模型为 **H2，而不是 G1**。
 
-## mjlab GPU 双桨模仿训练
+## 安装
 
-训练入口和安装说明见 [TRAINING_MJLAB.md](TRAINING_MJLAB.md)。实现 H2 非头部 29 关节策略、头部固定目标 PD、船体六自由度、双手刚性握持、骨盆座椅铰链，以及每物理子步更新的 Warp 水动力。Actor 使用 125 帧机载历史和 16 维 latent；Critic 增加不含世界位置的 27 维特权观测。
-
-```bash
-python -m pip install -r requirements-training.txt
-python -m rowing_mjlab.train --device cuda:0 --num-envs 2048
-```
-
-水动力仍是未标定训练近似。开发机器无 CUDA GPU；同核 CPU 验证和短训练冒烟不代表已完成大规模 GPU 性能或策略收敛验证。请使用文档中的 benchmark 命令测量目标显卡。
-
-## 0–4 m/s 训练近似入口（2026-10-24）
-
-新增可执行的低阶训练模型，见 [HYDRODYNAMICS_TRAINING.md](HYDRODYNAMICS_TRAINING.md)。使用 `TrainingRowingHydrodynamics`，支持低速/高 Fn 连续延拓、按回合域随机化、船体横流、尾鳍与分布桨叶载荷。该模型未对当前 CAD 标定，不代表真实流体载荷上界；保留严格实验参考和旧场景适配器供对照。
-
-结果位于 `results/training/`，包含船阻先验范围与真实轨迹桨叶力律的无重拟合对比。当前场景是 H2+紧凑套筒手，不是 G1。原始 XML 无驱动器；mjlab 训练入口在内存中增加驱动器、水动力和碰撞配置。
-
-## 水动力研究入口（2026-10-24）
-
-当前推荐的模型组织、理论依据、适用条件及未闭合部分见 [HYDRODYNAMICS_CORE.md](HYDRODYNAMICS_CORE.md)。其中区分了通用力学内核、限定几何/运动的实验参考与研究候选；尚不存在对当前 CAD 全部运动已验证的水动力模型。
-
-`hydrodynamics/core.py` 和 `hydrodynamics/reference_models.py` 提供新的理论及参考入口。历史 `RowingHydrodynamics` 场景适配器保留用于复现实验，明确标记为探索模型，不能据其数值稳定宣称物理精度。XML/STL 未因本轮水动力整理而改动。
+推荐 Linux、NVIDIA CUDA 显卡、Python 3.12。CPU 可用于小规模正确性检查。所有命令在仓库根目录执行。
 
 ```bash
-python -m pytest -q
-python tools/check_core_hydrodynamics.py
+git clone https://github.com/kingfloydz/rowing.git
+cd rowing
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
 ```
 
-新结果位于 `results/core/`。现有几何与固定机器人姿态下的浮态计算出现负横摇恢复刚度；这是需要核验几何、重心及主动平衡的计算结果，不是实物稳定性测量。
-
-## 运行
+Windows PowerShell 使用 `py -3.12 -m venv .venv` 和 `.venv\Scripts\Activate.ps1`。
+先按 [PyTorch 安装页面](https://pytorch.org/get-started/locally/)选择与显卡驱动兼容的 CUDA 版本安装 PyTorch，再安装本项目依赖：
 
 ```bash
 python -m pip install -r requirements.txt
+python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+```
+
+使用独立环境，避免既有 TensorFlow/NumPy 等依赖冲突。GPU 训练前最后一条命令应输出 `True`。
+
+## 训练
+
+```bash
+python -m rowing_mjlab.train --device cuda:0 --num-envs 2048 --iterations 10000
+```
+
+日志、TensorBoard、模型与 `settings.json` 默认保存在 `logs/rowing/<时间>/`。显存不足时降低 `--num-envs`，例如 512；2048 不是实测最优并行数。
+
+```bash
+# CPU 冒烟检查，不能替代 GPU 性能测试
+python -m rowing_mjlab.train --device cpu --num-envs 1 --iterations 1 --no-compile
+# 恢复训练：保留优化器和网络状态，重新初始化物理状态
+python -m rowing_mjlab.train --device cuda:0 --num-envs 2048 --resume logs/rowing/运行目录/model_100.pt
+# Actor + 环境吞吐测试，不包含 PPO 反向传播
+python -m rowing_mjlab.train --device cuda:0 --num-envs 2048 --benchmark --benchmark-steps 1000
+```
+
+船体附加质量/辐射记忆、桨叶附加惯量/入水项默认启用；分别使用 `--no-hull-radiation`、`--no-blade-inertia` 关闭以做消融。`--log-dir` 指定输出目录。
+
+## 浏览器回放
+
+```bash
+python -m rowing_mjlab.play --checkpoint-file logs/rowing/运行目录/model_100.pt --device cuda:0 --num-envs 1 --host 127.0.0.1 --port 8080
+```
+
+打开 `http://localhost:8080`。远程服务器可使用 SSH 端口转发；需要直接对外提供服务时指定 `--host 0.0.0.0`。Viser 提供暂停、单步、速度、重置与水面显示选项，不需要服务器 OpenGL 渲染。复制 checkpoint 时同时复制同目录的 `settings.json`。模型应与当前观测及网络结构一致。
+
+```bash
+# 不启动网页的短时推理检查
+python -m rowing_mjlab.play --checkpoint-file /path/model_100.pt --device cpu --smoke-steps 10
+# 本地查看静态装配，需要图形桌面
 python -m mujoco.viewer --mjcf=preview.xml
 ```
 
-- `preview.xml`：固定船体、零重力，启用双手与双桨、双脚与船体的四个 weld，适合查看装配。
-- `scene.xml`：相同装配，船体有 freejoint，重力为 -9.81 m/s²。尚未加入浮力、水动力、驱动器或控制器，因此运行时不会自行漂浮。
-- 两个 XML 均使用相对路径引用随附网格，可独立加载。
+`preview.xml` 固定船体且关闭重力。`scene.xml` 包含自由船体与重力，但水动力和驱动器由训练/回放入口注入；单独打开 scene.xml 不会自动漂浮。
 
-## 当前模型配置
+## 当前任务
 
-桨锁间距 1.58 m，滑座沿船体纵向滑动；骨盆与滑座之间保留 ±30° 俯仰铰链。双桨保留 sweep、elevation、feather 三个转动自由度。
+- 船体六自由度，左右桨各三个转动关节；双手与桨、双脚与船体采用 weld，骨盆连接滑座。
+- 策略输出 29 个非头部关节位置目标，头部采用固定目标 PD。物理步长 2 ms，策略频率 50 Hz。
+- Actor 单帧 110 维，使用过去 125 帧和当前帧；TCN 编码为 16 维 latent。Critic 另有 27 维特权观测。
+- 参考周期为 60/26 秒；首个完整周期半速，前 0.3 秒平滑接入。九个软参考来自不同研究，不代表同步采集或已证明可实现的 H2 闭链轨迹。
+- 奖励权重：桨叶浸水投影面积 0.75、桨角 0.60、滑座 0.25、肘角 0.15、归一化力矩平方 -0.001、动作变化平方 -0.005、碰撞 -0.10。总奖励由框架乘控制步长 0.02 s。
+- 横摇超过 60°或状态非有限时终止；40 秒时间截断。当前 GPU 任务使用名义水动力参数，未自动启用域随机化。
 
-整艇质量为 18 kg（不含双桨和机器人）。滑座显式黏性阻尼为 5 N·s/m；左右双桨的 sweep、elevation、feather 阻尼分别为 0.20、0.10、0.08 N·m·s/rad，覆盖原先继承的 0.05。阻尼满足 F=-bv 或 τ=-bω，属于未实测标定的机械耗散工程初值，不代表附加质量或水动力阻尼。滑座速度 0.5 m/s 时阻力为 2.5 N；桨轴速度 1 rad/s 时对应阻力矩为 0.20、0.10、0.08 N·m。训练和回放从 scene.xml 继承这些参数；preview.xml 同步设置。
+## 目录
 
-双手已替换为内径 34 mm、外径 50 mm、长 70 mm 的圆角套筒，通过直径 50 mm、外露长度 4 mm 的短柱连接手腕，交接处 R5。设计文件、安装参数与完整关节角见 [compact_hand](designs/compact_hand/README.md) 和 [pose_report.json](designs/compact_hand/pose_report.json)。两侧握持中心距各自桨坐标原点均为 0.785 m，整个套筒位于实际桨柄段内。
+| 路径 | 用途 |
+|---|---|
+| `rowing_mjlab/` | 训练、回放、环境、网络、GPU 水动力 |
+| `hydrodynamics/` | 网格几何、阻力参数和附加惯量准备 |
+| `data/` | 运行必需参数、参考轨迹及来源记录 |
+| `scene.xml`、`preview.xml` | 动态装配与静态预览 |
+| `boat_meshes/`、`official_h2/`、`designs/` | XML 引用的网格和模型许可 |
+| [HYDRODYNAMICS.md](HYDRODYNAMICS.md) | 实际水动力模型、参数、假设和适用范围 |
 
-双臂与双桨已联合求解。相对记录的旧姿态，左右肘关节世界轴线方向变化均为 4.95°；肘关节相对几何最大伸展位的弯曲分别为 2.81°、5.00°。连杆偏置使上臂和小臂锚点连线仍存在约 19° 的最小夹角，不应将其误读为同等肘屈曲量。双手与桨、双脚与船体使用六维 weld，统一使用 `solref=".004 1"` 与 `solimp=".99 .999 .001 .5 2"`。
+座椅标定为 `data/seat_calibration.json`，包含 scene.xml 的哈希；更改场景后必须重新核验标定，不应绕过一致性检查。
 
-新手按均匀铝材密度 2700 kg/m³ 计算质量与惯量，单手约 0.240 kg，属于材料假设。双臂、双桨新初始姿态已写入两个 XML；关节坐标映射经过重参数化一致性检查，原双桨参考轨迹无需重新数字化。桨叶厚度仍为 3 mm。
-
-质量和惯量含几何近似值，夹爪与桨的连接是等式约束，不是摩擦夹持仿真。已在 MuJoCo 3.11.0 中验证加载、初始约束残差及零重力短时运行；这不代表水动力或控制性能验证。
+水动力是未经当前 CAD 实艇标定的工程先验。CPU 检查不代表大规模 CUDA 吞吐或策略收敛验证；应在目标显卡上运行 benchmark。
 
 ## 模型来源与许可
 
-- H2：[Unitree 官方 unitree_ros / h2_description](https://github.com/unitreerobotics/unitree_ros/tree/073aec51f548add65baf482ea8bb3be4cb81b7ad/robots/h2_description)，提交 `073aec51f548add65baf482ea8bb3be4cb81b7ad`。原许可证保留于 `official_h2/LICENSE`。
-- Dex1：[well-robotics/rickshaw](https://github.com/well-robotics/rickshaw)，`assets/g1_dex1`，提交 `fbb16ec3c59b2dbf8a2eed6070ad6004be4ba501`。手指在来源网格基础上缩短。来源仓库未见独立根目录 LICENSE，此处不授予额外许可。
-- 赛艇：Carloski 基于 Cpt.Cosmos 的 single-scull-racing-shell-model，CC BY-NC 4.0。来源说明保留于 `boat_source_description.pdf`；本模型进行了统一缩放、网格合并、配色和桨叶减薄。
+- H2：[Unitree unitree_ros/h2_description](https://github.com/unitreerobotics/unitree_ros/tree/073aec51f548add65baf482ea8bb3be4cb81b7ad/robots/h2_description)，提交 `073aec51f548add65baf482ea8bb3be4cb81b7ad`；原许可证见 [official_h2/LICENSE](official_h2/LICENSE)。
+- 赛艇：[Carloski](https://printables.com/model/1009515-single-scull-racing-shell) 基于 [Cpt.Cosmos](https://printables.com/model/495139-single-scull-racing-shell) 的 Single Scull racing shell，采用 [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)。本项目进行了缩放、网格合并、配色、桨叶减薄和尾鳍重建，需保留署名且限非商业使用。
+- 紧凑套筒手为本项目装配几何。各第三方资产遵循各自许可，不对整套资产声明统一许可证。
 
-各第三方资产遵循各自许可，不对整套资产声明统一的开源许可。紧凑手的设计及逆运动学工具保留在 `designs/compact_hand/` 和 `tools/fit_compact_hand.py`。
-
-
-## 文献参考质量与惯量（2026-10-23）
-
-以下是文献参考与几何估算结合的参数集，不是当前 CAD 对应实物的实测结果。刚体惯量不包含流体附加质量/惯量。
-
-| 参数 | 当前值 | 依据 |
-|---|---:|---|
-| 船艇质量（不含桨、机器人） | 18 kg | 用户指定的整艇质量；含必要附件，不是14 kg竞赛最低艇重 |
-| 固定船体 / 滑座 / 单侧桨锁 | 17 / 0.8 / 0.1 kg | 工程质量拆分；增加的4 kg分配至固定船体 |
-| 固定船体质心纵摇惯量 Iyy | 45.26886 kg·m² | 原34.6173606503 × (17/13)，保持归一化质量分布 |
-| 单桨质量 | 1.5 kg | Kleshnev 2015/05 常见双桨参考值 |
-| 单桨质心 | 桨锁向桨叶侧 0.55 m | 同一来源；局部 Y：port +0.55、starboard -0.55 m |
-| 单桨绕桨锁横向摆动惯量 | 3.2 kg·m² | 同一来源中的标准双桨参考值 |
-| 单桨质心横向惯量 Ixx、Izz | 2.74625 kg·m² | 平行轴定理 3.2 - 1.5 × 0.55²；两个横向方向取相同值是细长桨近似 |
-| 单桨质心纵轴惯量 Iyy | 0.002116489 kg·m² | 原网格估计 × (1.5/1.4)，不是文献实测值 |
-
-船体参考源采用 8.2 m、15 kg、纵摇惯量 66 kg·m² 的算例，其原文明确说明部分几何与参数是合理假定。最初13 kg固定船体仅迁移 I/(mL²) 系数，使用质心二阶质量矩变换保持惯性张量物理可行。当前固定船体增至17 kg后，假设新增质量按原质量分布配置，完整质心惯性张量同比乘以17/13；质心和视觉网格不变。该处理属于质量分布估算，不代表实物配重测量。
-
-固定船体 fullinertia（Ixx Iyy Izz Ixy Ixz Iyz）：
-`0.4577385201 45.268856235008 45.499430138085 0.0017338012492208 -0.25671781063977 0.00030008570523077`。
-
-桨采用局部 Y 为纵轴的对角质心惯性张量；忽略横向质心偏移与惯性积也是建模近似。3.2 是桨锁处的参考惯量，XML 中填入的是质心惯量 2.74625，避免重复计入平行轴项。该参考桨不声称复现某一具体厂商型号，也不是由当前 STL 唯一推导得到。
-
-来源：
-- [World Rowing 2025 rules，Appendix R3](https://worldrowing.com/wp-content/uploads/2025/04/2025-World-Rowing-Rules-of-Racing-Overall-Classic-rowing-Related-byelaws_March2025.pdf)
-- [Formaggia 等，A model for the dynamics of rowing boats，DOI:10.1002/fld.1940](https://doi.org/10.1002/fld.1940)
-- [Kleshnev，Oar inertia forces，Rowing Biomechanics Newsletter 170，2015/05](https://www.biorow.com/RBN_en_2015_files/2015RowBiomNews05.pdf)
-
-验证：两个发布场景可加载；有质量刚体的主惯量为正且满足三角不等式；刚体初始位置、姿态及关节配置保持不变；初始等式约束残差约 9.7e-13；零重力 2 s 运行最大广义坐标漂移小于 4e-8。尚未验证水动力或受载控制稳定性。
-
-
-## 桨叶 3 mm 几何更新
-
-使用 `boat_meshes/port_blade_3mm.stl` 和 `starboard_blade_3mm.stl`。3 mm 指原桨局部 X 方向的最大包围厚度，不是曲面各处恒定的法向壁厚。两片网格均封闭，场景加载通过。质量、质心及惯量继续采用上节文献参考参数，不按外观厚度比例缩减；未建立材料与内部结构模型。
-
-## mjlab 船体附加质量与辐射记忆
-
-mjlab 训练默认启用基于当前浸水几何的六自由度附加质量和被动时域辐射模型，无需指定划频。附加惯量进入原生质量矩阵；辐射记忆增加一个批量 Warp 内核。完整参数、理论近似、适用范围、测试及 GPU 对照命令见 [HULL_RADIATION.md](HULL_RADIATION.md)。这些是未经 BEM/实艇辨识的工程先验；原 CPU `training_adapter` 不自动启用。使用 `--no-hull-radiation` 可进行消融与吞吐量对照。
-
-## mjlab 桨叶附加惯量与入水
-
-桨叶默认增加 8 kg/片的全浸没法向附加质量先验，按 16 条带计算变化湿润质量和入水动量，包含分布转动惯性及旋转速度项。GPU 路径新增两个批量内核；`--no-blade-inertia` 可单独关闭。公式、诊断量、数值分辨率与适用范围见 [BLADE_INERTIA.md](BLADE_INERTIA.md)。该工程模型未标定真实入水冲击峰值。
+参考轨迹出处保存在 `data/rowing_reference_provenance.json`、`data/reference9/source_provenance.json`。
