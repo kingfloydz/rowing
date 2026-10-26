@@ -69,9 +69,15 @@ class RowingReference(OarReference):
         from scipy.interpolate import PchipInterpolator
 
         super().__init__(device)
-        calibration = json.loads((ROOT/'data/seat_calibration.json').read_text())
-        if hashlib.sha256((ROOT/'scene.xml').read_bytes()).hexdigest() != calibration['scene_sha256']:
-            raise ValueError('Seat calibration is stale; recalibrate for the current scene')
+        calibration = json.loads((ROOT/'data/seat_calibration.json').read_text(encoding='utf-8'))
+        # Git may convert LF to CRLF on checkout; hash a canonical LF representation.
+        scene_bytes = (ROOT/'scene.xml').read_bytes().replace(b'\r\n', b'\n')
+        scene_hash = hashlib.sha256(scene_bytes).hexdigest()
+        if scene_hash != calibration['scene_sha256']:
+            raise ValueError(
+                'Seat calibration is stale; recalibrate for the current scene. '
+                f"Expected {calibration['scene_sha256']}, got {scene_hash}."
+            )
         prior = np.loadtxt(ROOT/'data/reference9/aligned_priors.csv',delimiter=',',skiprows=1)
         phase = prior[:,0]
         oars = np.loadtxt(ROOT/'data/rowing_reference.csv',delimiter=',',skiprows=1)

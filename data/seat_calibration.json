@@ -2,7 +2,7 @@
   "target_included_angle_deg": 172,
   "target_flexion_deg": 8,
   "definition": "sagittal hip_pitch-anchor / knee-anchor / ankle_pitch-anchor included angle; proxy for human landmarks",
-  "scene_sha256": "6587b9e9604607dc245c9c38ea19d35bac389e2f747eaf086d86df312ba90055",
+  "scene_sha256": "22f2cd32da99135cf09f51cb73b1e2180663944cac847cecf644d824634f3350",
   "finish_seat_joint_m": 0.2533400110211172,
   "finish_motor_angles_deg": [
     16.615373882478185,

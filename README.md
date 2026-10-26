@@ -80,7 +80,7 @@ python -m mujoco.viewer --mjcf=preview.xml
 | `boat_meshes/`、`official_h2/`、`designs/` | XML 引用的网格和模型许可 |
 | [HYDRODYNAMICS.md](HYDRODYNAMICS.md) | 实际水动力模型、参数、假设和适用范围 |
 
-座椅标定为 `data/seat_calibration.json`，包含 scene.xml 的哈希；更改场景后必须重新核验标定，不应绕过一致性检查。
+座椅标定为 `data/seat_calibration.json`，其中 `scene_sha256` 为 scene.xml 将 CRLF 换行统一为 LF 后的 SHA-256；生成标定与运行时校验必须采用相同规则，避免跨平台换行差异造成误报。更改场景内容后必须重新核验标定，不应通过直接更新哈希绕过一致性检查。
 
 水动力是未经当前 CAD 实艇标定的工程先验。CPU 检查不代表大规模 CUDA 吞吐或策略收敛验证；应在目标显卡上运行 benchmark。
 
