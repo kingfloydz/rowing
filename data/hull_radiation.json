@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "dof_order": [
+    "u",
+    "v",
+    "w",
+    "p",
+    "q",
+    "r"
+  ],
+  "status": "unvalidated geometry-based passive engineering prior, not BEM data",
+  "reference_point_body_m": [
+    -0.002635805968659491,
+    0.0,
+    -0.12027640288595698
+  ],
+  "rho_reference_kg_m3": 1000.0,
+  "pole_rad_s": 5.333763095472519,
+  "damping_ratio": 1.0,
+  "added_mass_inf": [
+    [
+      0.2794021829141922,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      40.85708409031975,
+      0.0,
+      0.0,
+      0.0,
+      -3.95859916607726
+    ],
+    [
+      0.0,
+      0.0,
+      83.39893631070704,
+      0.0,
+      5.602646770000163,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      0.07270251350932172,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      5.602646770000163,
+      0.0,
+      127.91387142351188,
+      0.0
+    ],
+    [
+      0.0,
+      -3.95859916607726,
+      0.0,
+      0.0,
+      0.0,
+      78.21722563094809
+    ]
+  ],
+  "radiation_delta_mass": [
+    [
+      0.2794021829141922,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      40.85708409031975,
+      0.0,
+      0.0,
+      0.0,
+      -3.95859916607726
+    ],
+    [
+      0.0,
+      0.0,
+      83.39893631070704,
+      0.0,
+      5.602646770000163,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      0.07270251350932172,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      5.602646770000163,
+      0.0,
+      127.91387142351188,
+      0.0
+    ],
+    [
+      0.0,
+      -3.95859916607726,
+      0.0,
+      0.0,
+      0.0,
+      78.21722563094809
+    ]
+  ],
+  "geometry": {
+    "mesh": "shell_white.stl",
+    "sha256": "3bc5c67242a7c818615aa6d5dcbc0e90b5ed7c543167f66d98d0136a19633054",
+    "water_level_body_m": -0.12027640288595698,
+    "waterline_length_m": 5.873023460837786,
+    "maximum_wet_beam_m": 0.34482723762673295,
+    "draft_m": 0.11188441867108802,
+    "displaced_volume_m3": 0.09088271934401218,
+    "strip_sections": 241
+  },
+  "assumptions": {
+    "half_domain_factor": 0.5,
+    "instantaneous_fraction": 0.5,
+    "radiation": "one critically damped pole pair shared by six DOFs",
+    "pole_rule": "sqrt(g / maximum_wet_beam); not stroke frequency",
+    "speed": "zero-forward-speed coefficients used as a training approximation"
+  },
+  "sources": [
+    "https://home.hvl.no/ansatte/gste/ftp/MarinLab_files/Litteratur/Marine_Hydrodynamics_Newman_2018.pdf",
+    "https://doi.org/10.1017/jfm.2020.1104",
+    "https://wec-sim.github.io/WEC-Sim/main/theory/theory.html"
+  ]
+}

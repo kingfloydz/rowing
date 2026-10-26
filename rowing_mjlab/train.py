@@ -17,6 +17,10 @@ def main():
     parser.add_argument('--resume',type=Path)
     parser.add_argument('--log-dir',type=Path)
     parser.add_argument('--compile',action=argparse.BooleanOptionalAction,default=True)
+    parser.add_argument('--hull-radiation',action=argparse.BooleanOptionalAction,default=True,
+                        help='Hull added inertia and radiation memory (disable for an ablation/benchmark)')
+    parser.add_argument('--blade-inertia',action=argparse.BooleanOptionalAction,default=True,
+                        help='Distributed blade added inertia and entry momentum (default on)')
     parser.add_argument('--benchmark',action='store_true',help='Full Actor+environment throughput, no training')
     parser.add_argument('--benchmark-steps',type=int,default=1000)
     args = parser.parse_args()
@@ -35,6 +39,8 @@ def main():
     from .networks import HISTORY_LENGTH, LATENT_DIM, TCN_CHANNELS, PRIVILEGED_DIM
     configure_torch_backends()
     cfg = env_cfg(args.num_envs)
+    cfg.actions['h2'].hull_radiation = args.hull_radiation
+    cfg.actions['h2'].blade_inertia = args.blade_inertia
     cfg.seed = args.seed
     agent = rl_cfg(args.num_envs)
     agent.seed = args.seed
@@ -56,6 +62,8 @@ def main():
                     'physics_dt':env.physics_dt,'control_dt':env.step_dt,
                     'history_frames':HISTORY_LENGTH,'latent_dim':LATENT_DIM,'tcn_channels':TCN_CHANNELS,'privileged_dim':PRIVILEGED_DIM,
                     'hydro_faces':env.rowing.hydro.face_count,'water_level_m':float(env.rowing.hydro.water.numpy()[0,0]),
+                    'hull_radiation':env.rowing.hydro.radiation.parameters if args.hull_radiation else None,
+                    'blade_inertia':env.rowing.hydro.blade_inertia.parameters if args.blade_inertia else None,
                     'settings':asdict(agent)}
         (log_dir/'settings.json').write_text(json.dumps(metadata,indent=2),encoding='utf8')
         if args.benchmark:

@@ -7,11 +7,12 @@ from mjlab.managers.action_manager import ActionTerm, ActionTermCfg
 from hydrodynamics.models import ROOT
 from .asset import OAR_NAMES, h2_names
 from .hydro import WarpHydrodynamics
-from .reference import OarReference
+from .reference import RowingReference, IMITATION_NAMES
+from .blade_area import BladeAreaReference
 
 
 class RowingState:
-    def __init__(self,env):
+    def __init__(self,env,hull_radiation=True,blade_inertia=True):
         self.env = env
         model = env.sim.mj_model
         device = env.device
@@ -33,24 +34,32 @@ class RowingState:
         policy_ids = [model.joint('rowing/'+n).id for n in self.policy_names]
         self.limits = torch.tensor(model.jnt_range[joint_ids].copy(),device=device,dtype=torch.float32)
         self.torque_limits = torch.tensor(model.jnt_actfrcrange[policy_ids,1].copy(),device=device,dtype=torch.float32)
-        self.ref = OarReference(device)
+        self.imitation_q = joints(IMITATION_NAMES,'jnt_qposadr')
+        self.ref = RowingReference(device,model,prefix='rowing/')
+        self.initial_imitation = self.q0[self.imitation_q]
         self.initial_oars = self.q0[self.oar_q]
         self.phase0 = self.ref.nearest(self.initial_oars)
-        self.hydro = WarpHydrodynamics(model,env.num_envs,device,prefix='rowing/')
+        self.hydro = WarpHydrodynamics(model,env.num_envs,device,prefix='rowing/',
+            hull_radiation=hull_radiation,blade_inertia=blade_inertia)
         provenance = json.loads((ROOT/'data/rowing_reference_provenance.json').read_text())
         wp.to_torch(self.hydro.water)[:,0] = provenance['water_level_m_at_repository_reset']
+        self.water_level = wp.to_torch(self.hydro.water)[:,0]
+        self.blade_area = BladeAreaReference(model,self.ref,
+            provenance['water_level_m_at_repository_reset'],device,prefix='rowing/')
         self.loads = wp.to_torch(self.hydro.loads)
         # Resolve entity-local indices independently from model joint order.
         entity = env.scene['rowing']
         self.entity_joint_ids,_ = entity.find_joints(self.h2_names,preserve_order=True)
 
     def reference(self):
-        return self.ref.target(self.env.episode_length_buf*self.env.step_dt,self.phase0,self.initial_oars)
+        return self.ref.target(self.env.episode_length_buf*self.env.step_dt,self.phase0,self.initial_imitation)
 
 
 @dataclass(kw_only=True)
 class RowingActionCfg(ActionTermCfg):
     scale: float = 1.0  # Fraction of available joint travel on each side of q0.
+    hull_radiation: bool = True
+    blade_inertia: bool = True
 
     def build(self,env):
         return RowingAction(self,env)
@@ -59,7 +68,7 @@ class RowingActionCfg(ActionTermCfg):
 class RowingAction(ActionTerm):
     def __init__(self,cfg,env):
         super().__init__(cfg,env)
-        env.rowing = RowingState(env)
+        env.rowing = RowingState(env,hull_radiation=cfg.hull_radiation,blade_inertia=cfg.blade_inertia)
         self.state = env.rowing
         self._raw = torch.zeros(env.num_envs,self.action_dim,device=env.device)
         self.targets = self.state.q0[self.state.h2_q].expand(env.num_envs,-1).clone()
@@ -90,6 +99,7 @@ class RowingAction(ActionTerm):
         ids = slice(None) if env_ids is None else env_ids
         self._raw[ids] = 0
         self.targets[ids] = self.state.q0[self.state.h2_q]
+        self.state.hydro.reset(env_ids)
 
 
 def install_hydrodynamics(env,env_ids=None):
@@ -97,6 +107,10 @@ def install_hydrodynamics(env,env_ids=None):
         raise RuntimeError('A control callback already exists; do not silently replace it')
     env.sim.wp_model.callback.control = env.rowing.hydro
     wp.load_module(module='rowing_mjlab.hydro',device=env.device)
+    if env.rowing.hydro.radiation is not None:
+        wp.load_module(module='rowing_mjlab.radiation',device=env.device)
+    if env.rowing.hydro.blade_inertia is not None:
+        wp.load_module(module='rowing_mjlab.blade_inertia',device=env.device)
     # Re-capture so step AND forward graphs include current-state hydrodynamics.
     env.sim.create_graph()
 
@@ -131,7 +145,7 @@ def privileged(env):
 
 def track_oars(env):
     s = env.rowing
-    target = s.reference()[-1]
+    target = s.reference()[-1][...,:6]
     error = ((env.sim.data.qpos[:,s.oar_q]-target)/s.ref.sigma).reshape(-1,2,3)
     scores = torch.exp(-error.square().mean(1))
     return 0.40*scores[:,0]+0.35*scores[:,1]+0.25*scores[:,2]
@@ -165,9 +179,47 @@ def invalid_state(env):
 
 def tracking_rmse_deg(env):
     s = env.rowing
-    return torch.rad2deg((env.sim.data.qpos[:,s.oar_q]-s.reference()[-1]).square().mean(-1).sqrt())
+    return torch.rad2deg((env.sim.data.qpos[:,s.oar_q]-s.reference()[-1][...,:6]).square().mean(-1).sqrt())
 
 
 def torque_saturation(env):
     s = env.rowing
     return (env.sim.data.qfrc_actuator[:,s.policy_v].abs() >= .98*s.torque_limits).float().mean(-1)
+
+
+def track_seat(env):
+    s = env.rowing
+    error = (env.sim.data.qpos[:,s.imitation_q[6]]-s.reference()[-1][:,6])/s.ref.seat_sigma
+    return torch.exp(-error.square())
+
+
+def track_elbows(env):
+    s = env.rowing
+    error = (env.sim.data.qpos[:,s.imitation_q[7:]]-s.reference()[-1][:,7:])/s.ref.elbow_sigma
+    return torch.exp(-error.square().mean(-1))
+
+
+def seat_error_m(env):
+    s = env.rowing
+    return (env.sim.data.qpos[:,s.imitation_q[6]]-s.reference()[-1][:,6]).abs()
+
+
+def elbow_rmse_deg(env):
+    s = env.rowing
+    return torch.rad2deg((env.sim.data.qpos[:,s.imitation_q[7:]]-s.reference()[-1][:,7:]).square().mean(-1).sqrt())
+
+
+def blade_area_error(env):
+    s = env.rowing
+    phase,_,blend,_ = s.reference()
+    return s.blade_area.actual(env.sim.data,s.water_level)-s.blade_area.target(phase,blend)
+
+
+def track_blade_area(env):
+    s = env.rowing
+    error = blade_area_error(env)/(s.blade_area.full_area*s.blade_area.sigma)
+    return torch.exp(-error.square().mean(-1))
+
+
+def blade_area_rmse_m2(env):
+    return blade_area_error(env).square().mean(-1).sqrt()

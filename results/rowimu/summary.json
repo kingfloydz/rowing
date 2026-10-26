@@ -1,0 +1,136 @@
+{
+  "source_url": "https://ojs.ub.uni-konstanz.de/cpa/article/download/6500/5867",
+  "source_sha256": "199b8f380f0432aa29add1d1eeadbf357b72d1c4f52dd68feb9c1437a272e914",
+  "data_status": "One-oar printed curves digitized; second oar mirrored; no synchronized bilateral measurements",
+  "reference_statistic": "Median colored pixels per column; bands are pixel spread, not statistical confidence intervals",
+  "smoothing": "Periodic Gaussian: sigma 1.25% cycle for angles, 0.5% for displayed measured force; then periodic cubic spline",
+  "pixel_calibration": {
+    "sweep_deg": {
+      "embedded_image_index": 4,
+      "x_at_phase_0": 134,
+      "x_at_phase_1": 518,
+      "y_at_zero": 138,
+      "pixels_per_unit": 2.06
+    },
+    "elevation_deg": {
+      "embedded_image_index": 2,
+      "x_at_phase_0": 124,
+      "x_at_phase_1": 498,
+      "y_at_zero": 143,
+      "pixels_per_unit": 12.36
+    },
+    "feather_deg": {
+      "embedded_image_index": 1,
+      "x_at_phase_0": 128,
+      "x_at_phase_1": 514,
+      "y_at_zero": 312,
+      "pixels_per_unit": 2.44
+    },
+    "handle_force_N": {
+      "embedded_image_index": 0,
+      "x_at_phase_0": 126,
+      "x_at_phase_1": 507,
+      "y_at_zero": 285,
+      "pixels_per_unit": 1.335
+    }
+  },
+  "stroke_rate_spm": 26,
+  "period_s": 2.3076923076923075,
+  "water_z_m": 0,
+  "level_heave_m": 0.12027640288595698,
+  "static_condition": "Vertical force balance at original pose, roll/pitch held level; not free trim equilibrium",
+  "motion_condition": "Prescribed oar motion, hull attitude/heave fixed; H2 NOT executing these trajectories",
+  "force_condition": "Current harmonic quasi-steady training closure plus geometric buoyancy; no slamming/history/added mass",
+  "speed_condition": "U=0 is stationary hull; U=1..4 are prescribed forward speeds, not simulated speed response",
+  "handle_force_definition": "Hydrodynamic moment about signed vertical oarlock axis divided by horizontal handle lever, opposing water load; excludes oar inertia, gravity, hand torque and H2 dynamics",
+  "source_angle_mapping": "Physical elevation = printed elevation minus 6 deg, user-selected; feather 90deg=square",
+  "plot_coordinates": "World boat x unchanged; display axis reversed so bow is left and catch at left, finish at right",
+  "tip_geometry": "Single distal end edge between its upper and lower endpoints; excludes top/bottom perimeter",
+  "waterline_status": "Physical vertical-balance waterline unchanged; user-selected -6deg offset; force prediction remains unvalidated",
+  "sides": {
+    "port": {
+      "pivot_height_m": 0.32777413728595695,
+      "orientation_retarget_max_error_deg": 7.214615467279318e-10,
+      "joint_min_deg": [
+        -27.772563679384618,
+        0.7072808814549818,
+        -6.248935831256647
+      ],
+      "joint_max_deg": [
+        77.37177071290087,
+        14.444856781930302,
+        83.77667094248133
+      ],
+      "handle_horizontal_lever_range_m": [
+        0.768612857572432,
+        0.803450842844923
+      ],
+      "wet_fraction_range": [
+        0.0,
+        1.0000000000000016
+      ],
+      "blade_z_range_m": [
+        -0.40598291308386003,
+        0.2225758196289765
+      ],
+      "max_relative_water_power_W": 0.0,
+      "wet_phase_range": [
+        0.0,
+        1.0
+      ],
+      "force_peaks_N": {
+        "0": 5683.410257605549,
+        "1": 3869.0302078487243,
+        "2": 2410.363783761902,
+        "3": 1305.519109394749,
+        "4": 558.6911653062788
+      }
+    },
+    "starboard": {
+      "pivot_height_m": 0.32777413728595695,
+      "orientation_retarget_max_error_deg": 1.1918053791951493e-09,
+      "joint_min_deg": [
+        -77.37177071603466,
+        -14.44485678206022,
+        -6.248935831226656
+      ],
+      "joint_max_deg": [
+        27.772563676251355,
+        -0.707280881584725,
+        83.77667094251164
+      ],
+      "handle_horizontal_lever_range_m": [
+        0.7686128575724317,
+        0.8034508428449229
+      ],
+      "wet_fraction_range": [
+        0.0,
+        1.0000000000000016
+      ],
+      "blade_z_range_m": [
+        -0.4060602860780551,
+        0.23085061908739074
+      ],
+      "max_relative_water_power_W": 0.0,
+      "wet_phase_range": [
+        0.0,
+        1.0
+      ],
+      "force_peaks_N": {
+        "0": 5602.65714987891,
+        "1": 3817.141368035022,
+        "2": 2381.3298779159563,
+        "3": 1295.6212544586872,
+        "4": 562.7061871743908
+      }
+    }
+  },
+  "elevation_offset_deg": -6.0,
+  "offset_provenance": "Explicit user-selected geometric retargeting, not measured RowIMU calibration",
+  "verification": {
+    "adapter_moment_checks": 16,
+    "passivity": "all sampled wetted tractions non-positive power",
+    "dry_force": "zero",
+    "finite_forces": true
+  }
+}

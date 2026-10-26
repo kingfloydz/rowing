@@ -1,0 +1,117 @@
+{
+  "status": "Cross-study kinematic priors, NOT synchronized human recordings; not yet H2-feasible",
+  "sources": {
+    "seat": {
+      "doi": "10.3390/s23031060",
+      "pdf_sha256": "176f5305a652275f5719f5c03f7e28b8b214fe5684cc4e4c7310c2da22f7dead",
+      "page": 8,
+      "figure": 4,
+      "series": "Stage 4, participant 3 example",
+      "method": "1001 PDF vector vertices",
+      "protocol_spm": 26,
+      "pooled_observed_spm": 28.97,
+      "pooled_rate_not_individual_rate": true,
+      "raw_seat_range_m": [
+        0.0062134927272727465,
+        0.5837929714452214
+      ]
+    },
+    "elbow": {
+      "doi": "10.3390/app14199055",
+      "pdf_sha256": "dbf8884d022770d6c8960d99233fb12b22d9ae22dd3d35e7944e38994550640f",
+      "page": 6,
+      "figure": 2,
+      "series": "left elbow mean across 12 rowers; right not measured",
+      "method": "black mean-line pixels from embedded 3296x1460 image",
+      "calibration": {
+        "x_catch": 142,
+        "x_finish": 653,
+        "x_next_catch": 1122,
+        "y_zero": 830,
+        "pixels_per_deg": 1.9333333333333333
+      },
+      "raw_range_deg": [
+        4.913793103448276,
+        101.37931034482759
+      ]
+    },
+    "oars": {
+      "source_url": "https://ojs.ub.uni-konstanz.de/cpa/article/download/6500/5867",
+      "source_sha256": "199b8f380f0432aa29add1d1eeadbf357b72d1c4f52dd68feb9c1437a272e914",
+      "description": "Digitized RowIMU single-oar curves mirrored, retargeted to this CAD with -6 degree shaft elevation offset. Not measured bilateral motion.",
+      "period_s": 2.3076923076923075,
+      "units": "rad",
+      "water_level_m_at_repository_reset": -0.12027640288595698
+    }
+  },
+  "period_s": 2.3076923076923075,
+  "samples_including_periodic_endpoint": 401,
+  "target_events": {
+    "catch_phase": 0,
+    "release_phase": 0.4
+  },
+  "seat_phase_method": "5% positive handle-force peak crossings; approximate events, not blade tracking",
+  "seat_event_threshold_sensitivity": {
+    "0.02": {
+      "catch": 0.01995785069908138,
+      "release": 0.4647529071458048
+    },
+    "0.05": {
+      "catch": 0.04601790895707656,
+      "release": 0.46021625501446395
+    },
+    "0.1": {
+      "catch": 0.10099706939352755,
+      "release": 0.4536699947282697
+    }
+  },
+  "elbow_phase_method": "map printed Catch-Finish-Catch separately to 0,0.4,1; figure fraction is NOT time",
+  "smoothing": "periodic Gaussian sigma=0.2% cycle and periodic cubic interpolation; raw curves retained",
+  "seat_units": "raw metres; aligned shape normalized; robot amplitude/offset not yet identified",
+  "elbow_units": "raw anatomical degrees, aligned anatomical radians; not H2 encoder coordinates",
+  "uncertainty": "PDF plotting precision is not experimental sensor accuracy; elbow pixel scale ~0.52 deg/pixel",
+  "model_seat_mapping": {
+    "model_joint": "seat_slide",
+    "reset_coordinate_m_information_only": 0.028,
+    "reference_start_phase_information_only": 0.19091796875,
+    "reference_datum": "boat-frame mean left/right ankle pitch joint center (fixed by foot welds)",
+    "seat_point": "seat body frame origin; not anatomical hip or mesh center",
+    "mean_ankle_center_x_m": -0.5398091662703439,
+    "seat_x_at_joint_zero_m": 0.13295420895,
+    "distance_at_joint_zero_m": 0.6727633752203439,
+    "physical_coordinate_formula": "seat_minus_ankle_longitudinal_distance = distance_at_joint_zero + q_seat",
+    "direction_sign": 1,
+    "offset_m": -0.0597387161627272,
+    "span_m": 0.18433982076560726,
+    "calibration_status": "whole_cycle_kinematic_fit_pending_collision_validation",
+    "formula": "q_seat(phi) = fitted_offset + fitted_span * normalized_shape(phi)",
+    "range_m": [
+      -0.05957428470426754,
+      0.12459697328187501
+    ],
+    "experimental_origin_not_transferred": true,
+    "reset_is_not_a_reference_anchor": true,
+    "position_at_selected_start_m": -0.011144323102176251,
+    "range_is_not_full_chain_reachability": true,
+    "fitting_method": "Joint constrained optimization of pose sequence, seat offset and seat span; no reset anchor",
+    "offset_bounds_m": [
+      -0.24,
+      0.24
+    ],
+    "span_bounds_m": [
+      0.0,
+      0.48
+    ],
+    "physical_distance_range_m": [
+      0.6131890905160764,
+      0.7973603485022189
+    ],
+    "collision_penalty_weight": 300.0
+  },
+  "elbow_extension_coordinates_rad": [
+    1.3367544075489928,
+    1.3367544070680557
+  ],
+  "nine_channel_priors": "rowing_reference9_priors.csv; NOT feasible trajectory. Elbow limits deliberately not clipped.",
+  "scene_sha256": "fb3e55725b1b042d4c2b2fb5008978b5b9eb83db79d0ba6021ed5a2c7dbd7cba"
+}

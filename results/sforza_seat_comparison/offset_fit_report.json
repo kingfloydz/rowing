@@ -1,0 +1,35 @@
+{
+  "definition": "theta_new=theta_Sforza+delta_deg; fitted_position=q_H2(theta_new)-old_q_finish+shift_m",
+  "time_alignment": "previous maximum-extension phase alignment retained; no phase shift or time warp",
+  "delta_knee_flexion_deg": -9.727829978645145,
+  "delta_included_angle_deg": 9.727829978645145,
+  "seat_vertical_shift_m": -0.08490770663198506,
+  "fit_domain_original_flexion_deg": [
+    20,
+    90
+  ],
+  "offset_search_bounds_deg": [
+    -15.964060096906305,
+    16.712965253907242
+  ],
+  "fit_sample_count": 683,
+  "comparison_sample_count": 1501,
+  "fit_rmse_before_m": 0.0941553392752746,
+  "fit_rmse_after_m": 0.0820357318682869,
+  "validation_common_valid_count": 870,
+  "validation_common_rmse_before_m": 0.09631388550188871,
+  "validation_common_rmse_after_m": 0.09090333093685635,
+  "after_valid_fraction_in_overlap": 0.631578947368421,
+  "mapped_angle_domain_deg": [
+    4.235294117647072,
+    106.6301880444152
+  ],
+  "full_trace_angle_span_deg": 120.93885109460803,
+  "at_search_boundary": false,
+  "limitations": [
+    "Optimum is conditional on fixed 20-90 degree fitting domain, not a full-cycle optimum",
+    "Seat shift is comparison-datum offset, not an IK-feasible translation of robot poses",
+    "No clipping or extrapolation of missing IK map; missing sections cannot be training targets",
+    "Previous pelvis selection rule and human landmark proxy still apply"
+  ]
+}

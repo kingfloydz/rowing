@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "status": "unvalidated finite-strip added-inertia and water-recruitment prior",
+  "full_normal_mass_kg_per_blade": 8.0,
+  "rho_reference_kg_m3": 1000.0,
+  "strips_per_blade": 16,
+  "cells_per_strip": 4,
+  "wetting_depth_m": 0.01,
+  "wetting_law": "cell-integrated cubic smoothstep below the water surface; strip mass proportional to wet fraction squared",
+  "entry_law": "-max(local_mass_rate, 0) * normal_relative_velocity",
+  "sources": [
+    "https://doi.org/10.1017/jfm.2019.102",
+    "https://arxiv.org/html/1904.09338",
+    "https://doi.org/10.1017/jfm.2023.820"
+  ]
+}

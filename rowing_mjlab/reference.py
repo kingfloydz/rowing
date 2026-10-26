@@ -49,3 +49,52 @@ class OarReference:
         blend = 10*u**3-15*u**4+6*u**5
         target = reset_angles+blend[...,None]*(self(phase)-reset_angles)
         return phase,rate,blend,target
+
+
+IMITATION_NAMES = tuple(s+'_'+j for s in ('port','starboard')
+                        for j in ('sweep','elevation','feather')) + (
+                            'seat_slide','left_elbow_joint','right_elbow_joint')
+
+
+class RowingReference(OarReference):
+    """Nine synchronized soft targets; not a certified closed-chain trajectory.
+
+    Seat retains the calibrated source stroke. Human flexion in radians is used
+    directly as elbow joint qpos, without offset, geometric inversion or clipping.
+    Right elbow mirrors the available left prior. Runtime stays on the device.
+    """
+    def __init__(self, device, model, prefix=''):
+        import hashlib
+        import json
+        from scipy.interpolate import PchipInterpolator
+
+        super().__init__(device)
+        calibration = json.loads((ROOT/'results/foot_reset_adjustment/seat_knee_172/calibration.json').read_text())
+        if hashlib.sha256((ROOT/'scene.xml').read_bytes()).hexdigest() != calibration['scene_sha256']:
+            raise ValueError('Seat calibration is stale; recalibrate for the current scene')
+        prior = np.loadtxt(ROOT/'data/reference9/aligned_priors.csv',delimiter=',',skiprows=1)
+        phase = prior[:,0]
+        oars = np.loadtxt(ROOT/'data/rowing_reference.csv',delimiter=',',skiprows=1)
+        values = np.empty((len(phase),9))
+        values[:,:6] = CubicSpline(oars[:,0],oars[:,1:],bc_type='periodic')(phase)
+        # Normalize the aligned waveform to retain the full measured stroke.
+        seat = prior[:,1]
+        values[:,6] = calibration['finish_seat_joint_m'] + calibration['source_seat_span_m']*((seat-seat.min())/np.ptp(seat)-1)
+        # Direct human-flexion targets in radians, as requested. The source
+        # contains only left elbow measurements; reuse them for the right.
+        values[:,7:] = prior[:,2,None]
+        values[-1] = values[0]
+        self.n = len(phase)-1
+        if not np.allclose(phase,np.linspace(0,1,self.n+1)):
+            raise ValueError('Reference needs a uniform phase grid')
+        # Shape-preserving interpolation avoids overshooting seat/elbow limits.
+        self.coefficients = torch.as_tensor(PchipInterpolator(phase,values).c,
+                                             dtype=torch.float32,device=device)
+        # Preserve the existing periodic oar spline exactly.
+        self.oars = OarReference(device)
+        self.seat_sigma = 0.05  # metres
+        self.elbow_sigma = float(np.deg2rad(15))
+
+    def __call__(self, phase):
+        values = super().__call__(phase)
+        return torch.cat((self.oars(phase),values[...,6:]),dim=-1)

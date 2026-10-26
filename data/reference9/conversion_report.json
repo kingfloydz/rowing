@@ -1,0 +1,55 @@
+{
+  "status": "candidate_not_activated",
+  "scene_sha256": "fb3e55725b1b042d4c2b2fb5008978b5b9eb83db79d0ba6021ed5a2c7dbd7cba",
+  "oar_source_sha256": "973943382cca1d4e19051fde4deaff012bbd55dfe0d40d93973293e19a7ed740",
+  "oars_unchanged_max_abs_rad": 1.5543122344752192e-15,
+  "period_s": 2.3076923076923075,
+  "nodes": 80,
+  "passes": 2,
+  "restarts": 6,
+  "max_attachment_position_error_m": 1.6014719639186707,
+  "max_attachment_rotation_error_deg": 179.01246600093017,
+  "max_joint_limit_violation": 0.0,
+  "seat_seed_range_m": [
+    -0.03523111118235192,
+    0.204728136803082
+  ],
+  "seat_anchor": {
+    "phase": 0.19091796875,
+    "reset_m": 0.028,
+    "scope": "prior; candidate must be checked"
+  },
+  "seat_actual_range_m": [
+    -0.24998999999999996,
+    0.2499897798768027
+  ],
+  "elbow_extension_coordinates_deg": [
+    76.59038585006901,
+    76.59038582248945
+  ],
+  "minimum_geometric_arm_bend_deg": [
+    18.98167633927021,
+    18.981676339270166
+  ],
+  "elbow_prior_conversion": "q_extension + human flexion, clipped to limits; weak heuristic, NOT exact anatomy equivalence",
+  "elbow_actual_range_deg": [
+    [
+      76.76361471939342,
+      175.9547650366768
+    ],
+    [
+      76.8058099749774,
+      175.95476592688067
+    ]
+  ],
+  "periodic_value_error": 0.0,
+  "max_robot_joint_speed_rad_s": 270.586070489625,
+  "collision_check": "pending",
+  "dynamics_check": "not performed",
+  "limitations": [
+    "Independent studies; event alignment does not establish experimental simultaneity",
+    "Sequential constrained least squares with periodic interpolation, not global optimality proof",
+    "Candidate must pass attachment, limits, continuity and collision gates before training"
+  ],
+  "attachment_gate_passed": false
+}

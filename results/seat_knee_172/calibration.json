@@ -1,0 +1,56 @@
+{
+  "target_included_angle_deg": 172,
+  "target_flexion_deg": 8,
+  "definition": "sagittal hip_pitch-anchor / knee-anchor / ankle_pitch-anchor included angle; proxy for human landmarks",
+  "scene_sha256": "fb3e55725b1b042d4c2b2fb5008978b5b9eb83db79d0ba6021ed5a2c7dbd7cba",
+  "finish_seat_joint_m": 0.2557364612408023,
+  "finish_motor_angles_deg": [
+    16.312368916741736,
+    16.3123688851622
+  ],
+  "finish_pelvis_hinge_deg": -16.892347290038774,
+  "finish_foot_position_error_m": 1.2761196618346468e-10,
+  "finish_foot_rotation_error_deg": 2.5975271085530822e-08,
+  "source_seat_span_m": 0.57757947871773,
+  "source_seat_joint_range_m": [
+    -0.3218430174769277,
+    0.2557364612408023
+  ],
+  "continuous_valid_seat_joint_range_m": [
+    -0.2140281814496181,
+    0.2557364612408023
+  ],
+  "continuous_valid_span_m": 0.4697646426904204,
+  "boundary_sampling_resolution_m": 0.0019252649290591,
+  "valid_catch_included_angle_deg": [
+    72.91106253003137,
+    72.9110625374469
+  ],
+  "seat_body_origin_boat_coordinates_m": {
+    "finish": [
+      0.3886906701908023,
+      0.0003146764083,
+      0.05626727181
+    ],
+    "feasible": [
+      -0.08107397249961809,
+      0.0003146764083,
+      0.05626727181
+    ],
+    "source": [
+      -0.1888888085269277,
+      0.0003146764083,
+      0.05626727181
+    ]
+  },
+  "mean_fixed_ankle_center_m": [
+    -0.5398091662580788,
+    0.00031467636040844946,
+    0.013792315345308129
+  ],
+  "source_curve_valid_fraction": 0.8021978021978022,
+  "mapping_rule": "fixed feet, calibrated finish pelvis hinge preferred; other solutions may exist",
+  "conversion_rule": "q=finish_q+source_seat-source_seat_max; PCHIP map; out-of-domain returns NaN",
+  "validation": "foot position <0.1 mm and orientation <0.1 deg; joint bounds retained; seat limit relaxed only in solver",
+  "training_ready": false
+}

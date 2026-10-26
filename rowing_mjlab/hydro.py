@@ -263,7 +263,7 @@ def reduce_chunks(
 
 class WarpHydrodynamics:
     """Owns persistent buffers; callback is compatible with mjlab CUDA capture."""
-    def __init__(self, model, nworld, device, prefix="", repository=ROOT):
+    def __init__(self, model, nworld, device, prefix="", repository=ROOT, hull_radiation=False, blade_inertia=False):
         from pathlib import Path
         repository = Path(repository)
         surfaces = [load_closed_surface(repository/'boat_meshes'/f'{name}.stl')[0]
@@ -302,6 +302,23 @@ class WarpHydrodynamics:
         self.water = wp.array(water,dtype=float,device=device)
         self.chunks = wp.zeros((nworld,self.nchunks,12),dtype=float,device=device)
         self.loads = wp.zeros((nworld,3,6),dtype=float,device=device)
+        self.radiation = None
+        if hull_radiation:
+            from .radiation import HullRadiation
+            from hydrodynamics.hull_radiation import load_parameters
+            self.radiation = HullRadiation(model,nworld,device,self.body_ids[0],
+                parameters=load_parameters(repository/'data/hull_radiation.json'))
+        self.blade_inertia = None
+        if blade_inertia:
+            from .blade_inertia import BladeInertia
+            self.blade_inertia = BladeInertia(model,nworld,device,
+                [self.body_ids[2],self.body_ids[4]],repository=repository)
+
+    def reset(self, env_ids=None):
+        if self.radiation is not None:
+            self.radiation.reset(env_ids)
+        if self.blade_inertia is not None:
+            self.blade_inertia.reset(env_ids)
 
     def __call__(self, model, data):
         wp.launch(integrate_chunks,(self.nworld,self.nchunks),inputs=[
@@ -311,3 +328,7 @@ class WarpHydrodynamics:
             self.chunks,self.ranges,self.bodies,self.roots,data.xmat,data.xipos,
             data.cvel,data.subtree_com,self.water,self.nodes,self.coefs,self.constants,
             self.loads,data.xfrc_applied],device=self.device)
+        if self.radiation is not None:
+            self.radiation(model,data,self.water,self.loads)
+        if self.blade_inertia is not None:
+            self.blade_inertia(model,data,self.water,self.loads)

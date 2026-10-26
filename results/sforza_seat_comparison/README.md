@@ -1,0 +1,17 @@
+# Sforza Figure 4 / H2 / WiRMS comparison
+
+This is a diagnostic comparison, not a training reference. No scene or training configuration was changed.
+
+Sources: Sforza et al. (2012), *A Three-Dimensional Study of Body Motion During Ergometer Rowing*, Figure 4 (https://benthamopen.com/contents/pdf/TOSMJ/TOSMJ-6-22.pdf); previously extracted WiRMS 2023 participant 3, Stage 4, in `data/reference9/wirms_stage4_raw.csv`.
+
+`figure4_native.png` is the embedded raster from PDF page 5. The solid mean curve is digitized using manually guided dark-pixel tracing; the dashed standard-error curves are not converted. The individual printed axis ticks are used for calibration because their pixel spacing is not uniform. The first/last trace samples lie slightly inside the plotted cycle; no endpoint extrapolation or periodic forcing is applied. `digitization_check.png` overlays the extraction. Small wiggles near grid crossings are digitization artifacts, not measured high-frequency motion. The visually estimated reading uncertainty is about 1–2 degrees; this is not a statistical confidence interval. Figure 4 extrema differ from Table 2, and no replacement by table values is made.
+
+The angle proxy is 180 degrees minus the sagittal-plane included angle at the knee, using H2 hip_pitch, knee, and ankle_pitch joint anchors. These anchors are not anatomically registered to human greater-trochanter/knee/ankle markers. The motor knee coordinate is not used as the human angle directly.
+
+The compiled scene geometry and saved foot welds are retained. Seat travel is relaxed to [-0.7, 0.7] m only in the optimization. Leg and pelvis-hinge limits are retained. Both feet remain constrained to the boat; the seat-pelvis connection is represented by the existing kinematic tree. The boat stays at its saved pose. A weak penalty selects pelvis hinge angles close to the original hinge posture, plus a tiny continuation penalty; seat position is not anchored to reset. This is a conditional, nonunique map, not identification of a unique human-to-robot transformation. Alternate pelvis seeds are tried when the primary solve fails. Solver failure does not establish global infeasibility.
+
+Acceptance thresholds: maximum foot equality residual < 1e-5 in MuJoCo's mixed residual units, and maximum knee-angle error < 0.1 degree. All solved poses respect optimization joint bounds. Full hand/oar closure, collision, dynamics, and continuous-time validity are not checked. Rows failing the acceptance thresholds are retained only as diagnostic best-fit solutions and plotted dashed, never as feasible reference points.
+
+Each curve's maximum-extension event is shifted to phase zero and seat displacement zero. For Sforza this is minimum digitized flexion; for WiRMS it is maximum seat displacement. These are kinematic events, not necessarily blade-release times. Original normalized phase scales and metre amplitudes are retained: no temporal warping or amplitude matching. Different experiments and participants are being compared, not simultaneous signals.
+
+Outputs: `seat_comparison.png`, `sforza_fig4_digitized.csv`, `h2_knee_seat_map.csv`, `h2_mapping_poses.npz`, `sforza_h2_seat.csv`, `wirms_finish_aligned.csv`, and `report.json`. The reported valid H2 span covers only accepted samples, not a validated full stroke. Reproduce with `python compare.py`; use `python compare.py --plot-only` to reuse the saved map.

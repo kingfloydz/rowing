@@ -41,7 +41,10 @@ def env_cfg(num_envs=2048,play=False):
             'hydrodynamics':EventTermCfg(func=mdp.install_hydrodynamics,mode='startup'),
         },
         rewards={
-            'oar_tracking':RewardTermCfg(func=mdp.track_oars,weight=1.0),
+            'blade_area_tracking':RewardTermCfg(func=mdp.track_blade_area,weight=0.75),
+            'oar_tracking':RewardTermCfg(func=mdp.track_oars,weight=0.6),
+            'seat_tracking':RewardTermCfg(func=mdp.track_seat,weight=0.25),
+            'elbow_tracking':RewardTermCfg(func=mdp.track_elbows,weight=0.15),
             'joint_torque':RewardTermCfg(func=mdp.joint_torque_cost,weight=-0.001),
             'action_rate':RewardTermCfg(func=mdp.action_rate_cost,weight=-0.005),
             'collision':RewardTermCfg(func=mdp.collision_cost,weight=-0.10),
@@ -53,6 +56,9 @@ def env_cfg(num_envs=2048,play=False):
         },
         metrics={
             'tracking_rmse_deg':MetricsTermCfg(func=mdp.tracking_rmse_deg),
+            'blade_area_rmse_m2':MetricsTermCfg(func=mdp.blade_area_rmse_m2),
+            'seat_error_m':MetricsTermCfg(func=mdp.seat_error_m),
+            'elbow_rmse_deg':MetricsTermCfg(func=mdp.elbow_rmse_deg),
             'torque_saturation_fraction':MetricsTermCfg(func=mdp.torque_saturation),
         },
     )

@@ -233,3 +233,81 @@ def test_compact_hand_pose_closure_axes_and_grip_placement():
         assert abs(q['port_sweep']+q['starboard_sweep'])<.7
         assert abs(q['port_elevation']+q['starboard_elevation'])<.2
         assert abs(q['port_feather']-q['starboard_feather'])<.1
+
+
+def test_nine_reference_and_reward_groups():
+    from rowing_mjlab.reference import RowingReference, IMITATION_NAMES
+    from rowing_mjlab import mdp
+    m = mujoco.MjModel.from_xml_path(str(ROOT/'scene.xml'))
+    ref = RowingReference('cpu',m)
+    phase = torch.linspace(0,1,10001)
+    target = ref(phase)
+    assert target.shape == (10001,9)
+    assert torch.isfinite(target).all()
+    torch.testing.assert_close(target[0],target[-1])
+    torch.testing.assert_close(target[:,:6],OarReference('cpu')(phase))
+    for i,name in enumerate(IMITATION_NAMES):
+        lo,hi = m.jnt_range[m.joint(name).id]
+        assert target[:,i].min() >= lo-1e-6
+        assert target[:,i].max() <= hi+1e-6
+    assert abs(float(target[:,6].max()-target[:,6].min())-.57757947871773)<1e-5
+    q0 = torch.tensor([m.qpos0[m.joint(n).qposadr[0]] for n in IMITATION_NAMES],dtype=torch.float32)
+    phase0 = ref.nearest(q0[:6])
+    torch.testing.assert_close(ref.target(torch.tensor([0.]),phase0,q0)[-1][0],q0)
+    # Every source knot must retain human flexion directly on BOTH elbows.
+    prior = np.loadtxt(ROOT/'data/reference9/aligned_priors.csv',delimiter=',',skiprows=1)
+    knots = ref(torch.tensor(prior[:,0],dtype=torch.float32))
+    expected = torch.tensor(prior[:,2],dtype=torch.float32)
+    torch.testing.assert_close(knots[:,7],expected,atol=1e-6,rtol=1e-5)
+    torch.testing.assert_close(knots[:,8],expected,atol=1e-6,rtol=1e-5)
+    target = ref(torch.tensor([.2,.6]))
+    state = SimpleNamespace(ref=ref,imitation_q=torch.arange(9),oar_q=torch.arange(6),
+        reference=lambda:(torch.tensor([.2,.6]),torch.ones(2),torch.ones(2),target))
+    env = SimpleNamespace(rowing=state,sim=SimpleNamespace(data=SimpleNamespace(qpos=target.clone())))
+    for reward in (mdp.track_oars,mdp.track_seat,mdp.track_elbows):
+        torch.testing.assert_close(reward(env),torch.ones(2))
+    assert mdp.onboard_command(env).shape == (2,13)
+    env.sim.data.qpos[:,6] += ref.seat_sigma
+    torch.testing.assert_close(mdp.track_seat(env),torch.full((2,),np.exp(-1),dtype=torch.float32))
+    torch.testing.assert_close(mdp.track_oars(env),torch.ones(2))
+    torch.testing.assert_close(mdp.track_elbows(env),torch.ones(2))
+    env.sim.data.qpos[:,7:] += ref.elbow_sigma
+    torch.testing.assert_close(mdp.track_elbows(env),torch.full((2,),np.exp(-1),dtype=torch.float32))
+
+
+def test_blade_area_geometry_and_reward():
+    import json
+    from rowing_mjlab.blade_area import BladeAreaReference, wet_fraction
+    from rowing_mjlab import mdp
+    # Dry, wet, half-submerged and waterline-degenerate triangles.
+    h = torch.tensor([[1.,2.,3.],[-3.,-2.,-1.],[-1.,0.,1.],[0.,0.,0.],[-1.,1.,1.]])
+    torch.testing.assert_close(wet_fraction(h),torch.tensor([0.,1.,.5,1.,.25]))
+    m = mujoco.MjModel.from_xml_path(str(ROOT/'scene.xml'))
+    d = mujoco.MjData(m)
+    ref = OarReference('cpu')
+    level = json.loads((ROOT/'data/rowing_reference_provenance.json').read_text())['water_level_m_at_repository_reset']
+    area = BladeAreaReference(m,ref,level,'cpu')
+    phase = torch.tensor([0.,.1,.25,.4,.6,.8,1.])
+    targets = area.target(phase,torch.ones_like(phase))
+    qa = [m.joint(s+'_'+j).qposadr[0] for s in ('port','starboard') for j in ('sweep','elevation','feather')]
+    positions,rotations = [],[]
+    for q in ref(phase).numpy():
+        d.qpos[:] = m.qpos0; d.qpos[qa] = q
+        mujoco.mj_kinematics(m,d)
+        positions.append(d.xpos.copy()); rotations.append(d.xmat.copy())
+    data = SimpleNamespace(xpos=torch.tensor(np.array(positions),dtype=torch.float32),
+                          xmat=torch.tensor(np.array(rotations),dtype=torch.float32))
+    actual = area.actual(data,torch.full_like(phase,level))
+    # GPU-style exact submerged fractions agree with independent CPU polygon clipping.
+    torch.testing.assert_close(actual,targets,atol=2e-6,rtol=1e-4)
+    assert torch.all(actual>=0) and torch.all(actual<=area.full_area+1e-6)
+    torch.testing.assert_close(targets[0],targets[-1])
+    torch.testing.assert_close(area.target(phase,torch.zeros_like(phase)),area.initial.expand(len(phase),-1))
+    state = SimpleNamespace(blade_area=area,water_level=torch.full_like(phase,level),
+        reference=lambda:(phase,torch.ones_like(phase),torch.ones_like(phase),None))
+    env = SimpleNamespace(rowing=state,sim=SimpleNamespace(data=data))
+    torch.testing.assert_close(mdp.track_blade_area(env),torch.ones_like(phase),atol=1e-5,rtol=1e-5)
+    # Lifting the blades entirely above water gives zero projected wetted area.
+    data.xpos[:,:,2] += 10
+    torch.testing.assert_close(area.actual(data,state.water_level),torch.zeros_like(actual))
+    assert (mdp.track_blade_area(env)[targets.max(-1).values>0.01]<1).all()

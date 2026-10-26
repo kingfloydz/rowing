@@ -1,0 +1,38 @@
+{
+  "model_joint": "seat_slide",
+  "reset_coordinate_m_information_only": 0.028,
+  "reference_start_phase_information_only": 0.19091796875,
+  "reference_datum": "boat-frame mean left/right ankle pitch joint center (fixed by foot welds)",
+  "seat_point": "seat body frame origin; not anatomical hip or mesh center",
+  "mean_ankle_center_x_m": -0.5398091662703439,
+  "seat_x_at_joint_zero_m": 0.13295420895,
+  "distance_at_joint_zero_m": 0.6727633752203439,
+  "physical_coordinate_formula": "seat_minus_ankle_longitudinal_distance = distance_at_joint_zero + q_seat",
+  "direction_sign": 1,
+  "offset_m": -0.0597387161627272,
+  "span_m": 0.18433982076560726,
+  "calibration_status": "whole_cycle_kinematic_fit_pending_collision_validation",
+  "formula": "q_seat(phi) = fitted_offset + fitted_span * normalized_shape(phi)",
+  "range_m": [
+    -0.05957428470426754,
+    0.12459697328187501
+  ],
+  "experimental_origin_not_transferred": true,
+  "reset_is_not_a_reference_anchor": true,
+  "position_at_selected_start_m": -0.011144323102176251,
+  "range_is_not_full_chain_reachability": true,
+  "fitting_method": "Joint constrained optimization of pose sequence, seat offset and seat span; no reset anchor",
+  "offset_bounds_m": [
+    -0.24,
+    0.24
+  ],
+  "span_bounds_m": [
+    0.0,
+    0.48
+  ],
+  "physical_distance_range_m": [
+    0.6131890905160764,
+    0.7973603485022189
+  ],
+  "collision_penalty_weight": 300.0
+}
