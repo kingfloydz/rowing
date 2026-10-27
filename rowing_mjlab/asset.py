@@ -11,6 +11,7 @@ from mjlab.actuator import BuiltinPositionActuatorCfg
 from mjlab.entity import EntityCfg, EntityArticulationInfoCfg
 
 from hydrodynamics.models import ROOT
+from rowing_mjlab.reset_pose import apply_reset_joints, reset_joint_positions
 
 OAR_NAMES = tuple(f"{s}_{j}" for s in ("port","starboard") for j in ("sweep","elevation","feather"))
 
@@ -46,6 +47,7 @@ def reset_float_pose():
 
 def build_spec():
     root = ET.parse(ROOT/'scene.xml').getroot()
+    apply_reset_joints(root)
     pos,quat=reset_float_pose()
     boat=root.find("./worldbody/body[@name='boat']")
     boat.set('pos',' '.join(map(str,pos)))
@@ -156,6 +158,7 @@ def entity_cfg():
     model = base_model()
     positions = {re.escape(model.joint(i).name):float(model.qpos0[model.jnt_qposadr[i]])
                  for i in range(model.njnt) if model.jnt_type[i] != mujoco.mjtJoint.mjJNT_FREE}
+    positions.update({re.escape(name):value for name,value in reset_joint_positions().items()})
     actuators = []
     for name in h2_names():
         kp,kd = gains(name)

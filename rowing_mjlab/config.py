@@ -43,9 +43,9 @@ def env_cfg(num_envs=2048,play=False):
             'hydrodynamics':EventTermCfg(func=mdp.install_hydrodynamics,mode='startup'),
         },
         rewards={
-            'forward_speed':RewardTermCfg(func=mdp.boat_forward_speed,weight=1.0),
+            'forward_speed':RewardTermCfg(func=mdp.boat_forward_speed,weight=0.2),
             'oar_sweep_tracking':RewardTermCfg(func=mdp.track_oar_sweep,weight=1.0),
-            'oar_elevation_tracking':RewardTermCfg(func=mdp.track_oar_elevation,weight=2.0),
+            'oar_elevation_tracking':RewardTermCfg(func=mdp.track_oar_elevation,weight=1.0),
             'oar_feather_tracking':RewardTermCfg(func=mdp.track_oar_feather,weight=1.0),
             'seat_tracking':RewardTermCfg(func=mdp.track_seat,weight=0.4),
             'elbow_tracking':RewardTermCfg(func=mdp.track_elbows,weight=0.25),

@@ -4,15 +4,20 @@ import sys
 from pathlib import Path
 import numpy as np
 import mujoco
+import xml.etree.ElementTree as ET
 from scipy.optimize import root
 from scipy.spatial.transform import Rotation
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from hydrodynamics.models import ROOT, load_closed_surface, hydrostatic_wrench
+from rowing_mjlab.reset_pose import apply_reset_joints
 
 
 def calibrate():
-    model=mujoco.MjModel.from_xml_path(str(ROOT/'scene.xml'))
+    scene=ET.parse(ROOT/'scene.xml').getroot()
+    apply_reset_joints(scene)
+    scene.find('compiler').set('meshdir',str(ROOT))
+    model=mujoco.MjModel.from_xml_string(ET.tostring(scene,encoding='unicode'))
     data=mujoco.MjData(model);mujoco.mj_kinematics(model,data)
     mass=model.body_mass.sum()
     cg=(model.body_mass[:,None]*data.xipos).sum(axis=0)/mass
@@ -42,7 +47,7 @@ def calibrate():
                 pitch_deg=float(np.rad2deg(pitch)),water_level_m=level,mass_kg=float(mass),
                 buoyancy_N=float(force[2]),weight_N=float(mass*9.81),
                 moment_about_system_cg_Nm=torque.tolist(),
-                note='Heave and pitch balanced; roll/yaw zero; internal joint assembly unchanged. Residual roll requires active control. Recalibrate after mass/geometry changes.')
+                note='Heave and pitch balanced; roll/yaw zero; internal joints follow reset_joint_pose.json. Residual roll requires active control. Recalibrate after mass/geometry changes.')
 
 
 if __name__=='__main__':

@@ -1,0 +1,19 @@
+{
+  "note": "Outward upper-arm axial rotation: left +56.978 deg, right -53.114 deg from saved assembly; mirrored shoulder yaw -12/+12 deg. Hand poses preserved by IK.",
+  "joint_positions_rad": {
+    "left_shoulder_pitch_joint": -1.305823324177416,
+    "left_shoulder_roll_joint": 0.3089187559799642,
+    "left_shoulder_yaw_joint": -0.20943951023931956,
+    "left_elbow_joint": 1.4088532362055335,
+    "left_wrist_roll_joint": 1.9446197931857967,
+    "left_wrist_pitch_joint": -0.19629794958512053,
+    "left_wrist_yaw_joint": -0.4404280034028606,
+    "right_shoulder_pitch_joint": -1.396680183474404,
+    "right_shoulder_roll_joint": -0.1274268870798628,
+    "right_shoulder_yaw_joint": 0.20943951023931956,
+    "right_elbow_joint": 1.4301051064778816,
+    "right_wrist_roll_joint": -2.143497875129507,
+    "right_wrist_pitch_joint": -0.10959138311221352,
+    "right_wrist_yaw_joint": 0.5638203452484561
+  }
+}
