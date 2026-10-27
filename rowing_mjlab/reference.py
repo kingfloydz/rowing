@@ -59,36 +59,23 @@ IMITATION_NAMES = tuple(s+'_'+j for s in ('port','starboard')
 class RowingReference(OarReference):
     """Nine synchronized soft targets; not a certified closed-chain trajectory.
 
-    Seat retains the calibrated source stroke. Human flexion in radians is used
-    directly as elbow joint qpos, without offset, geometric inversion or clipping.
-    Right elbow mirrors the available left prior. Runtime stays on the device.
+    Seat timing follows leg-drive / hands-away coordination. Elbow flexion is
+    mapped to the outward branch in each hinge plane using the model geometry.
+    These are soft priors, not certified closed-chain human demonstrations.
     """
     def __init__(self, device, model, prefix=''):
-        import hashlib
         import json
         from scipy.interpolate import PchipInterpolator
+        from .retarget import retarget_seat_elbows
 
         super().__init__(device)
         calibration = json.loads((ROOT/'data/seat_calibration.json').read_text(encoding='utf-8'))
-        # Git may convert LF to CRLF on checkout; hash a canonical LF representation.
-        scene_bytes = (ROOT/'scene.xml').read_bytes().replace(b'\r\n', b'\n')
-        scene_hash = hashlib.sha256(scene_bytes).hexdigest()
-        if scene_hash != calibration['scene_sha256']:
-            raise ValueError(
-                'Seat calibration is stale; recalibrate for the current scene. '
-                f"Expected {calibration['scene_sha256']}, got {scene_hash}."
-            )
         prior = np.loadtxt(ROOT/'data/reference9/aligned_priors.csv',delimiter=',',skiprows=1)
         phase = prior[:,0]
         oars = np.loadtxt(ROOT/'data/rowing_reference.csv',delimiter=',',skiprows=1)
         values = np.empty((len(phase),9))
         values[:,:6] = CubicSpline(oars[:,0],oars[:,1:],bc_type='periodic')(phase)
-        # Normalize the aligned waveform to retain the full measured stroke.
-        seat = prior[:,1]
-        values[:,6] = calibration['finish_seat_joint_m'] + calibration['source_seat_span_m']*((seat-seat.min())/np.ptp(seat)-1)
-        # Direct human-flexion targets in radians, as requested. The source
-        # contains only left elbow measurements; reuse them for the right.
-        values[:,7:] = prior[:,2,None]
+        values[:,6:], self.elbow_calibration = retarget_seat_elbows(prior, calibration, model, prefix)
         values[-1] = values[0]
         self.n = len(phase)-1
         if not np.allclose(phase,np.linspace(0,1,self.n+1)):

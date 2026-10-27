@@ -80,7 +80,7 @@ python -m mujoco.viewer --mjcf=preview.xml
 | `boat_meshes/`、`official_h2/`、`designs/` | XML 引用的网格和模型许可 |
 | [HYDRODYNAMICS.md](HYDRODYNAMICS.md) | 实际水动力模型、参数、假设和适用范围 |
 
-座椅标定为 `data/seat_calibration.json`，其中 `scene_sha256` 为 scene.xml 将 CRLF 换行统一为 LF 后的 SHA-256；生成标定与运行时校验必须采用相同规则，避免跨平台换行差异造成误报。更改场景内容后必须重新核验标定，不应通过直接更新哈希绕过一致性检查。
+座椅标定为 `data/seat_calibration.json`。运行时直接读取标定参数，不再计算或比较场景文件哈希；文件中的哈希字段仅保留为历史来源记录。周期性、相位网格及重映射后的关节限位检查仍然有效。
 
 水动力是未经当前 CAD 实艇标定的工程先验。CPU 检查不代表大规模 CUDA 吞吐或策略收敛验证；应在目标显卡上运行 benchmark。
 
@@ -91,3 +91,9 @@ python -m mujoco.viewer --mjcf=preview.xml
 - 紧凑套筒手为本项目装配几何。各第三方资产遵循各自许可，不对整套资产声明统一许可证。
 
 参考轨迹出处保存在 `data/rowing_reference_provenance.json`、`data/reference9/source_provenance.json`。
+
+运行时的座椅与肘部参考经过 `rowing_mjlab/retarget.py` 重映射；原始文献曲线保持不变。座椅在相位 0 换向、0.36 到达后端、0.58 开始回座；肘部峰值保留在 0.40，并将原曲线 0.85 的伸臂状态提前到 0.58。这些是依据动作顺序选定的初始设计参数，不是同步人体测量结果。依据为 [Rowing Ireland 双桨指南](https://www.rowingireland.ie/wp-content/uploads/2020/11/SCULLING-POSTER_RI.pdf) 和 [British Rowing 水上技术指南](https://www.britishrowing.org/knowledge/rower-development/british-rowing-technique/water-rowing-technique/)。
+
+肘部零位由上臂、前臂锚点向肘关节轴法平面的投影确定，左右分别选择初始肩部姿态下向外弯曲的分支，不再将人体屈曲角直接作为机器人关节坐标。投影零位不等于人体解剖学零位；当前 CAD 三维锚点的最小弯曲角约为 19°。肩部运动后仍需单独验证外侧构型。
+
+这九个通道仍是软运动先验，不能作为已通过全身闭链约束的动作演示：固定九目标的 41 相位检查中，局部逆运动学求解尚不能全程闭合原有手脚焊接约束，最大附件位置误差约 0.365 m、姿态误差约 20.63°；回桨段需要进一步联合调整全身姿态和参考幅度。没有进行动力学可执行性或碰撞认证。
