@@ -99,7 +99,7 @@ def build_spec():
                              group='3',rgba='0.6 0.6 0.6 0',condim='3',density='0')
                 ET.SubElement(bodies[name],'geom',attrs)
     # Oar shaft/grip capsules and blade convex mesh. Original visual meshes
-    # remain untouched. Grip is separate, allowing only its intended hand pair.
+    # remain untouched. Bit 2 also enables contacts between the two oars.
     for side in ('port','starboard'):
         for part in ('shaft','grip'):
             mesh = trimesh.load_mesh(ROOT/f'boat_meshes/{side}_{part}.stl')
@@ -113,7 +113,7 @@ def build_spec():
                     radius=float(np.linalg.norm(piece.vertices[:,[0,2]]-center[[0,2]],axis=1).max())
                     ET.SubElement(bodies[side+'_oar'],'geom',name=f'oar_collision_{side}_{part}_{k}',
                         type='cylinder',fromto=' '.join(map(str,np.r_[a,b])),size=str(radius),
-                        contype='2',conaffinity='1',group='3',rgba='0 0 0 0',density='0')
+                        contype='2',conaffinity='3',group='3',rgba='0 0 0 0',density='0')
                 continue
             verts = mesh.vertices
             low, high = verts.min(0), verts.max(0)
@@ -125,9 +125,9 @@ def build_spec():
                 a[1], b[1] = low[1], high[1]
             ET.SubElement(bodies[side+'_oar'],'geom',name=f'oar_collision_{side}_{part}',
                           type='capsule',fromto=' '.join(map(str,np.r_[a,b])),size=str(radius),
-                          contype='2',conaffinity='1',group='3',rgba='0 0 0 0',density='0')
+                          contype='2',conaffinity='3',group='3',rgba='0 0 0 0',density='0')
         ET.SubElement(bodies[side+'_oar'],'geom',name=f'oar_collision_{side}_blade',
-                      type='mesh',mesh=side+'_blade',contype='2',conaffinity='1',
+                      type='mesh',mesh=side+'_blade',contype='2',conaffinity='3',
                       group='3',rgba='0 0 0 0',density='0')
     contact = root.find('contact')
     if contact is None:

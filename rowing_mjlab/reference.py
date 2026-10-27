@@ -52,11 +52,11 @@ class OarReference:
         return grid[cost.argmin()]
 
     def target(self, elapsed, phase0, reset_angles):
-        cycles = torch.where(elapsed < 2*PERIOD, elapsed/(2*PERIOD),
-                             1+(elapsed-2*PERIOD)/PERIOD)
+        cycles = torch.where(elapsed < 3*PERIOD, elapsed/(3*PERIOD),
+                             1+(elapsed-3*PERIOD)/PERIOD)
         phase = (phase0+cycles).remainder(1.0)
-        rate = torch.where(elapsed < 2*PERIOD,0.5,1.0)
-        u = (elapsed/0.3).clamp(0,1)
+        rate = torch.where(elapsed < 3*PERIOD,1.0/3.0,1.0)
+        u = (elapsed/1.0).clamp(0,1)
         blend = 10*u**3-15*u**4+6*u**5
         target = reset_angles+blend[...,None]*(self(phase)-reset_angles)
         return phase,rate,blend,target

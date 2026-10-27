@@ -19,7 +19,7 @@ def add_water_surface(server, height):
         side='double',cast_shadow=False,receive_shadow=False)
     with server.gui.add_folder('Water surface'):
         show = server.gui.add_checkbox('Show water',initial_value=True)
-        opacity = server.gui.add_slider('Opacity',min=0.,max=.8,step=.05,initial_value=.30)
+        opacity = server.gui.add_slider('Opacity',min=0.,max=1.,step=.05,initial_value=.30)
 
         @show.on_update
         def _(_event):
