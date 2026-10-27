@@ -180,12 +180,23 @@ def privileged(env):
     return torch.cat((local_v,s.loads.flatten(1),d.qpos[:,s.oar_q]),dim=-1)
 
 
-def track_oars(env):
+def oar_tracking_scores(env):
     s = env.rowing
     target = s.reference()[-1][...,:6]
     error = ((env.sim.data.qpos[:,s.oar_q]-target)/s.ref.sigma).reshape(-1,2,3)
-    scores = torch.exp(-error.square().mean(1))
-    return 0.40*scores[:,0]+0.35*scores[:,1]+0.25*scores[:,2]
+    return torch.exp(-error.square().mean(1))
+
+
+def track_oar_sweep(env):
+    return oar_tracking_scores(env)[:,0]
+
+
+def track_oar_elevation(env):
+    return oar_tracking_scores(env)[:,1]
+
+
+def track_oar_feather(env):
+    return oar_tracking_scores(env)[:,2]
 
 
 def joint_torque_cost(env):

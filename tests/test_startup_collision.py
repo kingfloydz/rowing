@@ -2,19 +2,33 @@ import unittest
 import numpy as np
 import torch
 import mujoco
+from types import SimpleNamespace
+from rowing_mjlab import mdp
 from rowing_mjlab.reference import OarReference, PERIOD
 from rowing_mjlab.asset import build_spec
 
 
 class StartupCollisionTests(unittest.TestCase):
+    def test_oar_rewards_are_independent_and_bilateral(self):
+        sigma=torch.deg2rad(torch.tensor([10.,4.,15.,10.,4.,15.]))
+        q=torch.zeros(3,6)
+        for axis in range(3):
+            q[axis,axis]=sigma[axis]
+        state=SimpleNamespace(oar_q=torch.arange(6),ref=SimpleNamespace(sigma=sigma),
+                              reference=lambda:(None,None,None,torch.zeros(3,9)))
+        env=SimpleNamespace(rowing=state,sim=SimpleNamespace(data=SimpleNamespace(qpos=q)))
+        scores=torch.stack([mdp.track_oar_sweep(env),mdp.track_oar_elevation(env),mdp.track_oar_feather(env)],dim=-1)
+        expected=torch.ones(3,3);expected.fill_diagonal_(float(np.exp(-.5)))
+        torch.testing.assert_close(scores,expected)
+
     def test_first_cycle_rate_and_blend(self):
         ref=OarReference('cpu');p0=torch.tensor(.2);initial=torch.zeros(6)
-        t=torch.tensor([0.,.5,1.,1.5*PERIOD,3*PERIOD,3.25*PERIOD],dtype=torch.float64)
+        t=torch.tensor([0.,.5,1.,1.5*PERIOD,3*PERIOD,4*PERIOD,5*PERIOD,5.25*PERIOD],dtype=torch.float64)
         phase,rate,blend,target=ref.target(t,p0,initial)
-        expected=(p0+torch.tensor([0.,.5/(3*PERIOD),1/(3*PERIOD),.5,1.,1.25],dtype=torch.float64))%1
+        expected=(p0+torch.tensor([0.,.5/(3*PERIOD),1/(3*PERIOD),.5,1.,1.5,2.,2.25],dtype=torch.float64))%1
         torch.testing.assert_close(phase,expected)
-        torch.testing.assert_close(rate,torch.tensor([1/3,1/3,1/3,1/3,1.,1.]))
-        torch.testing.assert_close(blend,torch.tensor([0.,.5,1.,1.,1.,1.],dtype=torch.float64))
+        torch.testing.assert_close(rate,torch.tensor([1/3,1/3,1/3,1/3,.5,.5,1.,1.]))
+        torch.testing.assert_close(blend,torch.tensor([0.,.5,1.,1.,1.,1.,1.,1.],dtype=torch.float64))
         torch.testing.assert_close(target[0],torch.zeros(6,dtype=torch.float64))
         torch.testing.assert_close(target[2],ref(phase[2]))
 
