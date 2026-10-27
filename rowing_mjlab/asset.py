@@ -1,6 +1,7 @@
 """Training-only scene edits; preserve the saved assembly and all closures."""
 from functools import lru_cache
 import re
+import json
 import xml.etree.ElementTree as ET
 
 import mujoco
@@ -38,8 +39,17 @@ def gains(name):
     return 120.0, 6.0
 
 
+def reset_float_pose():
+    pose=json.loads((ROOT/'data/reset_float_pose.json').read_text())
+    return tuple(pose['position_m']),tuple(pose['quaternion_wxyz'])
+
+
 def build_spec():
     root = ET.parse(ROOT/'scene.xml').getroot()
+    pos,quat=reset_float_pose()
+    boat=root.find("./worldbody/body[@name='boat']")
+    boat.set('pos',' '.join(map(str,pos)))
+    boat.set('quat',' '.join(map(str,quat)))
     # mjlab applies simulation options on the assembled scene, not this entity.
     root.remove(root.find('option'))
     for weld in root.findall('./equality/weld'):
@@ -152,7 +162,8 @@ def entity_cfg():
         limit = float(model.jnt_actfrcrange[model.joint(name).id,1])
         actuators.append(BuiltinPositionActuatorCfg(target_names_expr=(name,),
             stiffness=kp,damping=kd,effort_limit=limit))
+    pos,quat=reset_float_pose()
     return EntityCfg(spec_fn=build_spec,
-        init_state=EntityCfg.InitialStateCfg(pos=tuple(model.qpos0[:3]),
-            rot=tuple(model.qpos0[3:7]),joint_pos=positions),
+        init_state=EntityCfg.InitialStateCfg(pos=pos,
+            rot=quat,joint_pos=positions),
         articulation=EntityArticulationInfoCfg(actuators=tuple(actuators)))

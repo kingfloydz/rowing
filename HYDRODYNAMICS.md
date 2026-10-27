@@ -10,7 +10,7 @@
 v_rel(P) = v_origin + omega × (P - origin) - current
 ```
 
-名义水密度 1000 kg/m³，重力 9.81 m/s²，运动黏度 1e-6 m²/s。水面为固定水平面，名义高度来自 `data/rowing_reference_provenance.json`，约 -0.120276403 m。水面不随船运动；水流假定均匀且恒定。该高度是既有水平装配的标称值，尾鳍减薄后未重新求解静态平衡。
+名义水密度 1000 kg/m³，重力 9.81 m/s²，运动黏度 1e-6 m²/s。水面为固定水平面，名义高度来自 `data/rowing_reference_provenance.json`，约 -0.120276403 m。水面不随船运动；水流假定均匀且恒定。该高度保持不变；训练通过 `data/reset_float_pose.json` 调整船体初始升沉与纵倾，使当前装配的浮重和纵倾力矩平衡。横摇保持零，残余横摇偏载仍需主动控制。
 
 | 文件 | 内容 |
 |---|---|

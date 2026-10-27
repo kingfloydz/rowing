@@ -225,12 +225,23 @@ def collision_cost(env):
     return found.reshape(env.num_envs,-1).any(-1).float()
 
 
-def capsized(env):
-    # Use current root qpos, not pre-integration xmat, for the hard 60-degree limit.
+def boat_roll(env):
+    # Use current root qpos, not pre-integration xmat.
     q = env.sim.data.qpos[:,3:7]  # wxyz, boat is the sole free root
     w,x,y,z = q.unbind(-1)
-    roll = torch.atan2(2*(w*x+y*z),1-2*(x*x+y*y))
-    return roll.abs() > torch.pi/3
+    return torch.atan2(2*(w*x+y*z),1-2*(x*x+y*y))
+
+
+def roll_upright(env, sigma_deg=10.0):
+    return torch.exp(-(boat_roll(env)/(sigma_deg*torch.pi/180)).square())
+
+
+def boat_roll_abs_deg(env):
+    return torch.rad2deg(boat_roll(env).abs())
+
+
+def capsized(env):
+    return boat_roll(env).abs() > torch.pi/3
 
 
 def invalid_state(env):
