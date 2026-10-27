@@ -138,9 +138,8 @@ def onboard_proprio(env):
 
 
 def onboard_command(env):
-    phase,rate,blend,target = env.rowing.reference()
-    return torch.cat((torch.sin(2*torch.pi*phase)[:,None],torch.cos(2*torch.pi*phase)[:,None],
-                      rate[:,None],target,blend[:,None]),dim=-1)
+    phase,_,_,_ = env.rowing.reference()
+    return torch.stack((torch.sin(2*torch.pi*phase),torch.cos(2*torch.pi*phase)),dim=-1)
 
 
 def trunk_angles(env):
