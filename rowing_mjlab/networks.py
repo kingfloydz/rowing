@@ -1,7 +1,7 @@
 """Causal residual TCN structure from kingfloydz/head_transport, with 125-frame history and 16-dimensional latent.
 
 Actor consumes onboard history only. Critic has its own encoder/normalizers and
-27 current privileged features; no world position is consumed by either model.
+29 current privileged features; no world position is consumed by either model.
 """
 from copy import deepcopy
 import torch
@@ -14,7 +14,7 @@ HISTORY_LENGTH = 125
 SEQUENCE_LENGTH = HISTORY_LENGTH+1
 LATENT_DIM = 16
 TCN_CHANNELS = 48
-PRIVILEGED_DIM = 27
+PRIVILEGED_DIM = 29
 
 
 class CausalBlock(nn.Module):
@@ -46,7 +46,7 @@ class TemporalModel(MLPModel):
         if obs['actor'].shape[-2] != SEQUENCE_LENGTH:
             raise ValueError('Expected 125 past frames plus the current frame')
         if self.privileged and obs['privileged'].shape[-1] != PRIVILEGED_DIM:
-            raise ValueError('Critic requires exactly 27 privileged scalars')
+            raise ValueError(f'Critic requires exactly {PRIVILEGED_DIM} privileged scalars')
         return ['actor'],obs['actor'].shape[-1]
 
     def _get_latent_dim(self):

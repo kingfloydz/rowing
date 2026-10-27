@@ -14,6 +14,10 @@ MIRROR_PAIRS = (
     ('elbow', 1), ('wrist_roll', -1), ('wrist_pitch', 1), ('wrist_yaw', -1),
 )
 
+# Midline roll/yaw change sign under sagittal reflection; pitch is symmetric.
+# Head joints are held fixed and are not policy actions.
+CENTER_JOINTS = ('waist_yaw_joint', 'waist_roll_joint')
+
 
 class BilateralSymmetry:
     def __init__(self, model, command_names, device, prefix=''):
@@ -26,6 +30,11 @@ class BilateralSymmetry:
             self.v.append(torch.tensor(model.jnt_dofadr[ids].copy(),device=device,dtype=torch.long))
             self.commands.append(torch.tensor([command_names.index(n) for n in side_names],device=device,dtype=torch.long))
             self.rest.append(torch.tensor(model.qpos0[model.jnt_qposadr[ids]].copy(),device=device,dtype=torch.float32))
+        center_ids = [model.joint(prefix+name).id for name in CENTER_JOINTS]
+        self.center_q = torch.tensor(model.jnt_qposadr[center_ids].copy(),device=device,dtype=torch.long)
+        self.center_v = torch.tensor(model.jnt_dofadr[center_ids].copy(),device=device,dtype=torch.long)
+        self.center_commands = torch.tensor([command_names.index(n) for n in CENTER_JOINTS],device=device,dtype=torch.long)
+        self.center_rest = torch.tensor(model.qpos0[model.jnt_qposadr[center_ids]].copy(),device=device,dtype=torch.float32)
         self.position_scale = math.radians(10)
         self.velocity_scale = math.radians(60)
         self.position_tolerance = math.radians(3)
@@ -35,6 +44,11 @@ class BilateralSymmetry:
         position = (qpos[...,self.q[0]]-self.rest[0])-self.sign*(qpos[...,self.q[1]]-self.rest[1])
         velocity = qvel[...,self.v[0]]-self.sign*qvel[...,self.v[1]]
         command = (commands[...,self.commands[0]]-self.rest[0])-self.sign*(commands[...,self.commands[1]]-self.rest[1])
+        # Use deviation from the assembled neutral pose (zero policy action),
+        # not twice that deviation, so the same angular tolerances apply.
+        position = torch.cat((position,qpos[...,self.center_q]-self.center_rest),dim=-1)
+        velocity = torch.cat((velocity,qvel[...,self.center_v]),dim=-1)
+        command = torch.cat((command,commands[...,self.center_commands]-self.center_rest),dim=-1)
         return position,velocity,command
 
     def cost(self, qpos, qvel, commands):

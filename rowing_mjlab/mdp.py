@@ -152,7 +152,7 @@ def trunk_angles(env):
     return actual,target
 
 
-def onboard_trunk(env):
+def privileged_trunk(env):
     actual,target = trunk_angles(env)
     return torch.stack((actual,target),dim=-1)
 

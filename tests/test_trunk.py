@@ -59,7 +59,7 @@ class TrunkTests(unittest.TestCase):
         state = SimpleNamespace(boat=0,torso=1,trunk_ref=ref,initial_trunk=torch.tensor(.1),
             reference=lambda:(phase,torch.ones(3),torch.ones(3),torch.zeros(3,9)))
         env = SimpleNamespace(rowing=state,sim=SimpleNamespace(data=SimpleNamespace(xmat=xmat)))
-        obs = mdp.onboard_trunk(env)
+        obs = mdp.privileged_trunk(env)
         self.assertEqual(obs.shape,(3,2))
         torch.testing.assert_close(obs[:,1],target)
         torch.testing.assert_close(mdp.trunk_error_deg(env),torch.tensor([0.,10.,20.]),atol=1e-5,rtol=1e-5)

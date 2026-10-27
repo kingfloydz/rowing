@@ -59,6 +59,24 @@ class SymmetryTests(unittest.TestCase):
         self.assertTrue(torch.all(mdp.bilateral_command_rmse_deg(env)>0))
         self.assertTrue(torch.all(mdp.bilateral_position_rmse_deg(env)==0))
 
+    def test_midline_yaw_roll_penalized_independently(self):
+        s=self.sym
+        for i in range(2):
+            for kind in ('position','velocity','command'):
+                q,v,c=self.state()
+                if kind=='position': q[:,s.center_q[i]]+=.3
+                elif kind=='velocity': v[:,s.center_v[i]]=1.
+                else: c[:,s.center_commands[i]]+=.3
+                self.assertTrue(torch.all(s.cost(q,v,c)>0), (i,kind))
+
+    def test_midline_pitch_is_allowed(self):
+        q,v,c=self.state()
+        joint=self.m.joint('waist_pitch_joint')
+        q[:,int(joint.qposadr[0])]+=.3
+        v[:,int(joint.dofadr[0])]=1.
+        c[:,self.names.index('waist_pitch_joint')]+=.3
+        self.assertTrue(torch.all(self.sym.cost(q,v,c)==0))
+
 
 if __name__=='__main__':
     unittest.main()
