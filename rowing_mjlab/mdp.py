@@ -9,6 +9,8 @@ from .asset import OAR_NAMES, h2_names
 from .hydro import WarpHydrodynamics
 from .reference import RowingReference, IMITATION_NAMES
 from .blade_area import BladeAreaReference
+from .trunk import TrunkReference, trunk_vertical_angle, angular_error
+from .symmetry import BilateralSymmetry
 
 
 class RowingState:
@@ -28,7 +30,9 @@ class RowingState:
         self.oar_q = joints(OAR_NAMES,'jnt_qposadr')
         self.boat = int(model.body('rowing/boat').id)
         self.imu = int(model.body('rowing/imu_in_pelvis').id)
+        self.torso = int(model.body('rowing/torso_link').id)
         self.q0 = torch.tensor(model.qpos0.copy(),device=device,dtype=torch.float32)
+        self.symmetry = BilateralSymmetry(model,self.h2_names,device,prefix='rowing/')
         self.controlled_local = torch.tensor([self.h2_names.index(n) for n in self.policy_names],device=device)
         joint_ids = [model.joint('rowing/'+n).id for n in self.h2_names]
         policy_ids = [model.joint('rowing/'+n).id for n in self.policy_names]
@@ -39,6 +43,14 @@ class RowingState:
         self.initial_imitation = self.q0[self.imitation_q]
         self.initial_oars = self.q0[self.oar_q]
         self.phase0 = self.ref.nearest(self.initial_oars)
+        self.trunk_ref = TrunkReference(device)
+        import mujoco
+        initial_data = mujoco.MjData(model)
+        initial_data.qpos[:] = model.qpos0
+        mujoco.mj_kinematics(model, initial_data)
+        self.initial_trunk = trunk_vertical_angle(
+            torch.tensor(initial_data.xmat[self.torso].reshape(3,3).copy(), device=device, dtype=torch.float32),
+            torch.tensor(initial_data.xmat[self.boat].reshape(3,3).copy(), device=device, dtype=torch.float32))
         self.hydro = WarpHydrodynamics(model,env.num_envs,device,prefix='rowing/',
             hull_radiation=hull_radiation,blade_inertia=blade_inertia)
         provenance = json.loads((ROOT/'data/rowing_reference_provenance.json').read_text())
@@ -72,6 +84,8 @@ class RowingAction(ActionTerm):
         self.state = env.rowing
         self._raw = torch.zeros(env.num_envs,self.action_dim,device=env.device)
         self.targets = self.state.q0[self.state.h2_q].expand(env.num_envs,-1).clone()
+        # Alias stays current because targets are updated/reset in place.
+        self.state.commanded_targets = self.targets
 
     @property
     def action_dim(self):
@@ -129,6 +143,30 @@ def onboard_command(env):
                       rate[:,None],target,blend[:,None]),dim=-1)
 
 
+def trunk_angles(env):
+    s,d = env.rowing,env.sim.data
+    actual = trunk_vertical_angle(d.xmat[:,s.torso].reshape(-1,3,3),
+                                  d.xmat[:,s.boat].reshape(-1,3,3))
+    phase,_,blend,_ = s.reference()
+    target = s.trunk_ref.target(phase,blend,s.initial_trunk)
+    return actual,target
+
+
+def onboard_trunk(env):
+    actual,target = trunk_angles(env)
+    return torch.stack((actual,target),dim=-1)
+
+
+def track_trunk(env):
+    actual,target = trunk_angles(env)
+    return torch.exp(-(angular_error(actual,target)/env.rowing.trunk_ref.sigma).square())
+
+
+def trunk_error_deg(env):
+    actual,target = trunk_angles(env)
+    return torch.rad2deg(angular_error(actual,target).abs())
+
+
 def last_action(env):
     return env.action_manager.action
 
@@ -158,6 +196,29 @@ def joint_torque_cost(env):
 
 def action_rate_cost(env):
     return (env.action_manager.action-env.action_manager.prev_action).square().mean(-1)
+
+
+def bilateral_asymmetry_cost(env):
+    s,d = env.rowing,env.sim.data
+    return s.symmetry.cost(d.qpos,d.qvel,s.commanded_targets)
+
+
+def bilateral_position_rmse_deg(env):
+    s,d = env.rowing,env.sim.data
+    position,_,_ = s.symmetry.errors(d.qpos,d.qvel,s.commanded_targets)
+    return torch.rad2deg(position.square().mean(dim=-1).sqrt())
+
+
+def bilateral_velocity_rmse_deg_s(env):
+    s,d = env.rowing,env.sim.data
+    _,velocity,_ = s.symmetry.errors(d.qpos,d.qvel,s.commanded_targets)
+    return torch.rad2deg(velocity.square().mean(dim=-1).sqrt())
+
+
+def bilateral_command_rmse_deg(env):
+    s,d = env.rowing,env.sim.data
+    _,_,command = s.symmetry.errors(d.qpos,d.qvel,s.commanded_targets)
+    return torch.rad2deg(command.square().mean(dim=-1).sqrt())
 
 
 def collision_cost(env):

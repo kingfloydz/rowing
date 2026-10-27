@@ -1,0 +1,5 @@
+{
+  "oar_phase_advance": 0.04,
+  "seat_phase_delay": 0.03,
+  "definition": "Oar advance is relative to Finish-aligned calibration; seat delay is relative to Catch-aligned source. Positive advance samples later source phase; positive delay samples earlier source phase."
+}

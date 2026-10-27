@@ -1,0 +1,31 @@
+{
+  "source": "Pitto et al., Influence of Neuromuscular Activity and Technical Determinants on Scull Rowing Performance",
+  "doi": "10.3390/app14199055",
+  "page": 6,
+  "figure": 2,
+  "panel": "Trunk vertical (T6)",
+  "statistic": "printed mean curve across 12 male rowers; not raw synchronized data",
+  "angle": "relative to vertical; positive backward, negative forward",
+  "digitization": {
+    "image_size": [
+      3296,
+      1460
+    ],
+    "catch_x": 1245,
+    "finish_x": 1756,
+    "next_catch_x": 2217,
+    "zero_y": 304,
+    "forty_deg_y": 181.5,
+    "valid_column_fraction": 0.9907502569373073,
+    "pixel_angle_deg": 0.32653061224489793
+  },
+  "phase": "original printed Catch-to-Catch figure fraction; Finish is not remapped to 0.4",
+  "smoothing": "PCHIP resampling and endpoint reconciliation only",
+  "runtime_phase": "identity; Catch aligned at 0; no nonlinear time warp",
+  "robot_proxy": "torso_link local +Z projected into the vertical plane along boat heading; world vertical zero",
+  "range_deg": [
+    -18.05419787757197,
+    34.612244898
+  ],
+  "limitation": "rigid robot torso proxy for human T6 sensor; no lumbar or pelvis-angle imitation"
+}

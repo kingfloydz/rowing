@@ -92,8 +92,24 @@ python -m mujoco.viewer --mjcf=preview.xml
 
 参考轨迹出处保存在 `data/rowing_reference_provenance.json`、`data/reference9/source_provenance.json`。
 
-运行时的座椅与肘部参考经过 `rowing_mjlab/retarget.py` 重映射；原始文献曲线保持不变。座椅在相位 0 换向、0.36 到达后端、0.58 开始回座；肘部峰值保留在 0.40，并将原曲线 0.85 的伸臂状态提前到 0.58。这些是依据动作顺序选定的初始设计参数，不是同步人体测量结果。依据为 [Rowing Ireland 双桨指南](https://www.rowingireland.ie/wp-content/uploads/2020/11/SCULLING-POSTER_RI.pdf) 和 [British Rowing 水上技术指南](https://www.britishrowing.org/knowledge/rower-development/british-rowing-technique/water-rowing-technique/)。
-
+当前人体与座椅参考仅按 **Catch 对齐**：`tools/align_reference_catches.py` 从保存的原始数字化曲线生成运行数据，不再按 Finish 对齐，不添加停座平台，也不加速伸臂或躯干回摆。WiRMS 座椅图的 Catch 为区间，采用原曲线最小位移的换向点（原相位 0.121）作为代理，循环平移到 0；肘部、T6 和桨采用各自原图标注的 Catch。仅做 PCHIP 重采样与周期端点衔接。各来源的周期内部间隔保持不变，Finish 可以不一致。详细定义见 `data/reference9/catch_alignment.json`。现有机器人座椅幅度和肘部几何转换保留。
 肘部零位由上臂、前臂锚点向肘关节轴法平面的投影确定，左右分别选择初始肩部姿态下向外弯曲的分支，不再将人体屈曲角直接作为机器人关节坐标。投影零位不等于人体解剖学零位；当前 CAD 三维锚点的最小弯曲角约为 19°。肩部运动后仍需单独验证外侧构型。
 
-这九个通道仍是软运动先验，不能作为已通过全身闭链约束的动作演示：固定九目标的 41 相位检查中，局部逆运动学求解尚不能全程闭合原有手脚焊接约束，最大附件位置误差约 0.365 m、姿态误差约 20.63°；回桨段需要进一步联合调整全身姿态和参考幅度。没有进行动力学可执行性或碰撞认证。
+这些通道仍是跨研究组合的软运动先验，未通过全身闭链、碰撞或动力学可执行性验证。此前 41 相位闭链误差数值针对旧的人工时间映射，不能用来评价当前 Catch-only 曲线。
+另外增加一个任务空间模仿量：**躯干相对竖直方向的倾角**。来源为 Pitto 等（2024，DOI `10.3390/app14199055`）图 2 的 `Trunk vertical`（T6 胸段）平均曲线，不是腰段或骨盆曲线。数据及提取坐标保存在 `data/reference9/trunk_vertical_{raw,prior}.csv` 与 `trunk_vertical_provenance.json`；可用 `python tools/extract_trunk_prior.py <原文.pdf> --qa-dir <检查图目录>` 提取，再运行 `python tools/align_reference_catches.py` 统一生成 Catch-only 数据。原图前倾约 18°、后倾峰值约 34.5°；保留原图 Catch-to-Catch 横坐标，不将 Finish 强制映射为 0.4，不进行非线性时间重映射。Pitto 图的横坐标不是原始测量时间，统一播放周期不代表多来源实验真实同步。
+
+`rowing_mjlab/trunk.py` 用 `torso_link` 的局部 +Z 轴近似胸段纵轴，在船体水平纵向与世界竖直组成的平面内计算带符号倾角：竖直为零，向划手后方倾斜为正，前倾为负。该场景中船体 +X 对应划手后方；船体俯仰不会重新定义竖直。它是刚性机器人躯干对人体 T6 的近似，不等于 `waist_pitch_joint` 坐标，也不要求骨盆或腰段具有同一角度。
+
+训练新增 `trunk_tracking` 奖励（初始权重 0.15，角度尺度 10°）与 `trunk_error_deg` 指标，目标沿用原参考的相位、启动慢速周期和初始姿态渐入。Actor 观测增加当前躯干角与目标角两项；原九个关节目标顺序不变。**观测维数增加 2，旧检查点不能直接严格加载到新网络，应新开训练或显式迁移权重。** 此修改未解决原有闭链可达性问题。
+
+桨的相位另作整体平移：六通道统一延后 `0.1084471999` 周期（26 桨/分钟时约 0.2503 s），运行时直接在原桨曲线上计算 `q((phase-delay) % 1)`，不拉伸划水或回桨时长，也不改变左右桨相对时序。平均完全出水时刻对齐人体原图 Finish（52.3574%）；左右桨原有微小差异保留，分别约在 52.4879% 和 52.2270% 完全出水。桨的 Catch 也随之延后，不再与人体 Catch 同时。标定采用静止船体与既有水位，见 `data/oar_finish_alignment.json`；可用 `python tools/align_oar_finish.py` 重建。`data/rowing_reference_finish_aligned.csv` 仅是重采样预览，运行时不读取它。
+
+在上述 Finish 标定基础上，当前手动调整见 `data/reference_phase_offsets.json`：桨提前 0.04 周期、座椅延后 0.03 周期。桨相对最初原曲线的净延后量为 0.0684471999 周期，平均完全出水约在 48.3574%；座椅原曲线以 `(phase-0.03) % 1` 取样，最大后移位置约在 49.5%。肘部与躯干不变。该文件的桨提前量相对于 Finish 标定值、座椅延后量相对于 Catch-only 数据，不是每次运行累加。
+
+## 左右动作协调惩罚
+
+当前训练采用上面的手动相位版本（桨提前 4%、座椅延后 3%），并启用 `bilateral_asymmetry`，奖励权重 **-1.0**。`rowing_mjlab/symmetry.py` 比较 13 对左右腿、肩、肘、腕关节：pitch、膝和肘同号，roll/yaw 反号。姿态和下发目标比较相对初始装配姿态的变化量，保留原有左右抓握偏置；不直接比较归一化策略动作，因为左右关节可用行程不同。
+
+代价为 `0.5 * 姿态误差 + 0.2 * 速度误差 + 0.3 * 指令目标误差`，各项均为跨关节对的归一化均方误差。姿态与指令使用 3° 容差、10° 尺度；速度使用 5°/s 容差、60°/s 尺度。容差内不惩罚，超出部分平方增长。这是相对装配姿态的软协调约束，不强制左右手空间位置完全镜像。新增位置、速度和指令对称性 RMSE 指标便于观察约束强度；权重及尺度是训练初值，不是实测最优值。
+
+CPU 检查：`python -m unittest discover -s tests -v`。测试覆盖镜像符号、装配姿态零代价、实际速度/控制目标独立惩罚、批量梯度、T6 角度符号与观测奖励接线；不代表四卡训练收敛验证。

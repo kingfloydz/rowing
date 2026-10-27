@@ -1,0 +1,36 @@
+{
+  "target_finish_phase": 0.5235743680188125,
+  "finish_definition": "mean of printed elbow and T6 Finish fractions; mean bilateral emergence aligned to this event",
+  "event_definition": "lowest vertex of full 3 mm blade mesh crosses water plane upward (fully out)",
+  "water_level_m": -0.12027640288595698,
+  "hull_pose": "scene qpos0, held fixed",
+  "mapping": "source_phase = (phase-delay) modulo 1; one constant delay for all six channels",
+  "phase_delay": 0.10844719985583512,
+  "phase_delay_seconds": 0.250262768898081,
+  "original_data": "data/rowing_reference.csv",
+  "runtime_data": "original spline evaluated at shifted phase",
+  "sampled_preview": "data/rowing_reference_finish_aligned.csv",
+  "unchanged": [
+    "source angle trajectories",
+    "within-cycle durations",
+    "bilateral relative timing",
+    "seat",
+    "elbow",
+    "trunk"
+  ],
+  "sides": [
+    {
+      "side": "port",
+      "source_exit_phase": 0.4164313707691223,
+      "resampled_exit_phase": 0.5248785718087954,
+      "clearance_at_finish_m": -0.0034263237088211496
+    },
+    {
+      "side": "starboard",
+      "source_exit_phase": 0.4138229655568325,
+      "resampled_exit_phase": 0.5222701691472672,
+      "clearance_at_finish_m": 0.003428573525111195
+    }
+  ],
+  "limitation": "geometric reference event at fixed hull, not guaranteed emergence under learned boat motion"
+}

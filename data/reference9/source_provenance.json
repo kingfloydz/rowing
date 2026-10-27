@@ -48,9 +48,9 @@
   "samples_including_periodic_endpoint": 401,
   "target_events": {
     "catch_phase": 0,
-    "release_phase": 0.4
+    "release_phase": "source-specific; no forced alignment"
   },
-  "seat_phase_method": "5% positive handle-force peak crossings; approximate events, not blade tracking",
+  "seat_phase_method": "cyclic shift by raw seat minimum; no drive/recovery rescaling",
   "seat_event_threshold_sensitivity": {
     "0.02": {
       "catch": 0.01995785069908138,
@@ -65,8 +65,8 @@
       "release": 0.4536699947282697
     }
   },
-  "elbow_phase_method": "map printed Catch-Finish-Catch separately to 0,0.4,1; figure fraction is NOT time",
-  "smoothing": "periodic Gaussian sigma=0.2% cycle and periodic cubic interpolation; raw curves retained",
+  "elbow_phase_method": "original printed Catch-to-Catch figure fraction; no Finish remapping",
+  "smoothing": "PCHIP resampling and endpoint reconciliation only; raw curves retained",
   "seat_units": "raw metres; aligned shape normalized; robot amplitude/offset not yet identified",
   "elbow_units": "raw anatomical degrees, aligned anatomical radians; not H2 encoder coordinates",
   "uncertainty": "PDF plotting precision is not experimental sensor accuracy; elbow pixel scale ~0.52 deg/pixel",
@@ -113,5 +113,6 @@
     1.3367544070680557
   ],
   "nine_channel_priors": "rowing_reference9_priors.csv; NOT feasible trajectory. Elbow limits deliberately not clipped.",
-  "scene_sha256": "fb3e55725b1b042d4c2b2fb5008978b5b9eb83db79d0ba6021ed5a2c7dbd7cba"
+  "scene_sha256": "fb3e55725b1b042d4c2b2fb5008978b5b9eb83db79d0ba6021ed5a2c7dbd7cba",
+  "runtime_alignment": "catch_alignment.json; supersedes historical model_seat_mapping below"
 }

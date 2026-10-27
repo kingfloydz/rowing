@@ -1,41 +1,14 @@
-"""Coaching-informed soft priors, not a dynamically feasible demonstration.
+"""Catch-aligned soft priors, not a dynamically feasible demonstration.
 
 The elbow angle is defined in the plane normal to its hinge axis. This avoids
 calling the non-collinear CAD shoulder/elbow/wrist anchors an anatomical zero.
 """
 import numpy as np
-from scipy.interpolate import PchipInterpolator
 
 
 def adjusted_priors(prior):
-    """Preserve source shapes, with explicit designer-selected event times.
-
-    Seat: catch at 0, finish of leg drive at .36, return begins at .58.
-    Elbows: peak at .40, source late-recovery (.85) reached at .58.
-    These times are initial coordination settings, not measured synchrony.
-    """
-    phase, seat, elbow = prior.T
-    catch, finish = phase[seat.argmin()], phase[seat.argmax()]
-    seat = (seat-seat.min()) / np.ptp(seat)
-    source = PchipInterpolator(np.r_[phase[:-1]-1, phase, phase[1:]+1],
-                               np.r_[seat[:-1], seat, seat[1:]])
-    # Zero time-map velocity at segment endpoints makes the dwell and seam C1.
-    def ease(x):
-        return x*x*(3-2*x)
-    time = np.empty_like(phase)
-    drive, recovery = phase < .36, phase > .58
-    time[drive] = catch+(finish-catch)*ease(phase[drive]/.36)
-    time[~(drive | recovery)] = finish
-    time[recovery] = finish+(1+catch-finish)*ease((phase[recovery]-.58)/.42)
-    adjusted_seat = source(time)
-    # Remove tiny digitization reversals, independently on each stroke half.
-    adjusted_seat[drive] = np.maximum.accumulate(adjusted_seat[drive])
-    adjusted_seat[recovery] = np.minimum.accumulate(adjusted_seat[recovery])
-    adjusted_seat[0] = adjusted_seat[-1] = 0.
-    elbow_time = PchipInterpolator([0, .20, .40, .58, 1], [0, .20, .40, .85, 1])(phase)
-    adjusted_elbow = PchipInterpolator(phase, elbow)(elbow_time)
-    adjusted_elbow[-1] = adjusted_elbow[0]
-    return adjusted_seat, adjusted_elbow
+    """Already catch-aligned source data; do not alter its timing or shape."""
+    return prior[:,1].copy(), prior[:,2].copy()
 
 
 def elbow_calibration(model, prefix=''):

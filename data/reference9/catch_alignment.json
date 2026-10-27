@@ -1,0 +1,16 @@
+{
+  "method": "catch-only cyclic translation; no finish alignment or nonlinear phase warp",
+  "seat_catch_source_phase": 0.121000000963,
+  "seat_catch_definition": "minimum seat displacement (turnaround), proxy within printed Catch interval",
+  "seat_source_peak_phase": 0.585999999359,
+  "seat_aligned_peak_phase": 0.46499999839600004,
+  "elbow_catch_source_phase": 0,
+  "trunk_catch_source_phase": 0,
+  "oar_catch_source_phase": 0,
+  "elbow_finish_source_fraction": 0.5214285714285715,
+  "trunk_finish_source_fraction": 0.5257201646090535,
+  "oar_finish_source_phase": 0.4,
+  "seam": "average first/last extracted values; interpolate missing endpoint margins; no other smoothing",
+  "limitation": "Pitto figure fractions are not measured elapsed time; sources are not synchronized recordings",
+  "amplitude": "original paper shape retained; existing robot seat amplitude and elbow geometric conversion retained"
+}
