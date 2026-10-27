@@ -43,6 +43,7 @@ def env_cfg(num_envs=2048,play=False):
             'hydrodynamics':EventTermCfg(func=mdp.install_hydrodynamics,mode='startup'),
         },
         rewards={
+            'forward_speed':RewardTermCfg(func=mdp.boat_forward_speed,weight=1.0),
             'oar_sweep_tracking':RewardTermCfg(func=mdp.track_oar_sweep,weight=1.0),
             'oar_elevation_tracking':RewardTermCfg(func=mdp.track_oar_elevation,weight=2.0),
             'oar_feather_tracking':RewardTermCfg(func=mdp.track_oar_feather,weight=1.0),
@@ -61,6 +62,7 @@ def env_cfg(num_envs=2048,play=False):
             'time_out':TerminationTermCfg(func=common.time_out,time_out=True),
         },
         metrics={
+            'forward_speed_m_s':MetricsTermCfg(func=mdp.boat_forward_speed),
             'tracking_rmse_deg':MetricsTermCfg(func=mdp.tracking_rmse_deg),
             'blade_area_rmse_m2':MetricsTermCfg(func=mdp.blade_area_rmse_m2),
             'seat_error_m':MetricsTermCfg(func=mdp.seat_error_m),

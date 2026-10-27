@@ -170,12 +170,26 @@ def last_action(env):
     return env.action_manager.action
 
 
+def boat_world_velocity(env):
+    s,d = env.rowing,env.sim.data
+    cv = d.cvel[:,s.boat]
+    # cvel translation is at root subtree COM; move to boat body COM.
+    return cv[:,3:]+torch.cross(cv[:,:3],d.xipos[:,s.boat]-d.subtree_com[:,s.boat],dim=-1)
+
+
+def boat_forward_speed(env):
+    s,d = env.rowing,env.sim.data
+    # Boat +X points behind the seated robot. Reward horizontal progress,
+    # excluding heave even when the hull pitches; reverse remains negative.
+    heading = d.xmat[:,s.boat].reshape(-1,3,3)[:,:2,0]
+    heading = heading/torch.linalg.vector_norm(heading,dim=-1,keepdim=True).clamp_min(1e-8)
+    return (boat_world_velocity(env)[:,:2]*heading).sum(dim=-1)
+
+
 def privileged(env):
     s,d = env.rowing,env.sim.data
     rotation = d.xmat[:,s.boat].reshape(-1,3,3)
-    cv = d.cvel[:,s.boat]
-    # cvel translation is at root subtree COM; move to boat body COM.
-    v = cv[:,3:]+torch.cross(cv[:,:3],d.xipos[:,s.boat]-d.subtree_com[:,s.boat],dim=-1)
+    v = boat_world_velocity(env)
     local_v = torch.bmm(rotation.transpose(1,2),v[...,None]).squeeze(-1)
     return torch.cat((local_v,s.loads.flatten(1),d.qpos[:,s.oar_q]),dim=-1)
 
