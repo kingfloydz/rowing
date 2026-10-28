@@ -80,7 +80,7 @@ def main():
     np.savetxt(ROOT/'data/oar_crossing_correction.csv',records[:,:7],delimiter=',',
                header='source_phase,port_sweep,port_elevation,port_feather,starboard_sweep,starboard_elevation,starboard_feather',comments='',fmt='%.12g')
 
-    # Small arm-only IK restores both hand welds after the +/-5 mm gate move.
+    # Refit arms to the installed gate heights and the calibrated grip frames.
     data.qpos[:]=model.qpos0;mujoco.mj_forward(model,data)
     old=json.loads((ROOT/'data/reset_joint_pose.json').read_text())
     solution={}
@@ -100,13 +100,22 @@ def main():
             data.qpos[idx]=x;mujoco.mj_kinematics(model,data)
             rotation=Rotation.from_matrix(target_rot.T@data.xmat[body1].reshape(3,3)).as_rotvec()
             return np.r_[(data.xpos[body1]-target_pos)*1000,rotation*1000,(x-initial)*.01]
-        fit=least_squares(residual,initial,bounds=(model.jnt_range[joint_ids,0],model.jnt_range[joint_ids,1]),max_nfev=4000,xtol=1e-12,gtol=1e-12,ftol=1e-12)
+        bounds=(model.jnt_range[joint_ids,0],model.jnt_range[joint_ids,1])
+        fit=least_squares(residual,initial,bounds=bounds,max_nfev=1000,xtol=1e-12,gtol=1e-12,ftol=1e-12)
+        rng=np.random.default_rng(42)
+        for attempt in range(12):
+            if np.max(abs(residual(fit.x)[:6]))<1e-4:break
+            start=np.clip(initial+rng.normal(0,.7,len(initial)),bounds[0]+1e-6,bounds[1]-1e-6)
+            candidate=least_squares(residual,start,bounds=bounds,max_nfev=500,xtol=1e-11,gtol=1e-11,ftol=1e-11)
+            if np.linalg.norm(residual(candidate.x))<np.linalg.norm(residual(fit.x)):fit=candidate
         if np.max(abs(residual(fit.x)[:6]))>1e-4:raise RuntimeError(f'{side} reset IK failed: {residual(fit.x)}')
         solution.update(zip(names,map(float,fit.x)))
     old['joint_positions_rad'].update(solution)
-    old['note']='Arm-only IK preserves hand welds after starboard/left-hand gate +5 mm and port/right-hand gate -5 mm. Other reset joints unchanged.'
+    old['note']='Arm-only IK closes both hand welds after gates +70 mm, seat/robot -10 mm and grip-frame axial adjustment +15 deg. Existing left/right gate differential retained. Full-cycle reach is validated separately.'
     (ROOT/'data/reset_joint_pose.json').write_text(json.dumps(old,indent=2)+'\n')
-    meta=dict(left_hand_gate='starboard',right_hand_gate='port',gate_height_change_m={'starboard':.005,'port':-.005},
+    meta=dict(left_hand_gate='starboard',right_hand_gate='port',gate_height_change_m={'starboard':.075,'port':.065},
+              additional_gate_raise_m=.070,seat_robot_height_change_m=-.010,
+              grip_frame_axial_adjustment_deg=15,
               differential_left_right_ratio=[1,4],differential_peak_deg=[.85,3.4],
               common_depth_correction='Common hand-raising angle plus differential left-up/right-down correction; common term is separate from 1:4 ratio',
               drive_source_phase=[.05,.35],blade_top_margin_m=.008,

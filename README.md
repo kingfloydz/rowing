@@ -66,7 +66,7 @@ python -m mujoco.viewer --mjcf=preview.xml
 - 策略输出 29 个非头部关节位置目标，头部采用固定目标 PD。物理步长 2 ms，策略频率 50 Hz。
 - Actor 单帧 99 维：31 维关节位置偏移、31 维关节速度、3 维 IMU 角速度、3 维重力方向、29 维上一步动作和 2 维相位正余弦。不输入启动渐入系数、参考播放速率倍率及当前九维参考目标；这些量仍用于内部参考轨迹与奖励计算。使用过去 125 帧和当前帧；TCN 编码为 16 维 latent。Critic 使用同一 Actor 历史，另有 29 维特权观测（含当前躯干角与目标角）。
 - 参考周期为 60/26 秒；首个完整周期以三分之一速度播放（约 6.923 秒），第二个完整周期以半速播放（约 4.615 秒），累计 11.538 秒后恢复正常速度；前 1 秒平滑接入。九个软参考来自不同研究，不代表同步采集或已证明可实现的 H2 闭链轨迹。
-- 奖励权重：船体前进速度 1.0、桨 sweep 1.0、elevation 2.0、feather 1.0、滑座 0.40、肘角 0.25、躯干角 0.10、船体横摇直立 0.6、左右不对称 -0.10、归一化力矩平方 -0.001、动作变化平方 -0.005、碰撞 -0.10。总奖励由框架乘控制步长 0.02 s。
+- 奖励权重：船体前进速度 0.6、侧向速度 -0.6、角速度 -0.6、桨 sweep 1.0、elevation 1.0、feather 1.0、滑座 0.5、肘角 0.25、躯干角 0.6、船体横摇直立 0.6、左右不对称 -0.05、归一化力矩平方 -0.005、动作变化平方 -0.025、碰撞 -0.10。总奖励由框架乘控制步长 0.02 s。
 - 横摇超过 60°或状态非有限时终止；40 秒时间截断。当前 GPU 任务使用名义水动力参数，未自动启用域随机化。
 
 ## 目录
@@ -100,7 +100,7 @@ python -m mujoco.viewer --mjcf=preview.xml
 
 `rowing_mjlab/trunk.py` 用 `torso_link` 的局部 +Z 轴近似胸段纵轴，在船体水平纵向与世界竖直组成的平面内计算带符号倾角：竖直为零，向划手后方倾斜为正，前倾为负。该场景中船体 +X 对应划手后方；船体俯仰不会重新定义竖直。它是刚性机器人躯干对人体 T6 的近似，不等于 `waist_pitch_joint` 坐标，也不要求骨盆或腰段具有同一角度。
 
-训练新增 `trunk_tracking` 奖励（权重 0.10，角度尺度 10°）与 `trunk_error_deg` 指标，目标沿用原参考的相位、启动慢速周期和初始姿态渐入。当前躯干角与目标角仅加入 Critic 的特权观测（27 → 29 维）。Actor 移除渐入系数、速率倍率与九维参考目标后为单帧 99 维；内部九个关节目标顺序不变。旧 110/112 维 Actor 及相应 Critic 检查点不能直接完整恢复，应重新训练或显式迁移权重。此修改未解决原有闭链可达性问题。
+训练新增 `trunk_tracking` 奖励（权重 0.6，角度尺度 10°）与 `trunk_error_deg` 指标，目标沿用原参考的相位、启动慢速周期和初始姿态渐入。当前躯干角与目标角仅加入 Critic 的特权观测（27 → 29 维）。Actor 移除渐入系数、速率倍率与九维参考目标后为单帧 99 维；内部九个关节目标顺序不变。旧 110/112 维 Actor 及相应 Critic 检查点不能直接完整恢复，应重新训练或显式迁移权重。此修改未解决原有闭链可达性问题。
 
 桨的相位另作整体平移：六通道统一延后 `0.1084471999` 周期（26 桨/分钟时约 0.2503 s），运行时直接在原桨曲线上计算 `q((phase-delay) % 1)`，不拉伸划水或回桨时长，也不改变左右桨相对时序。平均完全出水时刻对齐人体原图 Finish（52.3574%）；左右桨原有微小差异保留，分别约在 52.4879% 和 52.2270% 完全出水。桨的 Catch 也随之延后，不再与人体 Catch 同时。标定采用静止船体与既有水位，见 `data/oar_finish_alignment.json`；可用 `python tools/align_oar_finish.py` 重建。`data/rowing_reference_finish_aligned.csv` 仅是重采样预览，运行时不读取它。
 
@@ -108,7 +108,7 @@ python -m mujoco.viewer --mjcf=preview.xml
 
 ## 左右动作协调惩罚
 
-当前训练采用上面的手动相位版本（桨提前 4%、座椅延后 3%），并启用 `bilateral_asymmetry`，奖励权重 **-0.1**。`rowing_mjlab/symmetry.py` 比较 13 对左右腿、肩、肘、腕关节：pitch、膝和肘同号，roll/yaw 反号。姿态和下发目标比较相对初始装配姿态的变化量，保留原有左右抓握偏置；不直接比较归一化策略动作，因为左右关节可用行程不同。
+当前训练采用上面的手动相位版本（桨提前 4%、座椅延后 3%），并启用 `bilateral_asymmetry`，奖励权重 **-0.05**。`rowing_mjlab/symmetry.py` 比较 13 对左右腿、肩、肘、腕关节：pitch、膝和肘同号，roll/yaw 反号。姿态和下发目标比较相对初始装配姿态的变化量，保留原有左右抓握偏置；不直接比较归一化策略动作，因为左右关节可用行程不同。
 
 中心关节另包含 `waist_yaw_joint` 与 `waist_roll_joint`：惩罚相对初始装配姿态的偏转、角速度和动作对应的实际目标偏移（零动作对应初始姿态）。`waist_pitch_joint` 的前后摆动符合左右对称运动，不纳入惩罚；头部关节固定，不属于策略动作。
 
@@ -126,7 +126,7 @@ CPU 检查：`python -m unittest discover -s tests -v`。测试覆盖镜像符�
 
 重建：先运行 `python tools/calibrate_crossing.py`，再运行 `python tools/calibrate_reset_float.py`。`tests/test_crossing.py` 检查全周期限位、周期端点、稳定段水位、握持点上下关系及双桨接触；未宣称全身闭链轨迹或动态横摇稳定性已验证。
 
-当前奖励以代码为准，覆盖前文历史值：前进速度 **1.0**；侧向水平速度平方 **−0.1**（m²/s²，使用船体质心速度）；船体三轴角速度平方和 **−0.1**（rad²/s²）；`bilateral_asymmetry` **−0.05**；归一化 `joint_torque` **−0.005**；`action_rate` **−0.025**。后两项均为修改前的 5 倍。其他奖励维持当前代码设置，elevation 跟踪权重为 1.0。
+当前奖励以代码为准，覆盖前文历史值：前进速度 **0.6**；侧向水平速度平方 **−0.6**（m²/s²，使用船体质心速度）；船体三轴角速度平方和 **−0.6**（rad²/s²）；`bilateral_asymmetry` **−0.05**；归一化 `joint_torque` **−0.005**；`action_rate` **−0.025**。后两项均为修改前的 5 倍。其他奖励维持当前代码设置，elevation 跟踪权重为 1.0。
 
 
 ## 横摇直立奖励与初始浮态
@@ -144,6 +144,30 @@ CPU 检查：`python -m unittest discover -s tests -v`。测试覆盖镜像符�
 
 ## 前进速度奖励
 
-`forward_speed` 权重 1.0，取船体自身质心的世界速度在船体 +X 轴水平投影方向上的有符号分量，单位 m/s。该方向对应坐姿机器人身后。向前为正、倒退为负，纯横移或纯升沉不获得此奖励；采用水平投影避免船体俯仰时将竖向运动计作推进。由 MuJoCo `cvel` 转换到船体质心，不能直接读取其平移部分作为船速。
+`forward_speed` 权重 0.6，取船体自身质心的世界速度在船体 +X 轴水平投影方向上的有符号分量，单位 m/s。该方向对应坐姿机器人身后。向前为正、倒退为负，纯横移或纯升沉不获得此奖励；采用水平投影避免船体俯仰时将竖向运动计作推进。由 MuJoCo `cvel` 转换到船体质心，不能直接读取其平移部分作为船速。
 
 新增 `forward_speed_m_s` 指标。奖励是鼓励前进的线性速度项，没有目标船速或上限，不是速度跟踪奖励；权重为初始设置。框架仍按 0.02 s 控制步长缩放总奖励。Actor 保持 99 维、Critic 特权观测保持 29 维。
+# Raised oarlock installation (2026-10-28)
+
+The oarlocks are 70 mm above the previous installation, retaining the existing
+10 mm left-hand-over-right-hand height differential. The seat and robot are
+10 mm lower; footplates and foot welds move with them. The central rigger mount
+is retained, while its outer mesh struts gain a 6.77 degree upward slope.
+`tools/rebuild_raised_rigger.py` regenerates this visual approximation from the
+original mesh. The aggregate boat mass/inertia are unchanged.
+
+The hand attachment frames rotate 15 degrees about each signed feather axis,
+preserving their grip contact points and rigid welds. Reset arm IK and float
+trim are recalibrated. `data/rig_geometry.json` records the exact installation.
+The source literature CSV remains unchanged; the additive elevation correction
+is rebuilt for the new heights, preserving separate entry/extraction transitions.
+
+**Reachability remains unresolved.** The 25 regression tests cover reset
+closure, joint limits and blade-water geometry, not full-cycle arm feasibility.
+`python tools/validate_grip_reach.py --samples 101` separately checks arm IK
+with prescribed seat/trunk/oar references and free elbow adaptation; it writes
+phase errors and fitted poses under `renders/grip_reach`, and exits nonzero on
+failure. `--reset-feather` isolates the 0–90 degree feather test at reset.
+Neither check certifies leg closure, collision clearance or dynamic stability.
+The current installation must not be described as a certified feasible training
+reference: further coordinated seat/trunk/arm retargeting is needed.

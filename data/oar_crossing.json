@@ -2,9 +2,12 @@
   "left_hand_gate": "starboard",
   "right_hand_gate": "port",
   "gate_height_change_m": {
-    "starboard": 0.005,
-    "port": -0.005
+    "starboard": 0.075,
+    "port": 0.065
   },
+  "additional_gate_raise_m": 0.07,
+  "seat_robot_height_change_m": -0.01,
+  "grip_frame_axial_adjustment_deg": 15,
   "differential_left_right_ratio": [
     1,
     4
@@ -13,7 +16,7 @@
     0.85,
     3.4
   ],
-  "common_depth_correction": "Equal physical handle-raising angle, then differential left-up/right-down correction; common term is separate from 1:4 ratio",
+  "common_depth_correction": "Common hand-raising angle plus differential left-up/right-down correction; common term is separate from 1:4 ratio",
   "drive_source_phase": [
     0.05,
     0.35

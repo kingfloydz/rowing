@@ -1,19 +1,20 @@
 {
-  "note": "Arm-only IK preserves hand welds after starboard/left-hand gate +5 mm and port/right-hand gate -5 mm. Other reset joints unchanged.",
+  "note": "Arm-only IK closes both hand welds after gates +70 mm, seat/robot -10 mm and grip-frame axial adjustment +15 deg. Existing left/right gate differential retained. Full-cycle reach is validated separately.",
   "joint_positions_rad": {
-    "left_shoulder_pitch_joint": -1.2703241119342918,
-    "left_shoulder_roll_joint": 0.32708517758921657,
-    "left_shoulder_yaw_joint": -0.20457199326932762,
-    "left_elbow_joint": 1.3074149604606289,
-    "left_wrist_roll_joint": 1.9336171500826647,
-    "left_wrist_pitch_joint": -0.22917442420825263,
-    "left_wrist_yaw_joint": -0.49653880031810727,
-    "right_shoulder_pitch_joint": -1.325411384742617,
-    "right_shoulder_roll_joint": -0.1572794642741796,
-    "right_shoulder_yaw_joint": 0.21012453945676043,
-    "right_elbow_joint": 1.258460348548079,
-    "right_wrist_roll_joint": -2.1313434487505987,
-    "right_wrist_pitch_joint": -0.17019799502124475,
-    "right_wrist_yaw_joint": 0.6322959839792494
-  }
+    "left_shoulder_pitch_joint": -1.178858095032511,
+    "left_shoulder_roll_joint": 0.3992472177046083,
+    "left_shoulder_yaw_joint": -0.21514640057633602,
+    "left_elbow_joint": 0.8481985357576577,
+    "left_wrist_roll_joint": 1.9868899716406891,
+    "left_wrist_pitch_joint": -0.18696118707016132,
+    "left_wrist_yaw_joint": -0.786791435185747,
+    "right_shoulder_pitch_joint": -1.5379669159148392,
+    "right_shoulder_roll_joint": -0.30837082707212876,
+    "right_shoulder_yaw_joint": 0.42880664245603073,
+    "right_elbow_joint": 1.2527991928683113,
+    "right_wrist_roll_joint": -1.6225506741896019,
+    "right_wrist_pitch_joint": -0.5404374890867969,
+    "right_wrist_yaw_joint": 0.8193292300090205
+  },
+  "right_arm_posture": "Minimum projected elbow bend on outward branch, with exact existing hand weld and unchanged oar pose."
 }

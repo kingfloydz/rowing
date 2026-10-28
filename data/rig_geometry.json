@@ -1,0 +1,45 @@
+{
+  "additional_oarlock_height_m": 0.07,
+  "seat_and_robot_height_change_m": -0.01,
+  "central_rigger_attachment_half_width_m": 0.2,
+  "rigger_outer_span_m": 0.59,
+  "rigger_added_slope_deg": 6.766174822553062,
+  "footplates_shifted_with_robot": true,
+  "inertia_note": "Existing lumped boat mass and inertia retained; raised rigger mesh is a visual approximation.",
+  "grip": {
+    "left": {
+      "oar_frame_rotation_vector_deg": [
+        -7.974139656440463e-16,
+        -15.000000000000002,
+        3.1896558625761852e-15
+      ],
+      "total_angle_deg": 15.000000000000002,
+      "relpose": [
+        0.02899999999999563,
+        7.475875960533557e-15,
+        0.7850000000000005,
+        -0.14211456371300207,
+        0.1421145637130133,
+        0.6926784613229052,
+        -0.6926784613228967
+      ]
+    },
+    "right": {
+      "oar_frame_rotation_vector_deg": [
+        0.0,
+        14.999999999999998,
+        6.379311725152372e-15
+      ],
+      "total_angle_deg": 14.999999999999996,
+      "relpose": [
+        0.028999999999985693,
+        1.125340374408718e-15,
+        -0.7849999999999903,
+        0.30268825769474084,
+        -0.30268825769472235,
+        -0.6390460223283765,
+        0.639046022328389
+      ]
+    }
+  }
+}
