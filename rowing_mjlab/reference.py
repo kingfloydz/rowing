@@ -8,8 +8,8 @@ PERIOD = 60.0/26.0
 SIGMA_DEG = (10,4,15,10,4,15)
 OAR_REFERENCE_PATH = ROOT/'data/rowing_reference.csv'
 # Interior of the digitized drive, excluding catch/extraction transitions.
-# Verified at the repository waterline: both blades >70% wetted surface area
-# over this interval; sweep advances and the blade remains approximately square.
+# Geometrically calibrated at the reset hull/waterline: both blades fully wet
+# over this source-phase interval. Entry/extraction are separate transitions.
 DRIVE_START_PHASE = (0.05, 0.35)
 
 
@@ -21,6 +21,9 @@ class OarReference:
                               - offsets['oar_phase_advance']) if path is None else 0.0)
         self.seat_phase_offset = offsets['seat_phase_delay']
         values = np.loadtxt(path or OAR_REFERENCE_PATH,delimiter=',',skiprows=1)
+        if path is None:
+            correction = np.loadtxt(ROOT/'data/oar_crossing_correction.csv',delimiter=',',skiprows=1)
+            values[:,1:] += CubicSpline(correction[:,0],correction[:,1:],bc_type='periodic')(values[:,0])
         if not np.allclose(values[0,1:],values[-1,1:]):
             raise ValueError('Reference must be periodic')
         self.n = len(values)-1

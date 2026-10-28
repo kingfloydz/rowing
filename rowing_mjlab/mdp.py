@@ -186,6 +186,20 @@ def boat_forward_speed(env):
     return (boat_world_velocity(env)[:,:2]*heading).sum(dim=-1)
 
 
+def boat_lateral_velocity_cost(env):
+    """Squared horizontal speed perpendicular to the hull heading, in m²/s²."""
+    s,d = env.rowing,env.sim.data
+    heading = d.xmat[:,s.boat].reshape(-1,3,3)[:,:2,0]
+    heading = heading/torch.linalg.vector_norm(heading,dim=-1,keepdim=True).clamp_min(1e-8)
+    velocity = boat_world_velocity(env)[:,:2]
+    return (heading[:,0]*velocity[:,1]-heading[:,1]*velocity[:,0]).square()
+
+
+def boat_angular_velocity_cost(env):
+    """Squared hull angular speed across roll, pitch and yaw, in rad²/s²."""
+    return env.sim.data.cvel[:,env.rowing.boat,:3].square().sum(-1)
+
+
 def privileged(env):
     s,d = env.rowing,env.sim.data
     rotation = d.xmat[:,s.boat].reshape(-1,3,3)

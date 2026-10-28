@@ -116,6 +116,18 @@ python -m mujoco.viewer --mjcf=preview.xml
 
 CPU 检查：`python -m unittest discover -s tests -v`。测试覆盖镜像符号、装配姿态零代价、实际速度/控制目标独立惩罚、批量梯度、T6 角度符号与观测奖励接线；不代表四卡训练收敛验证。
 
+## 双桨上下交叉与当前奖励配置
+
+左手连接 `starboard_oar`，右手连接 `port_oar`。当前左手侧桨架升高 5 mm、右手侧降低 5 mm；两侧 elevation 限位分别扩展至 starboard −35°～15°、port −15°～35°。右手侧 reset elevation 微调 −0.01 rad，双臂通过 IK 恢复原手柄 weld，reset 左手约高 5 mm；浮态重新标定，仍保留零横摇和零艏摇。
+
+原文献 CSV 保留。运行时在原桨曲线上叠加 `data/oar_crossing_correction.csv`，随后沿用既有整体相位偏移。交叉附近的差分修正为左手抬高 0.85°、右手压低 3.4°，按水平握持点距离平滑启停，比例 1:4。另加独立的双侧共同浸水修正，避免压低右手使右桨叶抬出水面；因此最终 elevation 总修正量不必为 1:4。元数据见 `data/oar_crossing.json`。
+
+稳定 drive 采用原桨源相位 0.05～0.35，目标桨叶最高点低于水面 8 mm；稳定 recovery 为 0.50～0.90，最低点离水至少 20 mm。0.90～下一周期 0.05 和 0.35～0.50 为出入水过渡，使用平滑渐变，不要求过渡段全浸水或全离水。这些是稳定段的几何校验区间，不是重新定义实测 Catch/Finish。校验使用全部桨叶网格及固定 reset 浮态；实际船体运动和跟踪误差会改变浸水状态。
+
+重建：先运行 `python tools/calibrate_crossing.py`，再运行 `python tools/calibrate_reset_float.py`。`tests/test_crossing.py` 检查全周期限位、周期端点、稳定段水位、握持点上下关系及双桨接触；未宣称全身闭链轨迹或动态横摇稳定性已验证。
+
+当前奖励以代码为准，覆盖前文历史值：前进速度 **1.0**；侧向水平速度平方 **−0.1**（m²/s²，使用船体质心速度）；船体三轴角速度平方和 **−0.1**（rad²/s²）；`bilateral_asymmetry` **−0.05**；归一化 `joint_torque` **−0.005**；`action_rate` **−0.025**。后两项均为修改前的 5 倍。其他奖励维持当前代码设置，elevation 跟踪权重为 1.0。
+
 
 ## 横摇直立奖励与初始浮态
 

@@ -245,12 +245,12 @@
           <joint name="seat_pelvis_hinge" axis="0 1 0" pos="-0.04 0 -0.1" range="-0.523598775598299 0.523598775598299" damping="2" ref="-0.349065850399" />
         </body>
       </body>
-      <body name="port_gate" pos="0 0.79 0.2074977344" quat="0.95856160714843 0 0 -0.28488531956039">
+      <body name="port_gate" pos="0 0.79 0.2024977344" quat="0.95856160714843 0 0 -0.28488531956039">
         <joint name="port_sweep" axis="0 0 1" range="-0.698131700798 1.745329251994" ref="0.20762458743566" pos="0 0 0" damping="0.20" />
         <inertial mass="0.1" pos="0.0003446844517 -0.0001841301253 -0.009022383466" fullinertia="0.0001377848328 0.0003226216781 0.0002418139883 1.243789378e-06 -8.884091505e-07 -2.396916082e-07" />
         <geom name="gate_port_visual" type="mesh" mesh="gate_port" rgba=".35 .85 .055 1" contype="0" conaffinity="0" />
-        <body name="port_oar" quat="0.98317428715149 -0.18266995819914 -8.4893459942563e-05 1.5772874622056e-05" pos="0 0 0">
-          <joint name="port_elevation" axis="0.99999998508863 -4.083806633062e-15 -0.00017269259431702" range="-0.174532925199 0.523598775598" ref="-0.053243577661662" pos="0 0 0" damping="0.10" />
+        <body name="port_oar" quat="0.9822486515131282 -0.187583525782405 -8.481353473211395e-05 1.6197142991105187e-05" pos="0 0 0">
+          <joint name="port_elevation" axis="0.99999998508863 -4.083806633062e-15 -0.00017269259431702" range="-0.261799387799 0.610865238198" ref="-0.063243577661662" pos="0 0 0" damping="0.10" />
           <joint name="port_feather" axis="4.0989279570351e-15 1 -2.2759572004816e-15" range="-0.436332312999 1.832595714594" ref="-0.00017269259597705" pos="0 0 0" damping="0.08" />
           <inertial mass="1.5" pos="0 0.55 0" fullinertia="2.74625 0.00211648903115 2.74625 0 0 0" />
           <geom name="port_shaft_visual" type="mesh" mesh="port_shaft" rgba=".055 .065 .075 1" contype="0" conaffinity="0" />
@@ -260,12 +260,12 @@
         </body>
         <site name="port_oarlock" size=".012" rgba="0 0 0 0" />
       </body>
-      <body name="starboard_gate" pos="0 -0.79 0.2074977344" quat="0.95702438130431 0 0 0.29000747160911">
+      <body name="starboard_gate" pos="0 -0.79 0.2124977344" quat="0.95702438130431 0 0 0.29000747160911">
         <joint name="starboard_sweep" axis="0 0 1" range="-1.745329251994 0.698131700798" ref="-0.19692887375678" pos="0 0 0" damping="0.20" />
         <inertial mass="0.1" pos="0.0003263233046 6.958614175e-05 -0.008996370946" fullinertia="0.0001379095001 0.0003227821312 0.0002415992917 -1.27197087e-06 -8.753524165e-07 -5.344374134e-08" />
         <geom name="gate_starboard_visual" type="mesh" mesh="gate_starboard" rgba=".35 .85 .055 1" contype="0" conaffinity="0" />
         <body name="starboard_oar" quat="0.98300794583042 0.1835630094219 -2.4548006390952e-06 -4.5839974114899e-07" pos="0 0 0">
-          <joint name="starboard_elevation" axis="0.99999999998754 4.3291032001597e-15 -4.9944675189104e-06" range="-0.523598775598 0.174532925199" ref="0.05506039903905" pos="0 0 0" damping="0.10" />
+          <joint name="starboard_elevation" axis="0.99999999998754 4.3291032001597e-15 -4.9944675189104e-06" range="-0.610865238198 0.261799387799" ref="0.05506039903905" pos="0 0 0" damping="0.10" />
           <joint name="starboard_feather" axis="5.1067476629525e-15 -1 -3.219646771413e-15" range="-0.436332312999 1.832595714594" ref="4.9944675660112e-06" pos="0 0 0" damping="0.08" />
           <inertial mass="1.5" pos="0 -0.55 0" fullinertia="2.74625 0.00211648903115 2.74625 0 0 0" />
           <geom name="starboard_shaft_visual" type="mesh" mesh="starboard_shaft" rgba=".055 .065 .075 1" contype="0" conaffinity="0" />

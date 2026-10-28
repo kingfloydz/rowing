@@ -30,6 +30,16 @@ class ForwardSpeedTests(unittest.TestCase):
         env.sim.data.xipos[0,0,1]=1.
         torch.testing.assert_close(mdp.boat_forward_speed(env),torch.tensor([-2.]))
 
+    def test_lateral_cost_follows_heading_and_excludes_heave(self):
+        rot=Rotation.from_euler('z',np.array([[90],[0],[0],[0]]),degrees=True).as_matrix()
+        env=self.env([[2,0,0],[0,-2,0],[3,0,0],[0,0,5]],rot)
+        torch.testing.assert_close(mdp.boat_lateral_velocity_cost(env),torch.tensor([4.,4.,0.,0.]))
+
+    def test_angular_cost_includes_all_axes_without_linear_speed(self):
+        env=self.env([[8,0,0],[0,9,0]])
+        env.sim.data.cvel[:,0,:3]=torch.tensor([[1.,2.,3.],[-1.,0.,0.]])
+        torch.testing.assert_close(mdp.boat_angular_velocity_cost(env),torch.tensor([14.,1.]))
+
 
 if __name__=='__main__':
     unittest.main()
