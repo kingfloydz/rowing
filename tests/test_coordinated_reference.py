@@ -26,7 +26,7 @@ class CoordinatedReferenceTests(unittest.TestCase):
             self.assertTrue(np.isfinite(values).all())
             for part,sign in MIRROR_PAIRS:
                 if ref.metadata.get('reference_kind')=='literature_soft' and 'wrist' in part:
-                    # Fixed unequal grips may need different wrist rotations;
+                    # Crossing heights and opposite feather axes allow wrist differences;
                     # the ten-channel source tests cover bilateral targets.
                     continue
                 error=values[:,ref.names.index('left_'+part+'_joint')]-sign*values[:,ref.names.index('right_'+part+'_joint')]

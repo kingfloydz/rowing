@@ -11,6 +11,9 @@ from hydrodynamics.models import ROOT
 
 
 def main():
+    geometry=json.loads((ROOT/'data/rig_geometry.json').read_text())
+    if geometry.get('mirrored_effective_grip_installation'):
+        raise RuntimeError('Use tools/symmetrize_grip_installation.py: independent mount fitting would undo mirrored feather installation.')
     out=ROOT/'renders/reference10_literature';backup=out/'previous_installation';backup.mkdir(exist_ok=True)
     for name in ('scene.xml','preview.xml','data/reset_joint_pose.json','data/reset_float_pose.json','data/rig_geometry.json'):
         dst=backup/Path(name).name

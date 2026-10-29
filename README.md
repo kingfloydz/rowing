@@ -114,11 +114,11 @@ CPU 检查：`python -m unittest discover -s tests -v`。测试覆盖镜像符�
 
 左手连接 `starboard_oar`，右手连接 `port_oar`。在上一版整体抬高 7 cm 的基础上，两侧桨环再升高 2 cm，总升高 9 cm；保留左侧比右侧高 10 mm 的安装差。机器人、滑座和脚踏保留此前下移 1 cm 的设置，桨架外侧连接杆相应倾斜。
 
-物理装配重新校准了固定腕—握柄安装角：相对本轮开始状态，左右分别调整约 9.3°/15.6°；沿用向桨架移动 20 mm 的握持点，物理 weld 和碰撞仍启用，桨柄与套筒保持同轴。软参考允许手桨误差及局部碰撞，不要求整周期严格闭链。辅助姿态以侧后方屈肘和软协调为偏好，独立 elevation 修正保留左手在上、右手在下。
+物理装配采用镜像一致的有效腕—桨安装关系（固定手部安装旋转与 weld 旋转的组合）。握持中心保持，reset 双侧 feather 调整为约 4.92°，腰部侧倾限制在 ±0.04 rad；真实 weld 和碰撞保持启用。软参考仍容忍手桨误差及局部碰撞。
 
 稳定 drive、稳定 recovery、入水和出水分别记录在 metadata 的相位区间中。稳定 drive 检查整个桨叶网格在水下，稳定 recovery 检查最低点高于水面 20 mm；入水/出水过渡不强行套用这两种条件。检查基于标定的静止浮态，运动中的横摇、纵倾和跟踪误差会改变浸水情况。
 
-生成参考：`python tools/build_literature_reference10.py`；同设置文献基准 IK：加 `--baseline-diagnostic`；审计与十通道叠图：`python tools/audit_literature_reference10.py`。reset/固定握持校准为 `fit_literature_reset.py`、`install_literature_reset.py`，之后重算浮态并重新生成参考。测试：`python -m unittest discover -s tests -v`。预览：`python tools/render_reference.py`，输出到 `renders/reference10_literature/`。旧人工软参考和硬约束工具仅作为历史实验，不应覆盖当前文献参考。
+生成参考：`python tools/build_literature_reference10.py`；同设置文献基准 IK：加 `--baseline-diagnostic`；审计与十通道叠图：`python tools/audit_literature_reference10.py`。reset/固定握持校准为 `symmetrize_grip_installation.py`（自动安装，旧独立拟合已加防护），之后重算浮态并重新生成参考。测试：`python -m unittest discover -s tests -v`。预览：`python tools/render_reference.py`，输出到 `renders/reference10_literature/`。旧人工软参考和硬约束工具仅作为历史实验，不应覆盖当前文献参考。
 
 当前奖励以代码为准，覆盖前文历史值：前进速度 **0.6**；侧向水平速度平方 **−1.0**（m²/s²，使用船体质心速度）；船体三轴角速度平方和 **−1.0**（rad²/s²）；`bilateral_asymmetry` **−0.05**；归一化 `joint_torque` **−0.005**；`action_rate` **−0.025**。后两项均为修改前的 5 倍。其他奖励维持当前代码设置，elevation 跟踪权重为 1.0。
 
@@ -145,4 +145,4 @@ CPU 检查：`python -m unittest discover -s tests -v`。测试覆盖镜像符�
 
 `data/reference20/metadata.json` 和 `renders/reference10_literature/validation.json` 记录来源校验、修正量、水面间隙、同条件基准 IK 对比，以及允许存在的手桨误差和碰撞。运行时跟踪九个关节目标和躯干目标；完整手臂姿态仅用于诊断和预览，肘角奖励本身不保证策略学到相同肩部方向。当前水动力仍是未经实艇标定的工程先验。
 
-本次 29 项测试通过，包含原文献形状保持、目标不被辅助 IK 覆盖、周期性、限位、水位、侧后方屈肘和实际 reset 接入。同条件 IK 下双手位置 RMS 从约 8.5/8.6 cm 降至 2.9/3.4 cm，朝向 RMS 从约 46°/55° 降至 30°/42°；这是局部求解诊断，仍有残余误差和碰撞，不构成整周期可行性或动力学稳定性证明。0.2 秒零动作 reset 保持检查通过；此前硬约束版与人工软参考版结果分别在 `renders/reference20/` 和 `renders/reference20_soft/`，不应套用于当前版本。
+本次 30 项测试通过，含有效握持安装镜像、reset 闭合、原文献保持和水位检查。0.2 秒零动作保持通过。当前辅助 IK 手部位置 RMS 约 3.04/3.52 cm，朝向 RMS 约 52.08°/40.52°；左手朝向误差较旧装配增大。固定安装一致性已经修复，但不是整周期可达性或不打转的动态证明。详见 `renders/reference10_literature/report_zh.md`。

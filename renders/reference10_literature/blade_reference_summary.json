@@ -1,0 +1,15 @@
+{
+  "reference_root": "C:\\Users\\a3326\\Documents\\Codex\\2026-10-16\\wo-z\\outputs\\rowing_hydrodynamics",
+  "water_level_world_m": -0.12027640288595698,
+  "period_s": 3.0,
+  "oar_phase_delay": 0.0,
+  "drive_interior": [
+    0.11,
+    0.41
+  ],
+  "recovery_interior": [
+    0.56,
+    0.96
+  ],
+  "note": "Coordinated reference; fixed reset hull. Entry/extraction are separate transitions. Not a dynamics stability claim."
+}
