@@ -15,6 +15,8 @@ from rowing_mjlab.reset_pose import apply_reset_joints
 
 
 def main():
+    if (ROOT/'data/reference20/trajectory.npz').exists():
+        raise RuntimeError('Legacy additive calibration cannot overwrite the coordinated reset. Use build_reference20/refine_reference20 instead.')
     root = ET.parse(ROOT/'scene.xml').getroot()
     apply_reset_joints(root)
     root.find('compiler').set('meshdir', str(ROOT))

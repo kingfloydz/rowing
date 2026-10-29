@@ -32,7 +32,9 @@ class TrunkTests(unittest.TestCase):
         self.assertAlmostEqual(float(trunk_vertical_angle(rotation('x',25),torch.eye(3))),0.)
 
     def test_measured_reference_and_phase(self):
-        ref = TrunkReference('cpu')
+        from hydrodynamics.models import ROOT
+        # Historical measured source remains available without robot retargeting.
+        ref = TrunkReference('cpu',ROOT/'data/reference9/trunk_vertical_prior.csv')
         phase = torch.linspace(0,1,801)
         values = ref(phase)
         self.assertTrue(torch.isfinite(values).all())
@@ -76,7 +78,9 @@ class TrunkTests(unittest.TestCase):
         self.assertLess(float((torso[:,0]*boat[:,0]).sum()),-.9)
         self.assertGreater(float(torso[2,2]),.9)
         angle=trunk_vertical_angle(torso,boat)
-        self.assertTrue(-10 < float(torch.rad2deg(angle)) < 0)
+        # The literature-based reset is a forward-leaning recovery pose; the
+        # previous -10 degree bound described the old assembly, not the axis.
+        self.assertTrue(-20 < float(torch.rad2deg(angle)) < 0)
 
 
 if __name__ == '__main__':

@@ -13,12 +13,17 @@ from hydrodynamics.models import ROOT, load_closed_surface, hydrostatic_wrench
 from rowing_mjlab.reset_pose import apply_reset_joints
 
 
-def calibrate():
-    scene=ET.parse(ROOT/'scene.xml').getroot()
-    apply_reset_joints(scene)
-    scene.find('compiler').set('meshdir',str(ROOT))
-    model=mujoco.MjModel.from_xml_string(ET.tostring(scene,encoding='unicode'))
-    data=mujoco.MjData(model);mujoco.mj_kinematics(model,data)
+def calibrate(model=None, qpos=None):
+    if model is None:
+        scene=ET.parse(ROOT/'scene.xml').getroot()
+        apply_reset_joints(scene)
+        scene.find('compiler').set('meshdir',str(ROOT))
+        model=mujoco.MjModel.from_xml_string(ET.tostring(scene,encoding='unicode'))
+    data=mujoco.MjData(model)
+    if qpos is not None:data.qpos[:]=qpos
+    # Express the geometry in the hull frame before solving world heave/trim.
+    data.qpos[:7]=[0,0,0,1,0,0,0]
+    mujoco.mj_kinematics(model,data)
     mass=model.body_mass.sum()
     cg=(model.body_mass[:,None]*data.xipos).sum(axis=0)/mass
     level=json.loads((ROOT/'data/rowing_reference_provenance.json').read_text())['water_level_m_at_repository_reset']

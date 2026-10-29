@@ -1,0 +1,153 @@
+{
+  "samples": 1601,
+  "original_source_hashes_unchanged": true,
+  "adjusted": {
+    "hand_position_rmse_m": [
+      0.029191251673580495,
+      0.03443852895379207
+    ],
+    "hand_position_max_m": [
+      0.06145703514223765,
+      0.07572477296542345
+    ],
+    "hand_orientation_rmse_deg": [
+      30.24667990264347,
+      42.143717340248706
+    ],
+    "hand_orientation_max_deg": [
+      48.47549880944475,
+      92.9368331011264
+    ],
+    "foot_position_max_m": [
+      0.0019905119792238855,
+      0.0019930154837053053
+    ],
+    "trunk_rmse_deg": 0.5675892669758593,
+    "drive_top_max_m": [
+      -0.02958263827334756,
+      -0.0299845710369408
+    ],
+    "recovery_bottom_min_m": [
+      0.12887414889741944,
+      0.13890158014873183
+    ],
+    "full_cycle_bottom_min_m": [
+      -0.3162822505360346,
+      -0.3395451435013857
+    ],
+    "full_cycle_top_max_m": [
+      0.32016334810317126,
+      0.3033159629845257
+    ],
+    "crossing_target_height_min_m": 0.03247061935523449,
+    "crossing_actual_hand_height_min_m": 0.0159701111936027,
+    "max_penetration_m": 0.0652698589537441,
+    "collision_phase_fraction": 0.7376639600249844,
+    "finish_elbow_relative_shoulder_mean_m": [
+      [
+        -0.0005901847292732332,
+        -0.042018704097566695,
+        -0.12374427193705453
+      ],
+      [
+        0.0008629419126326704,
+        0.04186399324006001,
+        -0.12380429251719305
+      ]
+    ],
+    "finish_elbow_chord_offset_mean_m": [
+      [
+        0.05577134229569655,
+        -0.05429019425778321,
+        -0.06652432237207125
+      ],
+      [
+        0.056216965003289925,
+        0.054781499078644665,
+        -0.06574618083632658
+      ]
+    ],
+    "maximum_joint_limit_violation": 0.0
+  },
+  "literature_baseline_same_ik": {
+    "hand_position_rmse_m": [
+      0.08545929947773265,
+      0.08586825892544364
+    ],
+    "hand_position_max_m": [
+      0.17603618281190894,
+      0.1803943358579947
+    ],
+    "hand_orientation_rmse_deg": [
+      45.70582391553639,
+      55.28452411439564
+    ],
+    "hand_orientation_max_deg": [
+      78.11523573957834,
+      136.71924212117926
+    ],
+    "foot_position_max_m": [
+      0.004441590170529879,
+      0.00444981017876323
+    ],
+    "trunk_rmse_deg": 1.9741803362287969,
+    "drive_top_max_m": [
+      0.18703440610383046,
+      0.2046839316233655
+    ],
+    "recovery_bottom_min_m": [
+      0.09216273461256758,
+      0.10426607118302245
+    ],
+    "full_cycle_bottom_min_m": [
+      -0.31980235229442416,
+      -0.3098692251235589
+    ],
+    "full_cycle_top_max_m": [
+      0.3028794130502249,
+      0.3216498398223247
+    ],
+    "crossing_target_height_min_m": 0.009999946069116417,
+    "crossing_actual_hand_height_min_m": -0.00284268375674801,
+    "max_penetration_m": 0.05460497492339532,
+    "collision_phase_fraction": 0.6427232979387882,
+    "finish_elbow_relative_shoulder_mean_m": [
+      [
+        -0.01191220623919145,
+        -0.044208035846579515,
+        -0.12152950733803117
+      ],
+      [
+        -0.01108882067828571,
+        0.04312513842860727,
+        -0.12191429794314776
+      ]
+    ],
+    "finish_elbow_chord_offset_mean_m": [
+      [
+        0.049255487035810376,
+        -0.05448170786706061,
+        -0.06879622215312582
+      ],
+      [
+        0.04954428105815871,
+        0.05417652205918858,
+        -0.0687826404961479
+      ]
+    ],
+    "maximum_joint_limit_violation": 0.0
+  },
+  "comparison_note": "Same current installation, pose-fitting objective, solver and phase grid. Local IK diagnostics, not a proof of global feasibility or dynamics. Baseline water metrics use adjusted interior windows and are contextual only.",
+  "maximum_post_affine_change": {
+    "port_sweep": 0.0,
+    "port_elevation": 0.10334057820830475,
+    "port_feather": 0.0,
+    "starboard_sweep": 0.0,
+    "starboard_elevation": 0.13115467489332833,
+    "starboard_feather": 0.0,
+    "seat_slide": 0.0,
+    "left_elbow_joint": 0.0,
+    "right_elbow_joint": 0.0,
+    "trunk_vertical": 0.0
+  }
+}

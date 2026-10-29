@@ -14,6 +14,14 @@ from rowing_mjlab.reference import RowingReference, IMITATION_NAMES, PERIOD
 
 
 def main():
+    from rowing_mjlab.coordinated_reference import available
+    if available():
+        from tools.render_reference20 import render
+        from rowing_mjlab.coordinated_reference import CoordinatedReference
+        kind=CoordinatedReference('cpu').metadata.get('reference_kind')
+        folder={'soft_symmetric':'reference20_soft','literature_soft':'reference10_literature'}.get(kind,'reference20')
+        render(ROOT/'renders'/folder)
+        return
     output = ROOT/'renders/reference_reset'
     output.mkdir(parents=True, exist_ok=True)
     root = ET.parse(ROOT/'scene.xml').getroot()

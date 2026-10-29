@@ -1,0 +1,115 @@
+{
+  "reset_phase": 0.92,
+  "reset_q": {
+    "seat_slide": -0.11628299627015577,
+    "seat_pelvis_hinge": -0.33267530667645645,
+    "left_hip_pitch_joint": -2.0907497543923173,
+    "left_hip_roll_joint": -0.4321408089011079,
+    "left_hip_yaw_joint": -0.1574439395969967,
+    "left_knee_joint": 1.912489705575722,
+    "left_ankle_roll_joint": 0.20406403136060564,
+    "left_ankle_pitch_joint": -0.7420906594967092,
+    "right_hip_pitch_joint": -2.0907497542557802,
+    "right_hip_roll_joint": 0.43214080888285494,
+    "right_hip_yaw_joint": 0.15744393958713956,
+    "right_knee_joint": 1.9124897055633099,
+    "right_ankle_roll_joint": -0.20406403135823947,
+    "right_ankle_pitch_joint": -0.7420906596279904,
+    "waist_yaw_joint": 0.023902698878293698,
+    "waist_roll_joint": 0.030391666590110257,
+    "waist_pitch_joint": 0.5085927050735639,
+    "left_shoulder_pitch_joint": -1.1460969343356575,
+    "left_shoulder_roll_joint": 0.2181742317705582,
+    "left_shoulder_yaw_joint": -0.1282591912352418,
+    "left_elbow_joint": 1.2638566801373257,
+    "left_wrist_roll_joint": 2.1186242431881577,
+    "left_wrist_pitch_joint": -0.11302067760375843,
+    "left_wrist_yaw_joint": -0.7203250470159804,
+    "right_shoulder_pitch_joint": -1.0467680409405153,
+    "right_shoulder_roll_joint": -0.22823414379740015,
+    "right_shoulder_yaw_joint": 0.3137260659716379,
+    "right_elbow_joint": 1.2638566796565793,
+    "right_wrist_roll_joint": -2.3243826919768016,
+    "right_wrist_pitch_joint": 0.1812415534996232,
+    "right_wrist_yaw_joint": 0.7806118163053759,
+    "port_sweep": 0.046693085706771255,
+    "port_elevation": 0.2083237886994054,
+    "port_feather": 1.059133241631355,
+    "starboard_sweep": -0.046693085707469106,
+    "starboard_elevation": -0.20569431580187372,
+    "starboard_feather": 1.059133241631355
+  },
+  "grip": {
+    "left": {
+      "previous_position_m": [
+        0.06711963614469277,
+        0.005443933449897331,
+        -0.02082175972702622
+      ],
+      "previous_quaternion_wxyz": [
+        0.5830763715715584,
+        0.7056036381314803,
+        -0.327092841314823,
+        0.23485255785526596
+      ],
+      "position_m": [
+        0.06503884510320844,
+        0.0014881534086315519,
+        -0.019355967298902505
+      ],
+      "quaternion_wxyz": [
+        -0.6181365037423308,
+        -0.7011686812618212,
+        0.2548760768363079,
+        -0.2476043792328779
+      ],
+      "mount_rotation_change_deg": 9.330887776049613,
+      "relpose": [
+        0.028999999999996,
+        7.687854376764329e-15,
+        0.7650000000000009,
+        -0.14211456371300207,
+        0.1421145637130133,
+        0.6926784613229052,
+        -0.6926784613228967
+      ]
+    },
+    "right": {
+      "previous_position_m": [
+        0.05999874647103419,
+        0.00021143136829667656,
+        0.009767537179779443
+      ],
+      "previous_quaternion_wxyz": [
+        0.7258774728667677,
+        0.66543301177491,
+        0.12578278736864573,
+        -0.12033075927002895
+      ],
+      "position_m": [
+        0.06275717829438346,
+        0.0004060336667159511,
+        0.015363649196261094
+      ],
+      "quaternion_wxyz": [
+        0.6511051960453306,
+        0.7058342957734156,
+        0.18377204013196624,
+        -0.20997096908514112
+      ],
+      "mount_rotation_change_deg": 15.649299683258398,
+      "relpose": [
+        0.028999999999986342,
+        1.2065415443668157e-15,
+        -0.7649999999999907,
+        0.30268825769474084,
+        -0.30268825769472235,
+        -0.6390460223283765,
+        0.639046022328389
+      ]
+    }
+  },
+  "max_equality_error": 1.5475282166832471e-09,
+  "contacts": [],
+  "note": "Rigid wrist-to-gripper mount adjusted about grip center; sleeve remains coaxial and weld is constant. Reset elbows retain literature-derived near-extension angles."
+}

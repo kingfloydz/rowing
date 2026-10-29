@@ -1,12 +1,83 @@
 {
-  "additional_oarlock_height_m": 0.07,
+  "additional_oarlock_height_m": 0.09,
   "seat_and_robot_height_change_m": -0.01,
   "central_rigger_attachment_half_width_m": 0.2,
   "rigger_outer_span_m": 0.59,
-  "rigger_added_slope_deg": 6.766174822553062,
+  "rigger_added_slope_deg": 8.673174047879765,
   "footplates_shifted_with_robot": true,
   "inertia_note": "Existing lumped boat mass and inertia retained; raised rigger mesh is a visual approximation.",
   "grip": {
+    "left": {
+      "previous_position_m": [
+        0.06711963614469277,
+        0.005443933449897331,
+        -0.02082175972702622
+      ],
+      "previous_quaternion_wxyz": [
+        0.5830763715715584,
+        0.7056036381314803,
+        -0.327092841314823,
+        0.23485255785526596
+      ],
+      "position_m": [
+        0.06503884510320844,
+        0.0014881534086315519,
+        -0.019355967298902505
+      ],
+      "quaternion_wxyz": [
+        -0.6181365037423308,
+        -0.7011686812618212,
+        0.2548760768363079,
+        -0.2476043792328779
+      ],
+      "mount_rotation_change_deg": 9.330887776049613,
+      "relpose": [
+        0.028999999999996,
+        7.687854376764329e-15,
+        0.7650000000000009,
+        -0.14211456371300207,
+        0.1421145637130133,
+        0.6926784613229052,
+        -0.6926784613228967
+      ]
+    },
+    "right": {
+      "previous_position_m": [
+        0.05999874647103419,
+        0.00021143136829667656,
+        0.009767537179779443
+      ],
+      "previous_quaternion_wxyz": [
+        0.7258774728667677,
+        0.66543301177491,
+        0.12578278736864573,
+        -0.12033075927002895
+      ],
+      "position_m": [
+        0.06275717829438346,
+        0.0004060336667159511,
+        0.015363649196261094
+      ],
+      "quaternion_wxyz": [
+        0.6511051960453306,
+        0.7058342957734156,
+        0.18377204013196624,
+        -0.20997096908514112
+      ],
+      "mount_rotation_change_deg": 15.649299683258398,
+      "relpose": [
+        0.028999999999986342,
+        1.2065415443668157e-15,
+        -0.7649999999999907,
+        0.30268825769474084,
+        -0.30268825769472235,
+        -0.6390460223283765,
+        0.639046022328389
+      ]
+    }
+  },
+  "reference20_extra_oarlock_height_m": 0.02,
+  "previous_grip_installation": {
     "left": {
       "oar_frame_rotation_vector_deg": [
         -7.974139656440463e-16,
@@ -41,5 +112,8 @@
         0.639046022328389
       ]
     }
-  }
+  },
+  "grip_point_shift_toward_oarlock_m": 0.02,
+  "reference_metadata": "data/reference20/metadata.json",
+  "reset_calibration": "renders/reference10_literature/reset_fit.json"
 }

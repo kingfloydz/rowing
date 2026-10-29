@@ -3,19 +3,24 @@ import numpy as np
 import torch
 from scipy.interpolate import CubicSpline
 from hydrodynamics.models import ROOT
+from .coordinated_reference import CoordinatedReference, available
 
-PERIOD = 60.0/26.0
+PERIOD = 60.0/20.0
 SIGMA_DEG = (10,4,15,10,4,15)
 OAR_REFERENCE_PATH = ROOT/'data/rowing_reference.csv'
-# Interior of the digitized drive, excluding catch/extraction transitions.
-# Geometrically calibrated at the reset hull/waterline: both blades fully wet
-# over this source-phase interval. Entry/extraction are separate transitions.
-DRIVE_START_PHASE = (0.05, 0.35)
+# Interior of the coordinated drive; entry/extraction are separate transitions.
+DRIVE_START_PHASE = (0.08, 0.38)
 
 
 class OarReference:
     def __init__(self, device, path=None):
         import json
+        self.coordinated=CoordinatedReference(device) if path is None and available() else None
+        if self.coordinated is not None:
+            self.phase_offset=0.
+            self.seat_phase_offset=0.
+            self.sigma=torch.deg2rad(torch.tensor(SIGMA_DEG,device=device,dtype=torch.float32))
+            return
         offsets = json.loads((ROOT/'data/reference_phase_offsets.json').read_text())
         self.phase_offset = ((json.loads((ROOT/'data/oar_finish_alignment.json').read_text())['phase_delay']
                               - offsets['oar_phase_advance']) if path is None else 0.0)
@@ -34,6 +39,9 @@ class OarReference:
         self.sigma = torch.deg2rad(torch.tensor(SIGMA_DEG,device=device,dtype=torch.float32))
 
     def __call__(self, phase):
+        if self.coordinated is not None:
+            names=[s+'_'+j for s in ('port','starboard') for j in ('sweep','elevation','feather')]
+            return self.coordinated.joints(phase,names)
         return self._evaluate((phase-self.phase_offset).remainder(1.0))
 
     def _evaluate(self, phase):
@@ -44,7 +52,9 @@ class OarReference:
         return ((c[0]*delta+c[1])*delta+c[2])*delta+c[3]
 
     def nearest(self, angles):
-        """One shared bilateral phase, nearest in sweep only, inside drive."""
+        """Installed reset phase, or legacy sweep-nearest phase inside drive."""
+        if self.coordinated is not None:
+            return torch.tensor(self.coordinated.metadata['reset_phase'],device=angles.device,dtype=angles.dtype)
         grid = torch.arange(4096,device=angles.device,dtype=torch.float32)/4096
         sweep = torch.tensor([0,3],device=angles.device)
         cost = (self(grid).index_select(-1,sweep)-angles.index_select(-1,sweep)).square().mean(-1)
@@ -55,13 +65,10 @@ class OarReference:
         return grid[cost.argmin()]
 
     def target(self, elapsed, phase0, reset_angles):
-        cycles = torch.where(elapsed < 3*PERIOD, elapsed/(3*PERIOD),
-                             torch.where(elapsed < 5*PERIOD,
-                                         1+(elapsed-3*PERIOD)/(2*PERIOD),
-                                         2+(elapsed-5*PERIOD)/PERIOD))
+        cycles = torch.where(elapsed < 2*PERIOD, elapsed/(2*PERIOD),
+                             1+(elapsed-2*PERIOD)/PERIOD)
         phase = (phase0+cycles).remainder(1.0)
-        rate = torch.where(elapsed < 3*PERIOD,1.0/3.0,
-                           torch.where(elapsed < 5*PERIOD,0.5,1.0))
+        rate = torch.where(elapsed < 2*PERIOD,0.5,1.0)
         u = (elapsed/1.0).clamp(0,1)
         blend = 10*u**3-15*u**4+6*u**5
         target = reset_angles+blend[...,None]*(self(phase)-reset_angles)
@@ -74,11 +81,10 @@ IMITATION_NAMES = tuple(s+'_'+j for s in ('port','starboard')
 
 
 class RowingReference(OarReference):
-    """Nine synchronized soft targets; not a certified closed-chain trajectory.
+    """Nine targets from the shared IK trajectory, with legacy-data fallback.
 
-    Base curves use Catch/Finish alignment with independent manual phase offsets. Elbow flexion is
-    mapped to the outward branch in each hinge plane using the model geometry.
-    These are soft priors, not certified closed-chain human demonstrations.
+    Offline geometric closure is distinct from dynamic tracking feasibility.
+    The legacy fallback retains the original independently aligned priors.
     """
     def __init__(self, device, model, prefix=''):
         import json
@@ -86,6 +92,11 @@ class RowingReference(OarReference):
         from .retarget import retarget_seat_elbows
 
         super().__init__(device)
+        if self.coordinated is not None:
+            self.seat_sigma=.05
+            self.elbow_sigma=float(np.deg2rad(15))
+            self.elbow_calibration=[]
+            return
         calibration = json.loads((ROOT/'data/seat_calibration.json').read_text(encoding='utf-8'))
         prior = np.loadtxt(ROOT/'data/reference9/aligned_priors.csv',delimiter=',',skiprows=1)
         phase = prior[:,0]
@@ -106,6 +117,8 @@ class RowingReference(OarReference):
         self.elbow_sigma = float(np.deg2rad(15))
 
     def __call__(self, phase):
+        if self.coordinated is not None:
+            return self.coordinated.joints(phase,IMITATION_NAMES)
         # Manual shifts are independent; elbows keep their source phase.
         values = self._evaluate(phase)
         seat = self._evaluate((phase-self.seat_phase_offset).remainder(1.0))[...,6:7]

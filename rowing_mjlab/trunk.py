@@ -27,6 +27,10 @@ def angular_error(actual, target):
 
 class TrunkReference:
     def __init__(self, device, path=None):
+        from .coordinated_reference import CoordinatedReference,available
+        self.coordinated=CoordinatedReference(device) if path is None and available() else None
+        self.sigma=float(np.deg2rad(10))
+        if self.coordinated is not None:return
         table = np.loadtxt(path or ROOT/'data/reference9/trunk_vertical_prior.csv', delimiter=',', skiprows=1)
         phase, angle = table.T
         if (not np.isfinite(table).all() or not np.allclose(phase, np.linspace(0,1,len(phase)))
@@ -38,6 +42,7 @@ class TrunkReference:
         self.sigma = float(np.deg2rad(10))  # Initial tuning value, not a paper SD.
 
     def __call__(self, phase):
+        if self.coordinated is not None:return self.coordinated(phase)[...,-1]
         x = phase.remainder(1)*self.n
         index = x.long().clamp(0, self.n-1)
         delta = (x-index)/self.n

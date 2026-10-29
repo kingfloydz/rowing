@@ -1,0 +1,424 @@
+{
+  "technique_url": "https://www.britishrowing.org/knowledge/rower-development/british-rowing-technique/water-rowing-technique/",
+  "grip_adjustment_type": "Fixed wrist-to-gripper mounts calibrated at the closed reset; sleeve and oar remain coaxial.",
+  "original_gripper_mount": {
+    "left": {
+      "pos": [
+        0.0577152,
+        -1.38777878078e-17,
+        -0.00014865
+      ],
+      "quat": [
+        0.707106781187,
+        0.707106781187,
+        1.07866899545e-16,
+        2.30893650768e-17
+      ],
+      "relpose": [
+        0.02899999999999563,
+        7.475875960533557e-15,
+        0.7850000000000005,
+        -0.14211456371300207,
+        0.1421145637130133,
+        0.6926784613229052,
+        -0.6926784613228967
+      ]
+    },
+    "right": {
+      "pos": [
+        0.0582413,
+        7.4593109467e-17,
+        -0.00017221
+      ],
+      "quat": [
+        0.707106781187,
+        0.707106781187,
+        -4.32808084651e-17,
+        -1.94935651128e-17
+      ],
+      "relpose": [
+        0.028999999999985693,
+        1.125340374408718e-15,
+        -0.7849999999999903,
+        0.30268825769474084,
+        -0.30268825769472235,
+        -0.6390460223283765,
+        0.639046022328389
+      ]
+    }
+  },
+  "grip_point_shift_toward_oarlock_m": 0.02,
+  "physical_reset_calibration": {
+    "reset_phase": 0.92,
+    "reset_q": {
+      "seat_slide": -0.11628299627015577,
+      "seat_pelvis_hinge": -0.33267530667645645,
+      "left_hip_pitch_joint": -2.0907497543923173,
+      "left_hip_roll_joint": -0.4321408089011079,
+      "left_hip_yaw_joint": -0.1574439395969967,
+      "left_knee_joint": 1.912489705575722,
+      "left_ankle_roll_joint": 0.20406403136060564,
+      "left_ankle_pitch_joint": -0.7420906594967092,
+      "right_hip_pitch_joint": -2.0907497542557802,
+      "right_hip_roll_joint": 0.43214080888285494,
+      "right_hip_yaw_joint": 0.15744393958713956,
+      "right_knee_joint": 1.9124897055633099,
+      "right_ankle_roll_joint": -0.20406403135823947,
+      "right_ankle_pitch_joint": -0.7420906596279904,
+      "waist_yaw_joint": 0.023902698878293698,
+      "waist_roll_joint": 0.030391666590110257,
+      "waist_pitch_joint": 0.5085927050735639,
+      "left_shoulder_pitch_joint": -1.1460969343356575,
+      "left_shoulder_roll_joint": 0.2181742317705582,
+      "left_shoulder_yaw_joint": -0.1282591912352418,
+      "left_elbow_joint": 1.2638566801373257,
+      "left_wrist_roll_joint": 2.1186242431881577,
+      "left_wrist_pitch_joint": -0.11302067760375843,
+      "left_wrist_yaw_joint": -0.7203250470159804,
+      "right_shoulder_pitch_joint": -1.0467680409405153,
+      "right_shoulder_roll_joint": -0.22823414379740015,
+      "right_shoulder_yaw_joint": 0.3137260659716379,
+      "right_elbow_joint": 1.2638566796565793,
+      "right_wrist_roll_joint": -2.3243826919768016,
+      "right_wrist_pitch_joint": 0.1812415534996232,
+      "right_wrist_yaw_joint": 0.7806118163053759,
+      "port_sweep": 0.046693085706771255,
+      "port_elevation": 0.2083237886994054,
+      "port_feather": 1.059133241631355,
+      "starboard_sweep": -0.046693085707469106,
+      "starboard_elevation": -0.20569431580187372,
+      "starboard_feather": 1.059133241631355
+    },
+    "grip": {
+      "left": {
+        "previous_position_m": [
+          0.06711963614469277,
+          0.005443933449897331,
+          -0.02082175972702622
+        ],
+        "previous_quaternion_wxyz": [
+          0.5830763715715584,
+          0.7056036381314803,
+          -0.327092841314823,
+          0.23485255785526596
+        ],
+        "position_m": [
+          0.06503884510320844,
+          0.0014881534086315519,
+          -0.019355967298902505
+        ],
+        "quaternion_wxyz": [
+          -0.6181365037423308,
+          -0.7011686812618212,
+          0.2548760768363079,
+          -0.2476043792328779
+        ],
+        "mount_rotation_change_deg": 9.330887776049613,
+        "relpose": [
+          0.028999999999996,
+          7.687854376764329e-15,
+          0.7650000000000009,
+          -0.14211456371300207,
+          0.1421145637130133,
+          0.6926784613229052,
+          -0.6926784613228967
+        ]
+      },
+      "right": {
+        "previous_position_m": [
+          0.05999874647103419,
+          0.00021143136829667656,
+          0.009767537179779443
+        ],
+        "previous_quaternion_wxyz": [
+          0.7258774728667677,
+          0.66543301177491,
+          0.12578278736864573,
+          -0.12033075927002895
+        ],
+        "position_m": [
+          0.06275717829438346,
+          0.0004060336667159511,
+          0.015363649196261094
+        ],
+        "quaternion_wxyz": [
+          0.6511051960453306,
+          0.7058342957734156,
+          0.18377204013196624,
+          -0.20997096908514112
+        ],
+        "mount_rotation_change_deg": 15.649299683258398,
+        "relpose": [
+          0.028999999999986342,
+          1.2065415443668157e-15,
+          -0.7649999999999907,
+          0.30268825769474084,
+          -0.30268825769472235,
+          -0.6390460223283765,
+          0.639046022328389
+        ]
+      }
+    },
+    "max_equality_error": 1.5475282166832471e-09,
+    "contacts": [],
+    "note": "Rigid wrist-to-gripper mount adjusted about grip center; sleeve remains coaxial and weld is constant. Reset elbows retain literature-derived near-extension angles."
+  },
+  "strokes_per_minute": 20,
+  "period_s": 3,
+  "reset_phase": 0.92,
+  "reference_kind": "literature_soft",
+  "reset_on_reference": false,
+  "drive_interior": [
+    0.11,
+    0.41
+  ],
+  "recovery_interior": [
+    0.56,
+    0.96
+  ],
+  "flat_recovery_interior": [
+    0.6,
+    0.8
+  ],
+  "transitions": {
+    "approach_and_entry": [
+      [
+        0.96,
+        1
+      ],
+      [
+        0,
+        0.11
+      ]
+    ],
+    "extraction": [
+      [
+        0.41,
+        0.56
+      ]
+    ]
+  },
+  "source": "Literature curves retained; explicit amplitude/offset and phase shifts, with minimum elevation corrections for water and crossing. No IK replacement of the ten channels.",
+  "literature_lineage": {
+    "parameters": {
+      "period_s": 3.0,
+      "oar_delay": 0.06,
+      "seat_delay": 0.02,
+      "elbow_advance": 0.02,
+      "trunk_advance": 0.02,
+      "sweep_range_deg": [
+        -12.0,
+        65.0
+      ],
+      "feather_range_deg": [
+        0.0,
+        65.0
+      ],
+      "seat_range_m": [
+        -0.22,
+        0.22
+      ],
+      "elbow_amplitude_scale": 1.0,
+      "trunk_amplitude_scale": 0.85,
+      "drive_source_phase": [
+        0.05,
+        0.35
+      ],
+      "recovery_source_phase": [
+        0.5,
+        0.9
+      ],
+      "crossing_gap_m": 0.035
+    },
+    "sources": [
+      {
+        "path": "data/rowing_reference.csv",
+        "sha256": "973943382cca1d4e19051fde4deaff012bbd55dfe0d40d93973293e19a7ed740"
+      },
+      {
+        "path": "data/reference9/aligned_priors.csv",
+        "sha256": "cdd385f2a29b5bd2f2230d00b94367ea165f27ae00ecdeb9323cd06398393b97"
+      },
+      {
+        "path": "data/reference9/trunk_vertical_prior.csv",
+        "sha256": "a8ceadfbcbf59e485029839cadd82d93de36a98cd40a5a474207bf16f824ae45"
+      }
+    ],
+    "elbow_zero_calibration": [
+      {
+        "side": "left",
+        "zero_rad": 1.3367542682917763,
+        "direction": -1,
+        "minimum_anchor_bend_deg": 18.981676339268546,
+        "qpos_index": 29,
+        "joint_id": 23
+      },
+      {
+        "side": "right",
+        "zero_rad": 1.3367542678110291,
+        "direction": -1,
+        "minimum_anchor_bend_deg": 18.981676339268407,
+        "qpos_index": 36,
+        "joint_id": 30
+      }
+    ],
+    "provenance": "Literature curves retained; explicit amplitude/offset and phase shifts, with minimum elevation corrections for water and crossing. No IK replacement of the ten channels."
+  },
+  "elbow_direction": "posterolateral",
+  "original_literature_preserved": true,
+  "independent_phase_offsets_removed": true,
+  "limitation": "Ten-channel soft reference. Auxiliary full-body poses do not redefine elbow or trunk targets. Closure and collision errors are measured, not hard gates. No dynamic stability claim.",
+  "literature_validation": {
+    "samples": 1601,
+    "original_source_hashes_unchanged": true,
+    "adjusted": {
+      "hand_position_rmse_m": [
+        0.029191251673580495,
+        0.03443852895379207
+      ],
+      "hand_position_max_m": [
+        0.06145703514223765,
+        0.07572477296542345
+      ],
+      "hand_orientation_rmse_deg": [
+        30.24667990264347,
+        42.143717340248706
+      ],
+      "hand_orientation_max_deg": [
+        48.47549880944475,
+        92.9368331011264
+      ],
+      "foot_position_max_m": [
+        0.0019905119792238855,
+        0.0019930154837053053
+      ],
+      "trunk_rmse_deg": 0.5675892669758593,
+      "drive_top_max_m": [
+        -0.02958263827334756,
+        -0.0299845710369408
+      ],
+      "recovery_bottom_min_m": [
+        0.12887414889741944,
+        0.13890158014873183
+      ],
+      "full_cycle_bottom_min_m": [
+        -0.3162822505360346,
+        -0.3395451435013857
+      ],
+      "full_cycle_top_max_m": [
+        0.32016334810317126,
+        0.3033159629845257
+      ],
+      "crossing_target_height_min_m": 0.03247061935523449,
+      "crossing_actual_hand_height_min_m": 0.0159701111936027,
+      "max_penetration_m": 0.0652698589537441,
+      "collision_phase_fraction": 0.7376639600249844,
+      "finish_elbow_relative_shoulder_mean_m": [
+        [
+          -0.0005901847292732332,
+          -0.042018704097566695,
+          -0.12374427193705453
+        ],
+        [
+          0.0008629419126326704,
+          0.04186399324006001,
+          -0.12380429251719305
+        ]
+      ],
+      "finish_elbow_chord_offset_mean_m": [
+        [
+          0.05577134229569655,
+          -0.05429019425778321,
+          -0.06652432237207125
+        ],
+        [
+          0.056216965003289925,
+          0.054781499078644665,
+          -0.06574618083632658
+        ]
+      ],
+      "maximum_joint_limit_violation": 0.0
+    },
+    "literature_baseline_same_ik": {
+      "hand_position_rmse_m": [
+        0.08545929947773265,
+        0.08586825892544364
+      ],
+      "hand_position_max_m": [
+        0.17603618281190894,
+        0.1803943358579947
+      ],
+      "hand_orientation_rmse_deg": [
+        45.70582391553639,
+        55.28452411439564
+      ],
+      "hand_orientation_max_deg": [
+        78.11523573957834,
+        136.71924212117926
+      ],
+      "foot_position_max_m": [
+        0.004441590170529879,
+        0.00444981017876323
+      ],
+      "trunk_rmse_deg": 1.9741803362287969,
+      "drive_top_max_m": [
+        0.18703440610383046,
+        0.2046839316233655
+      ],
+      "recovery_bottom_min_m": [
+        0.09216273461256758,
+        0.10426607118302245
+      ],
+      "full_cycle_bottom_min_m": [
+        -0.31980235229442416,
+        -0.3098692251235589
+      ],
+      "full_cycle_top_max_m": [
+        0.3028794130502249,
+        0.3216498398223247
+      ],
+      "crossing_target_height_min_m": 0.009999946069116417,
+      "crossing_actual_hand_height_min_m": -0.00284268375674801,
+      "max_penetration_m": 0.05460497492339532,
+      "collision_phase_fraction": 0.6427232979387882,
+      "finish_elbow_relative_shoulder_mean_m": [
+        [
+          -0.01191220623919145,
+          -0.044208035846579515,
+          -0.12152950733803117
+        ],
+        [
+          -0.01108882067828571,
+          0.04312513842860727,
+          -0.12191429794314776
+        ]
+      ],
+      "finish_elbow_chord_offset_mean_m": [
+        [
+          0.049255487035810376,
+          -0.05448170786706061,
+          -0.06879622215312582
+        ],
+        [
+          0.04954428105815871,
+          0.05417652205918858,
+          -0.0687826404961479
+        ]
+      ],
+      "maximum_joint_limit_violation": 0.0
+    },
+    "comparison_note": "Same current installation, pose-fitting objective, solver and phase grid. Local IK diagnostics, not a proof of global feasibility or dynamics. Baseline water metrics use adjusted interior windows and are contextual only.",
+    "maximum_post_affine_change": {
+      "port_sweep": 0.0,
+      "port_elevation": 0.10334057820830475,
+      "port_feather": 0.0,
+      "starboard_sweep": 0.0,
+      "starboard_elevation": 0.13115467489332833,
+      "starboard_feather": 0.0,
+      "seat_slide": 0.0,
+      "left_elbow_joint": 0.0,
+      "right_elbow_joint": 0.0,
+      "trunk_vertical": 0.0
+    }
+  }
+}

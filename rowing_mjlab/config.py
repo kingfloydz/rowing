@@ -21,6 +21,7 @@ def env_cfg(num_envs=2048,play=False):
             sensors=(ContactSensorCfg(name='forbidden_contact',
                 primary=ContactMatch(mode='geom',pattern='(h2|oar)_collision_.*',entity='rowing'),
                 secondary=ContactMatch(mode='geom',pattern='(h2|oar)_collision_.*',entity='rowing'),
+                secondary_policy='any',
                 fields=('found',),reduce='netforce',num_slots=1),)),
         # Retain the repository 2ms timestep for stiff welds; control is 50Hz.
         sim=SimulationCfg(njmax=512,nconmax=128,contact_sensor_maxmatch=256,
@@ -44,8 +45,8 @@ def env_cfg(num_envs=2048,play=False):
         },
         rewards={
             'forward_speed':RewardTermCfg(func=mdp.boat_forward_speed,weight=0.6),
-            'lateral_velocity':RewardTermCfg(func=mdp.boat_lateral_velocity_cost,weight=-0.6),
-            'angular_velocity':RewardTermCfg(func=mdp.boat_angular_velocity_cost,weight=-0.6),
+            'lateral_velocity':RewardTermCfg(func=mdp.boat_lateral_velocity_cost,weight=-1.0),
+            'angular_velocity':RewardTermCfg(func=mdp.boat_angular_velocity_cost,weight=-1.0),
             'oar_sweep_tracking':RewardTermCfg(func=mdp.track_oar_sweep,weight=1.0),
             'oar_elevation_tracking':RewardTermCfg(func=mdp.track_oar_elevation,weight=1.0),
             'oar_feather_tracking':RewardTermCfg(func=mdp.track_oar_feather,weight=1.0),

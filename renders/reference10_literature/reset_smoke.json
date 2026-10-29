@@ -1,0 +1,8 @@
+{
+  "duration_s": 0.2,
+  "finite": true,
+  "terminated": false,
+  "max_abs_roll_deg": 0.07597263157367706,
+  "collision_steps": 0,
+  "note": "Zero-action reset hold only; not a rowing stability test."
+}

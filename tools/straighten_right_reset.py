@@ -13,6 +13,8 @@ from hydrodynamics.models import ROOT
 
 
 def main():
+    if (ROOT/'data/reference20/trajectory.npz').exists():
+        raise RuntimeError('Reset belongs to the coordinated trajectory. Refit the full trajectory instead of moving one arm independently.')
     m=build_spec().compile();d=mujoco.MjData(m)
     names=['right_'+j+'_joint' for j in ('shoulder_pitch','shoulder_roll','shoulder_yaw','elbow','wrist_roll','wrist_pitch','wrist_yaw')]
     joints=[m.joint(n).id for n in names];idx=m.jnt_qposadr[joints]

@@ -2,23 +2,23 @@
   "position_m": [
     0.0,
     0.0,
-    -0.0038614882945371
+    -0.004358301910744355
   ],
   "quaternion_wxyz": [
-    0.9999999994618932,
+    0.9999986517453773,
     0.0,
-    -3.2805692786675265e-05,
+    -0.0016421045726958954,
     0.0
   ],
-  "pitch_deg": -0.0037592554820328164,
+  "pitch_deg": -0.1881714076368809,
   "water_level_m": -0.12027640288595698,
   "mass_kg": 96.23017311955633,
-  "buoyancy_N": 944.0179983028474,
+  "buoyancy_N": 944.0179983028144,
   "weight_N": 944.0179983028476,
   "moment_about_system_cg_Nm": [
-    -6.07141470782698,
-    -2.2470914018413168e-13,
-    -9.583234333181087e-14
+    0.4350955908572178,
+    -1.3046297375751692e-10,
+    3.1560358694920034e-15
   ],
   "note": "Heave and pitch balanced; roll/yaw zero; internal joints follow reset_joint_pose.json. Residual roll requires active control. Recalibrate after mass/geometry changes."
 }

@@ -23,12 +23,12 @@ class StartupCollisionTests(unittest.TestCase):
 
     def test_first_cycle_rate_and_blend(self):
         ref=OarReference('cpu');p0=torch.tensor(.2);initial=torch.zeros(6)
-        t=torch.tensor([0.,.5,1.,1.5*PERIOD,3*PERIOD,4*PERIOD,5*PERIOD,5.25*PERIOD],dtype=torch.float64)
+        t=torch.tensor([0.,.5,1.,PERIOD,2*PERIOD-1e-6,2*PERIOD,2.5*PERIOD,3*PERIOD,4*PERIOD],dtype=torch.float64)
         phase,rate,blend,target=ref.target(t,p0,initial)
-        expected=(p0+torch.tensor([0.,.5/(3*PERIOD),1/(3*PERIOD),.5,1.,1.5,2.,2.25],dtype=torch.float64))%1
+        expected=(p0+torch.tensor([0.,.5/(2*PERIOD),1/(2*PERIOD),.5,1-1e-6/(2*PERIOD),1.,1.5,2.,3.],dtype=torch.float64))%1
         torch.testing.assert_close(phase,expected)
-        torch.testing.assert_close(rate,torch.tensor([1/3,1/3,1/3,1/3,.5,.5,1.,1.]))
-        torch.testing.assert_close(blend,torch.tensor([0.,.5,1.,1.,1.,1.,1.,1.],dtype=torch.float64))
+        torch.testing.assert_close(rate,torch.tensor([.5,.5,.5,.5,.5,1.,1.,1.,1.]))
+        torch.testing.assert_close(blend,torch.tensor([0.,.5,1.,1.,1.,1.,1.,1.,1.],dtype=torch.float64))
         torch.testing.assert_close(target[0],torch.zeros(6,dtype=torch.float64))
         torch.testing.assert_close(target[2],ref(phase[2]))
 

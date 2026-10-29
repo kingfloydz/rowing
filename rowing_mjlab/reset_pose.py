@@ -17,9 +17,11 @@ def apply_reset_joints(root):
             name = joint.get('name')
             if name not in positions:
                 continue
+            old = float(joint.get('ref', '0'))
+            if abs(positions[name]-old)<1e-12:
+                continue
             if len(body.findall('joint')) != 1 or joint.get('type', 'hinge') != 'hinge':
                 raise ValueError(f'Reset rebasing requires a single hinge: {name}')
-            old = float(joint.get('ref', '0'))
             axis = np.fromstring(joint.get('axis', '0 0 1'), sep=' ')
             delta = Rotation.from_rotvec(axis/np.linalg.norm(axis)*(positions[name]-old))
             quat = np.fromstring(body.get('quat', '1 0 0 0'), sep=' ')
