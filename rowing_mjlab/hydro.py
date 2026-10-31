@@ -10,6 +10,7 @@ import numpy as np
 import warp as wp
 
 from hydrodynamics.models import ROOT, load_closed_surface, projected_blade
+from hydrodynamics.blade_inertia import load_parameters as load_blade_parameters
 from hydrodynamics.training import TrainingHullResistance
 
 CHUNK = 32
@@ -68,7 +69,7 @@ def integrate_chunks(
     xpos: wp.array2d(dtype=wp.vec3), xmat: wp.array2d(dtype=wp.mat33),
     xipos: wp.array2d(dtype=wp.vec3), cvel: wp.array2d(dtype=wp.spatial_vector),
     subtree_com: wp.array2d(dtype=wp.vec3), water: wp.array2d(dtype=float),
-    result: wp.array3d(dtype=float),
+    blade_wetting_depth: float, result: wp.array3d(dtype=float),
 ):
     world, chunk = wp.tid()
     kind = kinds[chunk]  # hull=0, fin=1, blade volumes=2/4, surfaces=3/5
@@ -97,6 +98,7 @@ def integrate_chunks(
         a = rot*triangles[i,0]+origin
         b = rot*triangles[i,1]+origin
         c = rot*triangles[i,2]+origin
+        triangle_depth = level-(a[2]+b[2]+c[2])/3.0
         # At most four vertices after clipping a triangle by one plane.
         poly = Mat43(0.0)
         size = int(0)
@@ -146,6 +148,9 @@ def integrate_chunks(
                     if kind == 5:
                         chord = -ey
                     f_drag = blade_force(vel,ex,chord,area,rho)
+                    # Match the cubic waterline transition used by blade
+                    # added inertia during entry and extraction.
+                    f_drag *= sstep((triangle_depth+blade_wetting_depth)/(2.0*blade_wetting_depth))
                 force += f_drag
                 torque += wp.cross(center-com,f_drag)
                 weight = area
@@ -284,6 +289,8 @@ class WarpHydrodynamics:
         law = TrainingHullResistance(path=repository/'data/parameters.json')
         self.nworld = nworld
         self.device = device
+        blade_params = load_blade_parameters(repository/'data/blade_inertia.json')
+        self.blade_wetting_depth = float(blade_params['wetting_depth_m'])
         self.nchunks = len(starts)
         self.face_count = face_start
         self.triangles = wp.array(np.concatenate(surfaces).astype(np.float32),dtype=wp.vec3,device=device)
@@ -323,7 +330,8 @@ class WarpHydrodynamics:
     def __call__(self, model, data):
         wp.launch(integrate_chunks,(self.nworld,self.nchunks),inputs=[
             self.triangles,self.starts,self.counts,self.kinds,self.bodies,self.roots,
-            data.xpos,data.xmat,data.xipos,data.cvel,data.subtree_com,self.water,self.chunks],device=self.device)
+            data.xpos,data.xmat,data.xipos,data.cvel,data.subtree_com,self.water,
+            self.blade_wetting_depth,self.chunks],device=self.device)
         wp.launch(reduce_chunks,(self.nworld,3),inputs=[
             self.chunks,self.ranges,self.bodies,self.roots,data.xmat,data.xipos,
             data.cvel,data.subtree_com,self.water,self.nodes,self.coefs,self.constants,

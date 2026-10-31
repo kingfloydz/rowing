@@ -56,7 +56,7 @@ def env_cfg(num_envs=2048,play=False):
             'bilateral_asymmetry':RewardTermCfg(func=mdp.bilateral_asymmetry_cost,weight=-0.05),
             'roll_upright':RewardTermCfg(func=mdp.roll_upright,weight=0.6),
             'joint_torque':RewardTermCfg(func=mdp.joint_torque_cost,weight=-0.005),
-            'action_rate':RewardTermCfg(func=mdp.action_rate_cost,weight=-0.025),
+            'action_rate':RewardTermCfg(func=mdp.action_rate_cost,weight=-0.05),
             'collision':RewardTermCfg(func=mdp.collision_cost,weight=-0.10),
         },
         terminations={
