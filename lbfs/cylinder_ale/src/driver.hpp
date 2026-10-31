@@ -126,7 +126,7 @@ inline int run(int argc,char** argv) {
         if(!(p.rho0>0&&p.rho1>=p.rho0&&p.nu0>=0&&p.nu1>=0&&p.xi>0&&p.sigma>=0&&p.mobility>=0&&logevery>0&&phi_tol>=0&&umax_limit>0)||mode>2||p.periodic>1||b.enabled>1||b.free>1||b.dual<0||b.dual>1)
             throw std::runtime_error("invalid material or output parameters");
         if(b.enabled&&(!(b.radius>0&&b.length>0&&b.density>p.rho0)||p.periodic))throw std::runtime_error("invalid body or unsupported periodic IB");
-        if(b.free||b.inertia_mode!=1)throw std::runtime_error("Drive experiment requires prescribed motion and measured interior force");
+        if(b.free&&b.inertia_mode==0)throw std::runtime_error("Two-way coupling requires measured_interior or implicit_interior");
         if(b.plate_height<=0||b.plate_thickness<=0||b.radius<std::max(b.plate_height,b.plate_thickness)/2)throw std::runtime_error("Invalid plate or bounding radius");
 
         if(stretch){

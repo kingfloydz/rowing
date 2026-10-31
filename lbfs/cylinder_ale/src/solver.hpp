@@ -78,7 +78,7 @@ public:
         state(5*g.n()),base(5*g.n()),work(5*g.n()),faces((p.cache_faces?27:p.transport_mode==3?5:4)*g.n()),chem(g.n()),gradients(15*g.n()),coupling(5*g.n()),boundary_flux(5*std::max({size_t(g.nx)*g.ny,size_t(g.nx)*g.nz,size_t(g.ny)*g.nz})),markers(std::max(size_t(1),ms.size())),
         reductions(partials*8),body_state(25),force_sums(4*force_partials+4*((force_partials+255)/256)+4),marker_count(ms.size()) {
         if(!p.cache_faces||p.transport_mode!=3||!g.stretched())throw std::runtime_error("Optimized metric solver requires cached FCT and metric mesh");
-        if(b.enabled&&(b.free||b.inertia_mode!=1))throw std::runtime_error("Parallel drive reduction validated for prescribed measured-interior plate only");
+        if(b.enabled&&b.free&&b.inertia_mode==0)throw std::runtime_error("Free-body IB requires measured or implicit interior inertia");
         if(!ms.empty())markers.upload(ms);
         double initial_v=b.ramp_time>0?0:b.v0;
         std::vector<double> initial_body(25,0);initial_body[0]=initial_body[2]=b.z0;
