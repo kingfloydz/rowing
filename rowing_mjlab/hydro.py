@@ -12,7 +12,6 @@ import warp as wp
 from hydrodynamics.models import ROOT, load_closed_surface, projected_blade
 from hydrodynamics.blade_inertia import load_parameters as load_blade_parameters
 from hydrodynamics.training import TrainingHullResistance
-from hydrodynamics.force_profile import load_force_profile
 
 CHUNK = 32
 Mat43 = wp.types.matrix(shape=(4,3),dtype=wp.float32)
@@ -25,26 +24,21 @@ def sstep(x: float):
 
 
 @wp.func
-def blade_force_coefficients(v: wp.vec3, n: wp.vec3, c: wp.vec3, area: float, rho: float,
-                             coefficients: wp.vec3):
+def blade_force(v: wp.vec3, n: wp.vec3, c: wp.vec3, area: float, rho: float):
     vn = wp.dot(v, n)
     vt = wp.dot(v, c)
     u = wp.sqrt(vn*vn+vt*vt)
     f = wp.vec3(0.0)
     if u > 1.0e-12:
-        # Shared physical coefficients, evaluated from current relative flow.
-        cd = coefficients[0]*vn*vn/(u*u)+coefficients[2]
-        cl = 2.0*coefficients[1]*wp.abs(vn)*vt/(u*u)
+        # Algebraic equivalent of harmonic CD=2*sin(alpha)^2+.01,
+        # CL=.9*sin(2*alpha); retains the sign at negative chordwise flow.
+        cd = 2.0*vn*vn/(u*u)+0.01
+        cl = 1.8*wp.abs(vn)*vt/(u*u)
         e = (vt*c+vn*n)/u
         el = (wp.abs(vn)*c-wp.sign(vn)*vt*n)/u
         f = 0.5*rho*area*u*u*(-cd*e+cl*el)
     tangent = v-vt*c-vn*n
-    return f-0.5*coefficients[2]*rho*area*wp.length(tangent)*tangent
-
-
-@wp.func
-def blade_force(v: wp.vec3, n: wp.vec3, c: wp.vec3, area: float, rho: float):
-    return blade_force_coefficients(v,n,c,area,rho,wp.vec3(2.0,0.9,0.01))
+    return f-0.005*rho*area*wp.length(tangent)*tangent
 
 
 @wp.func
@@ -75,7 +69,7 @@ def integrate_chunks(
     xpos: wp.array2d(dtype=wp.vec3), xmat: wp.array2d(dtype=wp.mat33),
     xipos: wp.array2d(dtype=wp.vec3), cvel: wp.array2d(dtype=wp.spatial_vector),
     subtree_com: wp.array2d(dtype=wp.vec3), water: wp.array2d(dtype=float),
-    blade_wetting_depth: float, blade_coefficients: wp.vec3, result: wp.array3d(dtype=float),
+    blade_wetting_depth: float, result: wp.array3d(dtype=float),
 ):
     world, chunk = wp.tid()
     kind = kinds[chunk]  # hull=0, fin=1, blade volumes=2/4, surfaces=3/5
@@ -153,7 +147,7 @@ def integrate_chunks(
                     chord = ey
                     if kind == 5:
                         chord = -ey
-                    f_drag = blade_force_coefficients(vel,ex,chord,area,rho,blade_coefficients)
+                    f_drag = blade_force(vel,ex,chord,area,rho)
                     # Match the cubic waterline transition used by blade
                     # added inertia during entry and extraction.
                     f_drag *= sstep((triangle_depth+blade_wetting_depth)/(2.0*blade_wetting_depth))
@@ -274,19 +268,9 @@ def reduce_chunks(
 
 class WarpHydrodynamics:
     """Owns persistent buffers; callback is compatible with mjlab CUDA capture."""
-    def __init__(self, model, nworld, device, prefix="", repository=ROOT, hull_radiation=False, blade_inertia=False,
-                 force_profile=None):
+    def __init__(self, model, nworld, device, prefix="", repository=ROOT, hull_radiation=False, blade_inertia=False):
         from pathlib import Path
         repository = Path(repository)
-        # Fitted drag/lift are conditional on the existing added-inertia model.
-        # An inertia ablation automatically uses the original force law.
-        if force_profile is None and not blade_inertia:
-            force_profile = 'prior'
-        self.force_profile = load_force_profile(force_profile,repository)
-        if not blade_inertia and self.force_profile.get('required_blade_inertia'):
-            raise ValueError('CFD-calibrated force profile requires blade inertia')
-        self.blade_coefficients = wp.vec3(*[float(self.force_profile[k]) for k in
-            ('blade_cd_max','blade_cl_max','blade_skin_cd')])
         surfaces = [load_closed_surface(repository/'boat_meshes'/f'{name}.stl')[0]
                     for name in ('shell_white','fin')]
         for side in ('port','starboard'):
@@ -347,7 +331,7 @@ class WarpHydrodynamics:
         wp.launch(integrate_chunks,(self.nworld,self.nchunks),inputs=[
             self.triangles,self.starts,self.counts,self.kinds,self.bodies,self.roots,
             data.xpos,data.xmat,data.xipos,data.cvel,data.subtree_com,self.water,
-            self.blade_wetting_depth,self.blade_coefficients,self.chunks],device=self.device)
+            self.blade_wetting_depth,self.chunks],device=self.device)
         wp.launch(reduce_chunks,(self.nworld,3),inputs=[
             self.chunks,self.ranges,self.bodies,self.roots,data.xmat,data.xipos,
             data.cvel,data.subtree_com,self.water,self.nodes,self.coefs,self.constants,
