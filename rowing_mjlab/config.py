@@ -46,7 +46,7 @@ def env_cfg(num_envs=2048,play=False):
         rewards={
             'forward_speed':RewardTermCfg(func=mdp.boat_forward_speed,weight=0.6),
             'lateral_velocity':RewardTermCfg(func=mdp.boat_lateral_velocity_cost,weight=-1.0),
-            'angular_velocity':RewardTermCfg(func=mdp.boat_angular_velocity_cost,weight=-1.0),
+            'angular_velocity':RewardTermCfg(func=mdp.curriculum_angular_velocity_cost,weight=-1.0),
             'oar_sweep_tracking':RewardTermCfg(func=mdp.track_oar_sweep,weight=1.0),
             'oar_elevation_tracking':RewardTermCfg(func=mdp.track_oar_elevation,weight=1.0),
             'oar_feather_tracking':RewardTermCfg(func=mdp.track_oar_feather,weight=1.0),
@@ -56,7 +56,7 @@ def env_cfg(num_envs=2048,play=False):
             'bilateral_asymmetry':RewardTermCfg(func=mdp.bilateral_asymmetry_cost,weight=-0.05),
             'roll_upright':RewardTermCfg(func=mdp.roll_upright,weight=0.6),
             'joint_torque':RewardTermCfg(func=mdp.joint_torque_cost,weight=-0.005),
-            'action_rate':RewardTermCfg(func=mdp.action_rate_cost,weight=-0.05),
+            'action_rate':RewardTermCfg(func=mdp.curriculum_action_rate_cost,weight=-0.05),
             'collision':RewardTermCfg(func=mdp.collision_cost,weight=-0.10),
         },
         terminations={
@@ -65,6 +65,8 @@ def env_cfg(num_envs=2048,play=False):
             'time_out':TerminationTermCfg(func=common.time_out,time_out=True),
         },
         metrics={
+            'action_penalty_scale':MetricsTermCfg(func=mdp.action_penalty_scale),
+            'angular_penalty_scale':MetricsTermCfg(func=mdp.angular_penalty_scale),
             'forward_speed_m_s':MetricsTermCfg(func=mdp.boat_forward_speed),
             'tracking_rmse_deg':MetricsTermCfg(func=mdp.tracking_rmse_deg),
             'blade_area_rmse_m2':MetricsTermCfg(func=mdp.blade_area_rmse_m2),

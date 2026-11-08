@@ -1,0 +1,21 @@
+{
+  "unit_tests_passed": 35,
+  "new_calibration_tests_passed": 5,
+  "warp_backend": "cpu",
+  "cuda_tested": false,
+  "tensorboard_test_workaround": "In-process tensorboard.compat.notf marker selected TensorBoard's stub backend; installed dependencies unchanged.",
+  "free_policy_check": {
+    "seconds": 8.0,
+    "checkpoint_sha256": "0722d36fc321a19f911ec43cf64c085025470d70158b3258aac00d50b3a7ff79",
+    "terminated": false,
+    "truncated": false,
+    "all_numeric_arrays_finite": true,
+    "max_abs_roll_deg": 1.8371003996892856,
+    "final_forward_speed_ms": 3.462313413619995,
+    "force_profile": "experimental_prescribed_motion_cfd"
+  },
+  "interpretation": "8 s is a numerical integration check on an existing policy, not a performance or generalization validation.",
+  "historical_candidate_enabled_for_free_policy_check": true,
+  "current_default_candidate_enabled": false,
+  "source_audit_tests_passed": 6
+}

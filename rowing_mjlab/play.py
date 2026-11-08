@@ -37,6 +37,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--checkpoint-file',type=Path,required=True)
     parser.add_argument('--device',default=None)
+    parser.add_argument('--force-profile',help='CFD profile JSON; use prior to reproduce the original force law')
     parser.add_argument('--num-envs',type=int,default=1)
     parser.add_argument('--host',default='0.0.0.0')
     parser.add_argument('--port',type=int,default=8080)
@@ -63,6 +64,7 @@ def main():
             parser.error('CUDA unavailable; use --device cpu')
         torch.cuda.set_device(device)
     cfg = env_cfg(args.num_envs,play=True)
+    cfg.actions['h2'].force_profile = args.force_profile
     cfg.seed = args.seed
     cfg.viewer.body_name = 'rowing/boat'
     cfg.viewer.distance = 8.0

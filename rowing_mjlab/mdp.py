@@ -11,13 +11,15 @@ from .reference import RowingReference, IMITATION_NAMES
 from .blade_area import BladeAreaReference
 from .trunk import TrunkReference, trunk_vertical_angle, angular_error
 from .symmetry import BilateralSymmetry
+from .curriculum import PenaltyCurriculum
 
 
 class RowingState:
-    def __init__(self,env,hull_radiation=True,blade_inertia=True):
+    def __init__(self,env,hull_radiation=True,blade_inertia=True,force_profile=None):
         self.env = env
         model = env.sim.mj_model
         device = env.device
+        self.penalty_curriculum = PenaltyCurriculum(env.num_envs,device)
         self.h2_names = h2_names()
         self.policy_names = tuple(n for n in self.h2_names if not n.startswith('head_'))
         def joints(names,field):
@@ -52,7 +54,7 @@ class RowingState:
             torch.tensor(initial_data.xmat[self.torso].reshape(3,3).copy(), device=device, dtype=torch.float32),
             torch.tensor(initial_data.xmat[self.boat].reshape(3,3).copy(), device=device, dtype=torch.float32))
         self.hydro = WarpHydrodynamics(model,env.num_envs,device,prefix='rowing/',
-            hull_radiation=hull_radiation,blade_inertia=blade_inertia)
+            hull_radiation=hull_radiation,blade_inertia=blade_inertia,force_profile=force_profile)
         provenance = json.loads((ROOT/'data/rowing_reference_provenance.json').read_text())
         wp.to_torch(self.hydro.water)[:,0] = provenance['water_level_m_at_repository_reset']
         self.water_level = wp.to_torch(self.hydro.water)[:,0]
@@ -72,6 +74,7 @@ class RowingActionCfg(ActionTermCfg):
     scale: float = 1.0  # Fraction of available joint travel on each side of q0.
     hull_radiation: bool = True
     blade_inertia: bool = True
+    force_profile: str | None = None
 
     def build(self,env):
         return RowingAction(self,env)
@@ -80,7 +83,8 @@ class RowingActionCfg(ActionTermCfg):
 class RowingAction(ActionTerm):
     def __init__(self,cfg,env):
         super().__init__(cfg,env)
-        env.rowing = RowingState(env,hull_radiation=cfg.hull_radiation,blade_inertia=cfg.blade_inertia)
+        env.rowing = RowingState(env,hull_radiation=cfg.hull_radiation,blade_inertia=cfg.blade_inertia,
+                                force_profile=cfg.force_profile)
         self.state = env.rowing
         self._raw = torch.zeros(env.num_envs,self.action_dim,device=env.device)
         self.targets = self.state.q0[self.state.h2_q].expand(env.num_envs,-1).clone()
@@ -200,6 +204,18 @@ def boat_angular_velocity_cost(env):
     return env.sim.data.cvel[:,env.rowing.boat,:3].square().sum(-1)
 
 
+def curriculum_angular_velocity_cost(env):
+    return boat_angular_velocity_cost(env)*env.rowing.penalty_curriculum.scale('angular')
+
+
+def action_penalty_scale(env):
+    return env.rowing.penalty_curriculum.scale('action')
+
+
+def angular_penalty_scale(env):
+    return env.rowing.penalty_curriculum.scale('angular')
+
+
 def privileged(env):
     s,d = env.rowing,env.sim.data
     rotation = d.xmat[:,s.boat].reshape(-1,3,3)
@@ -234,6 +250,10 @@ def joint_torque_cost(env):
 
 def action_rate_cost(env):
     return (env.action_manager.action-env.action_manager.prev_action).square().mean(-1)
+
+
+def curriculum_action_rate_cost(env):
+    return action_rate_cost(env)*env.rowing.penalty_curriculum.scale('action')
 
 
 def bilateral_asymmetry_cost(env):

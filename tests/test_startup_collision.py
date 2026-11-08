@@ -4,7 +4,7 @@ import torch
 import mujoco
 from types import SimpleNamespace
 from rowing_mjlab import mdp
-from rowing_mjlab.reference import OarReference, PERIOD
+from rowing_mjlab.reference import OarReference, PERIOD, FIRST_CYCLE_DURATION
 from rowing_mjlab.asset import build_spec
 
 
@@ -23,11 +23,13 @@ class StartupCollisionTests(unittest.TestCase):
 
     def test_first_cycle_rate_and_blend(self):
         ref=OarReference('cpu');p0=torch.tensor(.2);initial=torch.zeros(6)
-        t=torch.tensor([0.,.5,1.,PERIOD,2*PERIOD-1e-6,2*PERIOD,2.5*PERIOD,3*PERIOD,4*PERIOD],dtype=torch.float64)
+        first=FIRST_CYCLE_DURATION
+        self.assertEqual(first,5.2)
+        t=torch.tensor([0.,.5,1.,first/2,first-1e-6,first,first+.5*PERIOD,first+PERIOD,first+2*PERIOD],dtype=torch.float64)
         phase,rate,blend,target=ref.target(t,p0,initial)
-        expected=(p0+torch.tensor([0.,.5/(2*PERIOD),1/(2*PERIOD),.5,1-1e-6/(2*PERIOD),1.,1.5,2.,3.],dtype=torch.float64))%1
+        expected=(p0+torch.tensor([0.,.5/first,1/first,.5,1-1e-6/first,1.,1.5,2.,3.],dtype=torch.float64))%1
         torch.testing.assert_close(phase,expected)
-        torch.testing.assert_close(rate,torch.tensor([.5,.5,.5,.5,.5,1.,1.,1.,1.]))
+        torch.testing.assert_close(rate,torch.tensor([PERIOD/first]*5+[1.]*4))
         torch.testing.assert_close(blend,torch.tensor([0.,.5,1.,1.,1.,1.,1.,1.,1.],dtype=torch.float64))
         torch.testing.assert_close(target[0],torch.zeros(6,dtype=torch.float64))
         torch.testing.assert_close(target[2],ref(phase[2]))

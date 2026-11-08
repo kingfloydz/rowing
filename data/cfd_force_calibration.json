@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "status": "experimental_prescribed_motion_cfd",
+  "blade_cd_max": 2.3244435914527375,
+  "blade_cl_max": 1.104247169798063,
+  "blade_skin_cd": 0.01,
+  "left_right_shared": true,
+  "source": {
+    "trajectory_sha256": "d8290722d24798301ddcd10c3f7d39a38e87477fa820cb865d241c4647fda7ee",
+    "forces_sha256": "3e7f2cf96e8e8a62273ae8b22088ebaa6f446ddb08f693b6fbe5a9dfa852c835",
+    "ale_sha256": "4475b35fb1b49b02a6cbbcda6281dbfb2e934497e65b347a9a63facb619d6ea8",
+    "basis_code_sha256": "ae1295438cd303b51c5aebc74bad896242f040e829bb57d1ffba230dc4e383b1",
+    "geometry_sha256": {
+      "port": "5e588d98ffa94e203527f6bfe30f997a39c7d05f734e227c1cb0f3bb997dd418",
+      "starboard": "d7e13a19a441be41bbb76e7a6c020ff8cc7988427b40cf831385c72bcba9ece6"
+    },
+    "inertia_sha256": "8735338bd13f0f5ebe8991b48e5e3301f6a8c46a9d30ac013fd3bd1ae7010306"
+  },
+  "required_blade_inertia": {
+    "full_normal_mass_kg_per_blade": 8.0,
+    "wetting_depth_m": 0.02,
+    "strips_per_blade": 16,
+    "cells_per_strip": 4
+  },
+  "identification": "Effective dynamic blade law conditional on existing inertia; raw IBM proxy, not total exterior load.",
+  "limitations": [
+    "Internal fictitious-fluid momentum and external hydrostatic loads are not recovered by these aggregate files.",
+    "Oar CFD assembly includes shaft; reduced model basis includes blade only.",
+    "Last-stage IBM reaction is not an independently timestamped RK-averaged load.",
+    "Last source segment switches numerical algorithm; terminal CFL failure at 10.57025 s.",
+    "Time-block validation is not validation on an independently generated trajectory."
+  ],
+  "validation": {
+    "frames": 144,
+    "baseline": {
+      "port": {
+        "force_rmse_N": 37.99220642938916,
+        "moment_rmse_Nm": 69.0053141541622,
+        "component_rmse": [
+          26.285979107260157,
+          18.02547881736833,
+          20.676971856406027,
+          39.47529497494955,
+          19.76805386775327,
+          53.03450305637782
+        ]
+      },
+      "starboard": {
+        "force_rmse_N": 38.145449242857936,
+        "moment_rmse_Nm": 68.7999368571811,
+        "component_rmse": [
+          23.16182282939261,
+          20.92699339313779,
+          21.92410109178586,
+          40.429318151414606,
+          22.59749326106565,
+          50.874894040969714
+        ]
+      }
+    },
+    "candidate": {
+      "port": {
+        "force_rmse_N": 31.170460793869427,
+        "moment_rmse_Nm": 56.08704839783741,
+        "component_rmse": [
+          17.803115616689908,
+          14.546029711170798,
+          21.048983825416833,
+          39.62355476896075,
+          17.24667608173459,
+          35.75308475620317
+        ]
+      },
+      "starboard": {
+        "force_rmse_N": 31.248742079752144,
+        "moment_rmse_Nm": 55.751282537980956,
+        "component_rmse": [
+          15.863883156486127,
+          15.214820334543694,
+          22.211040834499045,
+          39.66929737613169,
+          21.608100827505545,
+          32.674796540180125
+        ]
+      }
+    }
+  },
+  "state_range": {
+    "wet_area_m2": {
+      "min": [
+        0.0,
+        0.0
+      ],
+      "max": [
+        0.07558129232393837,
+        0.07558129232393837
+      ]
+    },
+    "speed_ms": {
+      "min": [
+        0.0,
+        0.0
+      ],
+      "max": [
+        4.566408152569035,
+        2.757233949022876
+      ]
+    },
+    "acceleration_ms2": {
+      "min": [
+        0.3624690093765377,
+        0.14692893562954573
+      ],
+      "max": [
+        87.9194322727819,
+        108.03180395590681
+      ]
+    }
+  },
+  "default_enabled": false,
+  "disabled_reason": "Source audit: velocity-only last-stage IBM reaction omits phase-remap momentum and prescribed-body interior correction."
+}

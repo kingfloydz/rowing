@@ -1,0 +1,447 @@
+{
+  "schema_version": 1,
+  "status": "provisional_raw_ib_fit",
+  "installed_profile": true,
+  "coefficient_order": [
+    "blade_drag_scale",
+    "blade_lift_scale",
+    "fixed_skin_scale",
+    "inertia_scale"
+  ],
+  "coefficients": [
+    1.1622217957263687,
+    1.2269412997756255,
+    1.0,
+    1.0
+  ],
+  "joint_fit_diagnostic": [
+    1.1563109733285972,
+    1.2898498683613524,
+    1.0,
+    1.263939151535145
+  ],
+  "inertia_sensitivity": [
+    {
+      "inertia_scale": 0.0,
+      "coefficients": [
+        1.1710744781163003,
+        0.9488869595725136,
+        1.0,
+        0.0
+      ],
+      "validation": {
+        "port": {
+          "force_rmse_N": 48.29502290955243,
+          "moment_rmse_Nm": 89.5160663213794,
+          "component_rmse": [
+            38.53413201563175,
+            19.033345099684585,
+            22.028655927050366,
+            36.052679269959285,
+            29.240546549067755,
+            76.53966869945837
+          ]
+        },
+        "starboard": {
+          "force_rmse_N": 49.64289466951508,
+          "moment_rmse_Nm": 91.98745341517252,
+          "component_rmse": [
+            36.62351990750217,
+            24.49705732785498,
+            22.86982647571137,
+            35.38723833198773,
+            32.745138724514554,
+            78.34022491004175
+          ]
+        }
+      }
+    },
+    {
+      "inertia_scale": 0.5,
+      "coefficients": [
+        1.1685138357489935,
+        1.0938859040131945,
+        1.0,
+        0.5
+      ],
+      "validation": {
+        "port": {
+          "force_rmse_N": 36.24491690008287,
+          "moment_rmse_Nm": 67.56779871749211,
+          "component_rmse": [
+            26.193189186233248,
+            13.716538707524407,
+            20.96347793742945,
+            36.72095487428797,
+            21.92967446468025,
+            52.307439953807595
+          ]
+        },
+        "starboard": {
+          "force_rmse_N": 36.89883755721148,
+          "moment_rmse_Nm": 68.57975065225705,
+          "component_rmse": [
+            24.12986055341106,
+            17.029676213195415,
+            22.11931668972039,
+            36.86746609985792,
+            25.619957246654934,
+            51.84197077254252
+          ]
+        }
+      }
+    },
+    {
+      "inertia_scale": 1.0,
+      "coefficients": [
+        1.1622217957263687,
+        1.2269412997756255,
+        1.0,
+        1.0
+      ],
+      "validation": {
+        "port": {
+          "force_rmse_N": 31.170460793869427,
+          "moment_rmse_Nm": 56.08704839783741,
+          "component_rmse": [
+            17.803115616689908,
+            14.546029711170798,
+            21.048983825416833,
+            39.62355476896075,
+            17.24667608173459,
+            35.75308475620317
+          ]
+        },
+        "starboard": {
+          "force_rmse_N": 31.248742079752144,
+          "moment_rmse_Nm": 55.751282537980956,
+          "component_rmse": [
+            15.863883156486127,
+            15.214820334543694,
+            22.211040834499045,
+            39.66929737613169,
+            21.608100827505545,
+            32.674796540180125
+          ]
+        }
+      }
+    },
+    {
+      "inertia_scale": 1.5,
+      "coefficients": [
+        1.149563500299531,
+        1.3431462290361753,
+        1.0,
+        1.5
+      ],
+      "validation": {
+        "port": {
+          "force_rmse_N": 35.68054696545094,
+          "moment_rmse_Nm": 60.52290619797068,
+          "component_rmse": [
+            18.699153114004336,
+            20.694446473027714,
+            22.25270747005323,
+            44.30402081675993,
+            17.2813523125984,
+            37.43702413873611
+          ]
+        },
+        "starboard": {
+          "force_rmse_N": 35.66429489186763,
+          "moment_rmse_Nm": 59.74121810075045,
+          "component_rmse": [
+            17.71816524388564,
+            20.580233043289674,
+            23.118446280153563,
+            43.533322610246636,
+            22.250078944288433,
+            34.3336125341706
+          ]
+        }
+      }
+    },
+    {
+      "inertia_scale": 2.0,
+      "coefficients": [
+        1.1316894065771337,
+        1.4560991680619293,
+        1.0,
+        2.0
+      ],
+      "validation": {
+        "port": {
+          "force_rmse_N": 46.92032759854249,
+          "moment_rmse_Nm": 77.70651533043954,
+          "component_rmse": [
+            27.65812189108537,
+            28.995111833360582,
+            24.40960723123839,
+            50.2621832610264,
+            21.910723461445563,
+            55.06301531909502
+          ]
+        },
+        "starboard": {
+          "force_rmse_N": 47.19710921503037,
+          "moment_rmse_Nm": 77.4175114823438,
+          "component_rmse": [
+            27.341272490141268,
+            29.448527938401305,
+            24.754921513439452,
+            48.184025619335614,
+            27.140040347078504,
+            54.177384296337095
+          ]
+        }
+      }
+    }
+  ],
+  "source": {
+    "trajectory_sha256": "d8290722d24798301ddcd10c3f7d39a38e87477fa820cb865d241c4647fda7ee",
+    "forces_sha256": "3e7f2cf96e8e8a62273ae8b22088ebaa6f446ddb08f693b6fbe5a9dfa852c835",
+    "ale_sha256": "4475b35fb1b49b02a6cbbcda6281dbfb2e934497e65b347a9a63facb619d6ea8",
+    "basis_code_sha256": "ae1295438cd303b51c5aebc74bad896242f040e829bb57d1ffba230dc4e383b1",
+    "geometry_sha256": {
+      "port": "5e588d98ffa94e203527f6bfe30f997a39c7d05f734e227c1cb0f3bb997dd418",
+      "starboard": "d7e13a19a441be41bbb76e7a6c020ff8cc7988427b40cf831385c72bcba9ece6"
+    },
+    "inertia_sha256": "8735338bd13f0f5ebe8991b48e5e3301f6a8c46a9d30ac013fd3bd1ae7010306"
+  },
+  "force_definition": "Saved integrated IB reactions; not virtual-fluid-corrected total hydrodynamic forces.",
+  "alignment_max_m": 0.0002813542350781019,
+  "alignment_rms_m": 9.386498191438659e-05,
+  "frames": 1077,
+  "time_s": [
+    0.01005,
+    10.57005
+  ],
+  "water_level_m": -0.12027640640735626,
+  "scope": "Shared left/right effective oar coefficients, fixed prescribed motion; no hull or hydrostatic identification.",
+  "metrics": {
+    "train": {
+      "frames": 528,
+      "baseline": {
+        "port": {
+          "force_rmse_N": 29.624457960380028,
+          "moment_rmse_Nm": 56.530118817743634,
+          "component_rmse": [
+            22.545540101594653,
+            10.580341366738658,
+            16.042553024284825,
+            29.580191854592858,
+            15.093862228649883,
+            45.747589077635865
+          ]
+        },
+        "starboard": {
+          "force_rmse_N": 36.01752248206472,
+          "moment_rmse_Nm": 67.49490989670909,
+          "component_rmse": [
+            29.01979097855619,
+            15.804052877111877,
+            14.329883808475145,
+            27.703855152501244,
+            14.416908690992331,
+            59.83487290409917
+          ]
+        }
+      },
+      "candidate": {
+        "port": {
+          "force_rmse_N": 29.228630920348618,
+          "moment_rmse_Nm": 55.92934032650543,
+          "component_rmse": [
+            22.3530086513001,
+            9.984732840914695,
+            15.96749760633837,
+            29.505634468308006,
+            14.574770751300731,
+            45.22261272336761
+          ]
+        },
+        "starboard": {
+          "force_rmse_N": 34.274875886258556,
+          "moment_rmse_Nm": 64.47579602269069,
+          "component_rmse": [
+            27.316860313680298,
+            14.944540624472545,
+            14.325395811104004,
+            27.635036811138697,
+            12.740237651647782,
+            56.84293586529611
+          ]
+        }
+      }
+    },
+    "validation": {
+      "frames": 144,
+      "baseline": {
+        "port": {
+          "force_rmse_N": 37.99220642938916,
+          "moment_rmse_Nm": 69.0053141541622,
+          "component_rmse": [
+            26.285979107260157,
+            18.02547881736833,
+            20.676971856406027,
+            39.47529497494955,
+            19.76805386775327,
+            53.03450305637782
+          ]
+        },
+        "starboard": {
+          "force_rmse_N": 38.145449242857936,
+          "moment_rmse_Nm": 68.7999368571811,
+          "component_rmse": [
+            23.16182282939261,
+            20.92699339313779,
+            21.92410109178586,
+            40.429318151414606,
+            22.59749326106565,
+            50.874894040969714
+          ]
+        }
+      },
+      "candidate": {
+        "port": {
+          "force_rmse_N": 31.170460793869427,
+          "moment_rmse_Nm": 56.08704839783741,
+          "component_rmse": [
+            17.803115616689908,
+            14.546029711170798,
+            21.048983825416833,
+            39.62355476896075,
+            17.24667608173459,
+            35.75308475620317
+          ]
+        },
+        "starboard": {
+          "force_rmse_N": 31.248742079752144,
+          "moment_rmse_Nm": 55.751282537980956,
+          "component_rmse": [
+            15.863883156486127,
+            15.214820334543694,
+            22.211040834499045,
+            39.66929737613169,
+            21.608100827505545,
+            32.674796540180125
+          ]
+        }
+      }
+    },
+    "changed_solver_audit": {
+      "frames": 284,
+      "baseline": {
+        "port": {
+          "force_rmse_N": 51.78291452665499,
+          "moment_rmse_Nm": 99.79958644907572,
+          "component_rmse": [
+            40.43173933456694,
+            16.403899769626683,
+            27.886497872707714,
+            45.814543590203435,
+            35.66710067115303,
+            81.17168829549945
+          ]
+        },
+        "starboard": {
+          "force_rmse_N": 32.11764744552681,
+          "moment_rmse_Nm": 58.687297834505614,
+          "component_rmse": [
+            25.437169992858234,
+            11.486308668690672,
+            15.892085242571184,
+            28.4343815987223,
+            16.959426623518922,
+            48.45681292466197
+          ]
+        }
+      },
+      "candidate": {
+        "port": {
+          "force_rmse_N": 49.642862193735425,
+          "moment_rmse_Nm": 95.69589385350592,
+          "component_rmse": [
+            38.24288331282749,
+            15.701754873591895,
+            27.483641254340753,
+            45.31471575659572,
+            34.17103293864225,
+            77.04947205676778
+          ]
+        },
+        "starboard": {
+          "force_rmse_N": 29.29181759415955,
+          "moment_rmse_Nm": 53.277991408290454,
+          "component_rmse": [
+            22.453012634275055,
+            10.137267476950338,
+            15.846406839260577,
+            28.213025920608302,
+            15.279637822927347,
+            42.533542115665895
+          ]
+        }
+      }
+    }
+  },
+  "force_basis": "World axes, torque about body origin. Dynamic oar proxy compared to uncorrected IBM reaction; no claim of total exterior hydrodynamic force.",
+  "state_range": {
+    "wet_area_m2": {
+      "min": [
+        0.0,
+        0.0
+      ],
+      "max": [
+        0.07558129232393837,
+        0.07558129232393837
+      ]
+    },
+    "speed_ms": {
+      "min": [
+        0.0,
+        0.0
+      ],
+      "max": [
+        4.566408152569035,
+        2.757233949022876
+      ]
+    },
+    "acceleration_ms2": {
+      "min": [
+        0.3624690093765377,
+        0.14692893562954573
+      ],
+      "max": [
+        87.9194322727819,
+        108.03180395590681
+      ]
+    }
+  },
+  "limitations": [
+    "Internal fictitious-fluid momentum and external hydrostatic loads are not recovered by these aggregate files.",
+    "Oar CFD assembly includes shaft; reduced model basis includes blade only.",
+    "Last-stage IBM reaction is not an independently timestamped RK-averaged load.",
+    "Last source segment switches numerical algorithm; terminal CFL failure at 10.57025 s.",
+    "Time-block validation is not validation on an independently generated trajectory."
+  ],
+  "validation_improves_both_oars": true,
+  "split_definition_s": {
+    "train": [
+      0.5,
+      6.0
+    ],
+    "validation": [
+      6.0,
+      7.44
+    ],
+    "changed_solver_audit": [
+      7.56,
+      10.4
+    ],
+    "restart_exclusion_radius": 0.06
+  },
+  "source_audit": "source_audit.md",
+  "default_enabled": false,
+  "recommendation": "Diagnostic candidate only until full prescribed-body fluid forces are available"
+}

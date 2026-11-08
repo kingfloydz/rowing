@@ -1,6 +1,20 @@
 # 水动力学模型
 
-本文说明 `rowing_mjlab/hydro.py`、`radiation.py`、`blade_inertia.py` 实际用于训练的模型。运行时不求解流体网格或自由面；使用裁剪几何、准定常力律和时域附加惯量模型。所有系数均为未经当前实艇标定的工程先验，不能据数值稳定宣称载荷准确。
+本文说明 `rowing_mjlab/hydro.py`、`radiation.py`、`blade_inertia.py` 实际用于训练的模型。运行时不求解流体网格或自由面；使用裁剪几何、准定常力律和时域附加惯量模型。2026-11-08 生成了固定轨迹 CFD 的实验性双桨候选；源码审计后候选不默认启用。运行参数仍为工程先验，未经当前实艇验证。
+
+## 固定轨迹 CFD 校准（2026-11-08）
+
+训练、微调和回放默认使用原力律。仅显式传入 `--force-profile data/cfd_force_calibration.json` 时启用候选，双桨共享 `CDmax=2.32444359`、`CLmax=1.10424717`，摩擦系数仍为 `0.01`。原值分别为 `2.0`、`0.9`。运行时根据当前姿态、湿润面积和相对速度计算，未按时间或参考相位重放 CFD 力。使用 `--force-profile prior` 可恢复原力律；关闭桨叶惯性时自动使用原力律。
+
+校准数据为 `final_policy_1100/policy_trajectory.csv` 的规定运动及 `force_data/rowing_20261108/rowing_forces_raw.zip`。原始文件有 1077 帧，所有记录已核对 SHA256。力和力矩从旋转 ALE 轴转至世界轴，比较力矩均绕组件原点；运行时仍正确施加于刚体质心。
+
+仅拟合 0.5–6 s，并排除续算边界附近；6–7.44 s 连续留出段双桨力向量 RMSE 分别由 37.99/38.15 N 降至 31.17/31.25 N。7.5 s 后更换 CFD 数值算法的数据单独审计。此结果是动态桨叶代理模型与原始 IBM 反力的一致性改善，不是对真实总水动力精度的证明。
+
+原始 IBM 反力未扣除内部虚拟流体贡献，且桨组件包含桨杆。当前仅作有条件的有效桨叶参数校准；船体浮力、阻力、附加质量及辐射记忆不据此辨识。升力倍率对原有 8 kg 桨叶附加质量假设敏感，附着水和出水峰值仍有明显误差。参数加载会检查桨叶几何与惯性配置，防止错误套用。
+
+源码确认 `prescribed_force` 只含最后 RK 阶段的速度修正反力，遗漏后续相场密度重映射的动量变化；规定运动分支也未使用解析刚体的内部动量修正。详见 `reports/cfd_calibration_20261108/source_audit.md`。此前误将该候选设为默认，现已撤销自动启用。
+
+完整对比、敏感性及复现方法见 `reports/cfd_calibration_20261108/report_zh.md`。重新拟合：`python tools/calibrate_cfd_forces.py --reuse-basis --install-profile`。`hydrodynamics.training.TrainingParameters()` 仍表示原始 CPU 工程先验；校准运行参数由 `hydrodynamics.force_profile.load_force_profile()` 读取。
 
 ## 坐标、参数与执行路径
 
@@ -73,12 +87,12 @@ CDi = CL²/(pi*0.8*AR)
 静水压力使用封闭 3 mm 网格；动水力使用局部 YZ 平面投影，法向为局部 X，避免厚度两侧重复计算受力面积。各湿润面元按当前局部速度计算：
 
 ```text
-CD = 2*sin(alpha)² + 0.01
-CL = 0.9*sin(2*alpha)
+CD = CDmax*sin(alpha)² + 0.01
+CL = CLmax*sin(2*alpha)
 dF = 0.5*rho*U²*dS*(-CD*e_velocity + CL*e_lift)
 ```
 
-升力方向按速度符号构造，另有展向摩擦系数 0.01。面元力按各自力臂求矩。系数为工程先验，不能据此声称复现实际曲面桨的动态升阻力或尾涡历史。
+升力方向按速度符号构造，另有展向摩擦系数 0.01。面元力按各自力臂求矩。CDmax/CLmax 使用上文的校准或原始配置，不能据此声称复现实际曲面桨的动态升阻力或尾涡历史。
 
 
 ## 船体附加质量与辐射记忆

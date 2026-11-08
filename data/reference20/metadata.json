@@ -165,8 +165,8 @@
     "mirrored_installation_before_deg": 102.18240266902151,
     "mirrored_installation_after_deg": 0.0
   },
-  "strokes_per_minute": 20,
-  "period_s": 3,
+  "strokes_per_minute": 18.75,
+  "period_s": 3.2,
   "reset_phase": 0.92,
   "reference_kind": "literature_soft",
   "reset_on_reference": false,
@@ -422,5 +422,71 @@
       "right_elbow_joint": 0.0,
       "trunk_vertical": 0.0
     }
+  },
+  "recovery_clearance_adjustment_20261108": {
+    "period_s": 3.2,
+    "strokes_per_minute": 18.75,
+    "first_half_speed_cycle_s": 6.4,
+    "adjustment": "Only bilateral elevation changed; +20 mm recovery bottom clearance with quintic phase ramps .41-.56 and .96-1.06 (periodic).",
+    "before_sha256": "21d20121ec9f1e251898cf2eeb4d8083066362a2af1a35cc27c7a01c023707ab",
+    "candidate_sha256": "4878509a7a98f4db739e6908a1afe471d77ddf2d327129b7cd0d1a97e4bdc32c",
+    "applied": true,
+    "max_elevation_change_deg": [
+      0.5470592119359322,
+      0.5449300126734221
+    ],
+    "other_joint_channels_bitwise_unchanged": true,
+    "trunk_bitwise_unchanged": true,
+    "dense_samples": 1601,
+    "geometry_reference": "Hull held at reset; geometry check, not a dynamic no-water-contact guarantee.",
+    "measurements": {
+      "before": {
+        "period_s": 3.0,
+        "drive_top_max_m": [
+          -0.029578938021385337,
+          -0.029984471634719123
+        ],
+        "recovery_bottom_min_m": [
+          0.12884546149574433,
+          0.13887662073835305
+        ],
+        "drive_center_speed_max_ms": [
+          3.111603435668129,
+          3.085807975088755
+        ],
+        "recovery_center_speed_max_ms": [
+          1.8678543024642837,
+          1.8630752424113388
+        ],
+        "minimum_left_over_right_handle_gap_m": 0.0117300503492076
+      },
+      "after": {
+        "period_s": 3.2,
+        "drive_top_max_m": [
+          -0.029578938021385337,
+          -0.029984471634719123
+        ],
+        "recovery_bottom_min_m": [
+          0.148845461494575,
+          0.1588766207377208
+        ],
+        "drive_center_speed_max_ms": [
+          2.917128220938985,
+          2.8929449766458135
+        ],
+        "recovery_center_speed_max_ms": [
+          1.7521581084425526,
+          1.7481520788495495
+        ],
+        "minimum_left_over_right_handle_gap_m": 0.0117300503492076
+      }
+    },
+    "auxiliary_whole_body_ik": "Not refitted; existing soft posture guide retained"
+  },
+  "startup_timing": {
+    "first_cycle_duration_s": 5.2,
+    "normal_cycle_duration_s": 3.2,
+    "first_cycle_rate_multiplier": 0.6153846153846154,
+    "blend_duration_s": 1.0
   }
 }

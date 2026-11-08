@@ -15,6 +15,7 @@ def main():
     parser.add_argument('--iterations',type=int,default=10000)
     parser.add_argument('--seed',type=int,default=42)
     parser.add_argument('--resume',type=Path)
+    parser.add_argument('--force-profile',help='CFD profile JSON; use prior for the original force law')
     parser.add_argument('--log-dir',type=Path)
     parser.add_argument('--compile',action=argparse.BooleanOptionalAction,default=True)
     parser.add_argument('--hull-radiation',action=argparse.BooleanOptionalAction,default=True,
@@ -33,7 +34,7 @@ def main():
     torch.set_num_threads(4)
     from mjlab.envs import ManagerBasedRlEnv
     from mjlab.rl import RslRlVecEnvWrapper
-    from mjlab.rl.runner import MjlabOnPolicyRunner
+    from .runner import RowingRunner
     from mjlab.utils.torch import configure_torch_backends
     from .config import env_cfg,rl_cfg
     from .networks import HISTORY_LENGTH, LATENT_DIM, TCN_CHANNELS, PRIVILEGED_DIM
@@ -41,6 +42,7 @@ def main():
     cfg = env_cfg(args.num_envs)
     cfg.actions['h2'].hull_radiation = args.hull_radiation
     cfg.actions['h2'].blade_inertia = args.blade_inertia
+    cfg.actions['h2'].force_profile = args.force_profile
     cfg.seed = args.seed
     agent = rl_cfg(args.num_envs)
     agent.seed = args.seed
@@ -54,7 +56,7 @@ def main():
     env = ManagerBasedRlEnv(cfg,device=args.device)
     wrapped = RslRlVecEnvWrapper(env,clip_actions=1.0)
     try:
-        runner = MjlabOnPolicyRunner(wrapped,settings,str(log_dir),args.device)
+        runner = RowingRunner(wrapped,settings,str(log_dir),args.device)
         runner.add_git_repo_to_log(__file__)
         if args.resume:
             runner.load(str(args.resume))
@@ -64,6 +66,7 @@ def main():
                     'hydro_faces':env.rowing.hydro.face_count,'water_level_m':float(env.rowing.hydro.water.numpy()[0,0]),
                     'hull_radiation':env.rowing.hydro.radiation.parameters if args.hull_radiation else None,
                     'blade_inertia':env.rowing.hydro.blade_inertia.parameters if args.blade_inertia else None,
+                    'force_profile':env.rowing.hydro.force_profile,
                     'settings':asdict(agent)}
         (log_dir/'settings.json').write_text(json.dumps(metadata,indent=2),encoding='utf8')
         if args.benchmark:

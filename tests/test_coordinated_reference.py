@@ -12,7 +12,7 @@ from rowing_mjlab.trunk import TrunkReference
 @unittest.skipUnless(available(),'coordinated reference is not installed')
 class CoordinatedReferenceTests(unittest.TestCase):
     def test_runtime_uses_one_clock_and_declared_reference_contract(self):
-        self.assertEqual(PERIOD,3.)
+        self.assertEqual(PERIOD,3.2)
         m=build_spec().compile();d=mujoco.MjData(m);ref=CoordinatedReference('cpu')
         phase=torch.linspace(0,1,801,dtype=torch.float64)
         values=ref(phase).numpy();qi=[m.joint(n).qposadr[0] for n in ref.names]

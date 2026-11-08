@@ -5,7 +5,8 @@ from scipy.interpolate import CubicSpline
 from hydrodynamics.models import ROOT
 from .coordinated_reference import CoordinatedReference, available
 
-PERIOD = 60.0/20.0
+PERIOD = 3.2  # User reference: 18.75 strokes/min after startup.
+FIRST_CYCLE_DURATION = 5.2
 SIGMA_DEG = (10,4,15,10,4,15)
 OAR_REFERENCE_PATH = ROOT/'data/rowing_reference.csv'
 # Interior of the coordinated drive; entry/extraction are separate transitions.
@@ -65,10 +66,10 @@ class OarReference:
         return grid[cost.argmin()]
 
     def target(self, elapsed, phase0, reset_angles):
-        cycles = torch.where(elapsed < 2*PERIOD, elapsed/(2*PERIOD),
-                             1+(elapsed-2*PERIOD)/PERIOD)
+        cycles = torch.where(elapsed < FIRST_CYCLE_DURATION, elapsed/FIRST_CYCLE_DURATION,
+                             1+(elapsed-FIRST_CYCLE_DURATION)/PERIOD)
         phase = (phase0+cycles).remainder(1.0)
-        rate = torch.where(elapsed < 2*PERIOD,0.5,1.0)
+        rate = torch.where(elapsed < FIRST_CYCLE_DURATION,PERIOD/FIRST_CYCLE_DURATION,1.0)
         u = (elapsed/1.0).clamp(0,1)
         blend = 10*u**3-15*u**4+6*u**5
         target = reset_angles+blend[...,None]*(self(phase)-reset_angles)

@@ -187,6 +187,7 @@
                               <joint name="left_wrist_yaw_joint" pos="0 0 0" axis="5.6621374255883e-15 -9.4368957093138e-16 0.99999999999999" range="-1.22 1.22" actuatorfrcrange="-10 10" ref="-0.7048187965347815" />
                               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.4 0.4 0.4 1" mesh="left_wrist_yaw_link" />
                               <body name="left_dex1_base_link" pos="0.05809584574272976 -0.0013319356134314842 0.004341172871622131" quat="-0.6974657185093528 -0.7120243773010587 -0.0708072524151817 0.03935975912889491">
+                                <joint name="left_hand_passive_roll" type="hinge" pos="0 0 0" axis="1 0 0" limited="false" damping="0.02" frictionloss="0" stiffness="0" armature="0" />
                                 <inertial mass="0.24021505977817" pos="0.024820850433962 -1.0252782649478e-08 1.7969073805612e-08" fullinertia="0.00014124913942121 0.00015210705124999 0.00012098664606621 -4.1394961700523e-11 1.0195111804661e-10 7.1191717885567e-10" />
                                 <geom name="left_compact_hand_visual" type="mesh" mesh="compact_hand" rgba=".7 .7 .7 1" contype="0" conaffinity="0" group="1" />
                                 <site name="left_gripper_center" pos=".029 0 0" size=".004" rgba="0 0 0 0" />
@@ -227,6 +228,7 @@
                               <joint name="right_wrist_yaw_joint" pos="0 0 0" axis="-1.5543122344752e-15 -4.0523140398818e-15 1" range="-1.22 1.22" actuatorfrcrange="-10 10" ref="0.7620917497043989" />
                               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.4 0.4 0.4 1" mesh="right_wrist_yaw_link" />
                               <body name="right_dex1_base_link" pos="0.05977037930953592 0.0009530304764190786 -0.009415599493538082" quat="-0.7084480947292011 -0.6868317557475453 0.12755296323959336 -0.10046729786407246">
+                                <joint name="right_hand_passive_roll" type="hinge" pos="0 0 0" axis="1 0 0" limited="false" damping="0.02" frictionloss="0" stiffness="0" armature="0" />
                                 <inertial mass="0.24021505977817" pos="0.024820850433962 -1.0252782649478e-08 1.7969073805612e-08" fullinertia="0.00014124913942121 0.00015210705124999 0.00012098664606621 -4.1394961700523e-11 1.0195111804661e-10 7.1191717885567e-10" />
                                 <geom name="right_compact_hand_visual" type="mesh" mesh="compact_hand" rgba=".7 .7 .7 1" contype="0" conaffinity="0" group="1" />
                                 <site name="right_gripper_center" pos=".029 0 0" size=".004" rgba="0 0 0 0" />
