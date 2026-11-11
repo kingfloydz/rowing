@@ -8,7 +8,7 @@ from PIL import Image
 from hydrodynamics.models import ROOT
 
 
-def render(folder):
+def render(folder, pose_path=None):
     from rowing_mjlab.coordinated_reference import available,CoordinatedReference
     folder.mkdir(parents=True,exist_ok=True)
     reset_phase=.15
@@ -22,6 +22,9 @@ def render(folder):
     else:
         m=mujoco.MjModel.from_binary_path(str(folder/'candidate.mjb'))
         poses=np.load(folder/'dense.npz')['qpos']
+    if pose_path is not None:
+        poses=np.load(pose_path)['qpos']
+        if poses.shape[1]!=m.nq:raise ValueError('Pose/model dimension mismatch')
     d=mujoco.MjData(m)
     water=json.loads((ROOT/'data/reset_float_pose.json').read_text())['water_level_m']
     m.vis.global_.offwidth=1600;m.vis.global_.offheight=1000
@@ -45,7 +48,9 @@ def render(folder):
     try:
         imageio.imwrite(folder/'reset.png',frame(None) if available() else frame(round(reset_phase*(len(poses)-1))))
         for phase in (.1,.25,.45,.7,.9):imageio.imwrite(folder/f'phase_{round(phase*100):02d}.png',frame(round(phase*(len(poses)-1))))
-        frames=[frame(round(i/90*(len(poses)-1))) for i in range(90)]
+        from rowing_mjlab.reference import PERIOD
+        frame_count=round(PERIOD*30)
+        frames=[frame(round(i/frame_count*(len(poses)-1))) for i in range(frame_count)]
         with imageio.get_writer(folder/'reference20.mp4',fps=30,codec='libx264',quality=8,macro_block_size=16) as writer:
             for f in frames:writer.append_data(f)
         preview=[Image.fromarray(f).resize((960,324)) for f in frames[::3]]

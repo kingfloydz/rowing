@@ -3,7 +3,7 @@ import torch
 
 
 class PenaltyCurriculum:
-    def __init__(self,num_envs,device,threshold=2000):
+    def __init__(self,num_envs,device,threshold=1000):
         self.threshold=threshold
         self.completed_iterations=0
         self.action_scale=torch.ones(num_envs,device=device)

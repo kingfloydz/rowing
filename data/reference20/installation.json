@@ -1,0 +1,6 @@
+{
+  "max_body_position_error_m": 1.7763568394002505e-15,
+  "max_body_rotation_matrix_error": 2.1094237467877974e-15,
+  "reset_hand_ik_closed": true,
+  "max_geom_point_error_m": 6.157722999477457e-08
+}

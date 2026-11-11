@@ -26,30 +26,36 @@ class PassiveCurriculumTests(unittest.TestCase):
 
     def test_completed_iteration_boundary_is_independent_of_environment_count(self):
         for n in (1,3,2048):
-            c=PenaltyCurriculum(n,'cpu');c.set_iteration(1999)
+            c=PenaltyCurriculum(n,'cpu');c.set_iteration(999)
             self.assertTrue(torch.all(c.scale('action')==1))
             c.advance()
-            self.assertEqual(c.completed_iterations,2000)
+            self.assertEqual(c.completed_iterations,1000)
             self.assertTrue(torch.all(c.scale('action')==40))
             self.assertTrue(torch.all(c.scale('angular')==5))
 
     def test_reward_scaling_and_checkpoint_roundtrip(self):
-        c=PenaltyCurriculum(2,'cpu');c.set_iteration(2000)
+        c=PenaltyCurriculum(2,'cpu');c.set_iteration(1000)
         env=SimpleNamespace(rowing=SimpleNamespace(boat=0,penalty_curriculum=c),
             sim=SimpleNamespace(data=SimpleNamespace(cvel=torch.ones(2,1,6))),
             action_manager=SimpleNamespace(action=torch.ones(2,29),prev_action=torch.zeros(2,29)))
         torch.testing.assert_close(-.05*mdp.curriculum_action_rate_cost(env),torch.tensor([-2.,-2.]))
         torch.testing.assert_close(-mdp.curriculum_angular_velocity_cost(env),torch.tensor([-15.,-15.]))
         restored=PenaltyCurriculum(2,'cpu');restored.load_state_dict(c.state_dict())
-        self.assertEqual(restored.completed_iterations,2000)
+        self.assertEqual(restored.completed_iterations,1000)
         resized=PenaltyCurriculum(3,'cpu');resized.load_state_dict(c.state_dict())
-        self.assertEqual(resized.completed_iterations,2000)
+        self.assertEqual(resized.completed_iterations,1000)
+
+    def test_resume_uses_current_threshold(self):
+        c=PenaltyCurriculum(1,'cpu')
+        c.load_state_dict({'completed_iterations':1500,'threshold':2000})
+        self.assertEqual(c.threshold,1000)
+        self.assertTrue(torch.all(c.action_scale==40))
 
     def test_runner_checkpoint_preserves_curriculum(self):
         import tempfile
         from pathlib import Path
         from rowing_mjlab.runner import RowingRunner
-        c=PenaltyCurriculum(2,'cpu');c.set_iteration(2000)
+        c=PenaltyCurriculum(2,'cpu');c.set_iteration(1000)
         env=SimpleNamespace(common_step_counter=123,rowing=SimpleNamespace(penalty_curriculum=c))
         runner=object.__new__(RowingRunner)
         runner.env=SimpleNamespace(unwrapped=env)
@@ -58,21 +64,21 @@ class PassiveCurriculumTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             path=str(Path(folder)/'checkpoint.pt');runner.save(path)
             c.set_iteration(0);runner.load(path,map_location='cpu')
-            self.assertEqual(c.completed_iterations,2000)
-            self.assertEqual(runner.current_learning_iteration,2000)
+            self.assertEqual(c.completed_iterations,1000)
+            self.assertEqual(runner.current_learning_iteration,1000)
             runner.load(path,load_cfg={'iteration':False},map_location='cpu')
             self.assertEqual(c.completed_iterations,0)
 
     def test_runner_advances_once_after_successful_ppo_update(self):
         from unittest.mock import patch
         from rowing_mjlab.runner import RowingRunner,MjlabOnPolicyRunner
-        c=PenaltyCurriculum(2,'cpu');c.set_iteration(1999)
+        c=PenaltyCurriculum(2,'cpu');c.set_iteration(999)
         def initialize(runner):
             runner.env=SimpleNamespace(unwrapped=SimpleNamespace(rowing=SimpleNamespace(penalty_curriculum=c)))
             runner.alg=SimpleNamespace(update=lambda:{'loss':1.})
         with patch.object(MjlabOnPolicyRunner,'__init__',initialize):runner=RowingRunner()
         self.assertEqual(runner.alg.update(),{'loss':1.})
-        self.assertEqual(c.completed_iterations,2000)
+        self.assertEqual(c.completed_iterations,1000)
         self.assertTrue(torch.all(c.action_scale==40))
 
 

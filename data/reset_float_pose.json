@@ -10,15 +10,6 @@
     -0.0016304808930252053,
     0.0
   ],
-  "pitch_deg": -0.18683943027863312,
-  "water_level_m": -0.12027640288595698,
-  "mass_kg": 96.23017311955633,
-  "buoyancy_N": 944.0179983028152,
-  "weight_N": 944.0179983028476,
-  "moment_about_system_cg_Nm": [
-    -1.5305149101610735,
-    -1.2334955279413862e-10,
-    1.9966244153366484e-14
-  ],
-  "note": "Heave and pitch balanced; roll/yaw zero; internal joints follow reset_joint_pose.json. Residual roll requires active control. Recalibrate after mass/geometry changes."
+  "water_level_m": -0.12027640640735626,
+  "note": "Inherited legacy float reset; gate mass relocation has not been hydrostatically recalibrated."
 }

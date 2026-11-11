@@ -20,11 +20,14 @@ class CoordinatedReferenceTests(unittest.TestCase):
         np.testing.assert_allclose(row(phase).numpy(),values[:,[ref.names.index(n) for n in IMITATION_NAMES]],atol=1e-6)
         np.testing.assert_allclose(trunk(phase).numpy(),values[:,-1],atol=1e-6)
         np.testing.assert_allclose(values[0],values[-1],atol=1e-7)
-        soft=ref.metadata.get('reference_kind') in ('soft_symmetric','literature_soft')
-        if soft:
+        policy_soft=ref.metadata.get('reference_kind')=='policy_retargeted_soft'
+        soft=policy_soft or ref.metadata.get('reference_kind') in ('soft_symmetric','literature_soft','literature_constrained')
+        if soft and not policy_soft:
             from rowing_mjlab.symmetry import MIRROR_PAIRS
             self.assertTrue(np.isfinite(values).all())
-            for part,sign in MIRROR_PAIRS:
+            # Closed bilateral IK may be asymmetric; its physical invariants
+            # are tested independently in test_cycle_reference.py.
+            for part,sign in ([] if ref.metadata.get('reference_kind')=='literature_constrained' else MIRROR_PAIRS):
                 if ref.metadata.get('reference_kind')=='literature_soft' and 'wrist' in part:
                     # Crossing heights and opposite feather axes allow wrist differences;
                     # the ten-channel source tests cover bilateral targets.
@@ -33,8 +36,26 @@ class CoordinatedReferenceTests(unittest.TestCase):
                 self.assertLess(np.rad2deg(np.sqrt(np.mean(error**2))),8.)
         for q in values[:,:-1]:
             d.qpos[:]=m.qpos0;d.qpos[qi]=q;mujoco.mj_forward(m,d)
+            if policy_soft:
+                # Retargeted recorded motion retains bounded soft-limit/foot residuals.
+                for i,n in enumerate(ref.names):
+                    j=m.joint(n).id
+                    if m.jnt_limited[j]:
+                        lo,hi=m.jnt_range[j]
+                        self.assertGreaterEqual(q[i],lo-.178)
+                        self.assertLessEqual(q[i],hi+.178)
+                for side in ('left','right'):
+                    for part,pos_tol,deg_tol in [('hand',.001,1.),('foot',.004,2.5)]:
+                        e=m.equality(side+'_'+part+'_fixed').id;a,b=m.eq_obj1id[e],m.eq_obj2id[e];rel=m.eq_data[e]
+                        ra=d.xmat[a].reshape(3,3);rb=d.xmat[b].reshape(3,3)
+                        self.assertLess(np.linalg.norm(d.xpos[a]+ra@rel[3:6]-d.xpos[b]),pos_tol)
+                        rot=Rotation.from_quat(rel[6:10][[1,2,3,0]]).as_matrix()
+                        self.assertLess(Rotation.from_matrix((ra@rot).T@rb).magnitude(),np.deg2rad(deg_tol))
+                self.assertFalse(any(c.dist<-.003 for c in d.contact))
+                continue
             if soft:
                 for i,n in enumerate(ref.names):
+                    if not m.jnt_limited[m.joint(n).id]:continue
                     lo,hi=m.jnt_range[m.joint(n).id]
                     self.assertGreaterEqual(q[i],lo-1e-6)
                     self.assertLessEqual(q[i],hi+1e-6)
@@ -47,6 +68,15 @@ class CoordinatedReferenceTests(unittest.TestCase):
                     rot=Rotation.from_quat(rel[6:10][[1,2,3,0]]).as_matrix()
                     self.assertLess(Rotation.from_matrix((ra@rot).T@rb).magnitude(),np.deg2rad(.2))
             self.assertFalse(any(c.dist<-.001 for c in d.contact))
+        if 'fixed_feet_20261110' in ref.metadata:
+            for q in values[:,:-1]:
+                d.qpos[:]=m.qpos0;d.qpos[qi]=q;mujoco.mj_kinematics(m,d)
+                for side in ('left','right'):
+                    e=m.equality(side+'_foot_fixed').id;a,b=m.eq_obj1id[e],m.eq_obj2id[e];rel=m.eq_data[e]
+                    ra=d.xmat[a].reshape(3,3);rb=d.xmat[b].reshape(3,3)
+                    rot=Rotation.from_quat(rel[6:10][[1,2,3,0]]).as_matrix()
+                    self.assertLess(np.linalg.norm(d.xpos[a]+ra@rel[3:6]-d.xpos[b]),.001)
+                    self.assertLess(Rotation.from_matrix((ra@rot).T@rb).magnitude(),np.deg2rad(.2))
         reset=ref.joints(torch.tensor(ref.metadata['reset_phase'],dtype=torch.float64),ref.names).numpy()
         if not soft:np.testing.assert_allclose(reset,m.qpos0[qi],atol=2e-6)
         else:
