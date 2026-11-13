@@ -13,8 +13,8 @@ class PenaltyCurriculum:
         if int(count)!=count or count<0:raise ValueError('Invalid iteration count')
         self.completed_iterations=int(count)
         late=count>=self.threshold
-        self.action_scale.fill_(40. if late else 1.) # -0.05 -> -2
-        self.angular_scale.fill_(5. if late else 1.) # -1 -> -5
+        self.action_scale.fill_(120. if late else 1.) # -0.05 -> -2
+        self.angular_scale.fill_(30. if late else 1.) # -1 -> -5
 
     def advance(self):
         self.set_iteration(self.completed_iterations+1)
