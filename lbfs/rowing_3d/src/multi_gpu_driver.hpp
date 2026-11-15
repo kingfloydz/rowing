@@ -214,6 +214,7 @@ inline int run_multi_gpu(const std::string& output,
             throw std::runtime_error("insufficient local solver memory on GPU "+std::to_string(r));
         auto sol=std::make_unique<Solver>(mm->grid(),p,b,local,trajectory,policy_trajectory);
         sol->async_video_output=true;sol->ib_partitioned=true;
+        sol->configure_surface_probe_grid(global_mesh->axes);
         sol->core_i0=lo[0]-hl[0];sol->core_i1=hi[0]-hl[0];sol->core_j0=lo[1]-hl[1];sol->core_j1=hi[1]-hl[1];
         sol->core_k0=lo[2]-hl[2];sol->core_k1=hi[2]-hl[2];
         sol->ale_time_scale=T;sol->ale_velocity_scale=L/T;sol->update_ale(0);sol->update_policy_pose(0);sol->initialize(mode);
@@ -289,8 +290,9 @@ inline int run_multi_gpu(const std::string& output,
         for(auto& r:ranks){cuda_check(cudaSetDevice(r.device));r.solver->prescribed_force.zero();r.solver->write_video_frame(output+"/video_surface_rank_"+std::to_string(r.device)+".bin",start_seconds,L,T,mass_scale,af,r.core0-r.halo0,r.core1-r.halo0);}
         video_output_seconds+=std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();
     }
-    int checkpoint_from=std::getenv("LU_CHECKPOINT_FROM")?std::atoi(std::getenv("LU_CHECKPOINT_FROM")):0;
     int checkpoint_every=std::getenv("LU_CHECKPOINT_EVERY")?std::atoi(std::getenv("LU_CHECKPOINT_EVERY")):0;
+    int checkpoint_from=std::getenv("LU_CHECKPOINT_FROM")?std::atoi(std::getenv("LU_CHECKPOINT_FROM")):checkpoint_every;
+    double checkpoint_seconds=0;int checkpoint_count=0;
     // Opt-in global rollback/subcycling. No additional full-domain scans or
     // state arrays: base already holds the complete pre-RK state on each GPU.
     const double retry_min=std::getenv("LU_TRANSPORT_MIN_DT_S")?std::atof(std::getenv("LU_TRANSPORT_MIN_DT_S")):0;
@@ -369,8 +371,13 @@ inline int run_multi_gpu(const std::string& output,
                      <<" time_s="<<accepted_time<<" dt_s="<<retry_cap<<std::endl;
         }
         } // accepted substeps reach the unchanged macro/output time
-        if(checkpoint_from>0&&checkpoint_every>0&&it>=checkpoint_from&&it%checkpoint_every==0)
-            multi_gpu_checkpoint(output+"/checkpoint_"+std::to_string(it),ranks,false);
+        if(checkpoint_every>0&&it>=checkpoint_from&&it%checkpoint_every==0){
+            auto checkpoint_start=std::chrono::steady_clock::now();
+            checkpoint_publish_latest(output+"/checkpoint_latest",it,output_time,nr,[&](const std::string& folder){multi_gpu_checkpoint(folder,ranks,false);});
+            checkpoint_seconds+=std::chrono::duration<double>(std::chrono::steady_clock::now()-checkpoint_start).count();++checkpoint_count;
+            std::ofstream cm(output+"/checkpoint_metrics.json");cm<<"{\"count\":"<<checkpoint_count<<",\"seconds\":"<<checkpoint_seconds<<",\"latest_time_s\":"<<std::setprecision(17)<<output_time<<"}\n";
+            std::cout<<"checkpoint_latest step="<<it<<" time_s="<<output_time<<" cumulative_write_s="<<checkpoint_seconds<<std::endl;
+        }
         if(it%logevery==0||it==steps){
             for(auto& r:ranks){cuda_check(cudaSetDevice(r.device));Stats st=r.solver->stats();
                 auto bs=r.solver->body_state.download();

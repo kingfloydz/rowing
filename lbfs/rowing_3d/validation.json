@@ -1,9 +1,10 @@
 {
-  "status": "gpu_unit_tests_and_200_step_full_mesh_smoke_passed",
+  "status": "probe_routing_and_latest_checkpoint_repair_cpu_gpu_tests_passed",
   "source_sha256": {
     "ale_motion.hpp": "2a0d77b0bf5a4461b12bc6b0728a57ae03956781161739af815dc996e7ec4be3",
     "backend.hpp": "878ce11086519bd5cb73e5cda876cc727a468c43306a701559049e82d9087dcc",
-    "checkpoint.hpp": "5617551e54140bdf86f7e10023d8eed746bfc2a65d09e8d5a6b54bcb5109024e",
+    "checkpoint.hpp": "ef78d11aa3be8a50ccdca27e3ad0de2739e5b3a8c4d01352732ba3c3f40ddebf",
+    "checkpoint_store.hpp": "d5e4947eb903a55d0b1f0d99b52c142c8add70649d02cabf03bf5713e4fdbf2b",
     "column_phase_repair.hpp": "88ea84a463dae96bb1f2cc4b82007e58833317d9c53741e4ca8dc8de86588f2d",
     "driver.hpp": "1c4411f3c91af9ce1f97552cc002d69f0f8834a90d30feb3acb4d5d8870cf9e2",
     "ib_support.hpp": "3489cd871082ef686799d3f6388cef00330f034ded1232e3f51e82958606f2c8",
@@ -14,7 +15,7 @@
     "metric_mesh_host.hpp": "c6d1fdccb423ba4d711f6a5cac2cfc81d9f956956c6f6cefed227de58fa2b2b3",
     "metric_operators.hpp": "fc29e4edf9eaa36732ad96322056e12206ccd4853c51e5d09a9e9bc3edc477cc",
     "metric_stress_vector.hpp": "546ae636b235bffd89de6dfff10a10af1a630af53d2d0b3d3ba3cc26c72f7979",
-    "multi_gpu_driver.hpp": "be6f5c4dbfae8ad35844380adeadf8b04d80c3c8b6d0f02629eac290d2893884",
+    "multi_gpu_driver.hpp": "d950c05a07ca5ac0b65cf3b403d43591a8161e24b41568e8f0fafb1e7f651cf7",
     "multi_gpu_phase_repair.hpp": "32e1eaef2ceac3baf83e23e42d208efb1a0f217144a418bb94c457ad4cb443a3",
     "numerics.hpp": "c7e2ff1f764e7dd5893691c25fedae7f1e5925e1e6e55f81545838c2be9506ff",
     "parallel_force_reduce.hpp": "a9e943e0fdcdfba336a1f6d772dd577205576affd4871a3c1efe651cedd9235c",
@@ -22,10 +23,10 @@
     "phase_audit.hpp": "5929dc79c217042b50b1f2313ac4fe37db19d2415f27b2fce2766dc30b0a365e",
     "rk_scheme.hpp": "71704774c0ebcfeb0c54c022c904cc2e4efb79cb05f2c9ef1fc2245b5d213432",
     "slab_partition.hpp": "57a48c0d7aa3c9d59fb2924060981566a51fea3703b673b32aa356459c9faf7f",
-    "solver.hpp": "96e411bde99b4f0ff29a9e2097a6f8531376ded46791957d23097b1660c8f496",
+    "solver.hpp": "279df4f6bb1b2306bd4aee1767bcfcdaefdf5ebc305755e0771ae3c0eff3919d",
     "step_time.hpp": "5d937b1405c5bcd0f0809e9ec43e58da8427b99b0f57ff5596852a67e46f0f72",
     "surface.hpp": "0abb6b034e4cca110fcd7fcc93c10eb8e9c5617d38cbc6128eb1cc4ec6f10f8d",
-    "surface_force.hpp": "e61119ef615cbce97252f591521908a4c61d613cfbac20b32689c46e46fc0b0a",
+    "surface_force.hpp": "e26ea48cebdccf27127fbe3ae218c16e840452e53dd404f9b124144f16f34c8d",
     "tensor_poisson_gpu.hpp": "8bd8bc70ffd4dd60648513e4636cd33b0c56262c25f42f4041547c76211e4149"
   },
   "changed_from_r9": [
@@ -33,8 +34,8 @@
     "solver.hpp",
     "surface_force.hpp"
   ],
-  "cpu_ctest": "4/4 passed",
-  "gpu_test": "8/8 H100 surface-force tests passed; -O3 sm90 solver built",
+  "cpu_ctest": "6/6 passed",
+  "gpu_test": "H100 synthetic routed stress/torque invariance passed; 5801-time full-trajectory coverage passed; Linux transactional checkpoint test passed",
   "motion_test": "actual 11.6s CSV at 25us substeps and knots passed",
   "force_method": "one-sided exterior stress; requires CFD offset/convergence validation",
   "full_mesh_test": {
@@ -83,5 +84,8 @@
     "test_end_s": 0.01,
     "long_run_stability_validated": false
   },
-  "solver_sha256": "1b0c7595f246c61f13b61ded931d398763110c0cdd06527527992276ffa8d284"
+  "solver_sha256": "bbe8281e505cfc53eef220272a1414e558a6edcb1802d5532201ea6c8e5d6fc2",
+  "repair": "Probe-owned surface stress; 10000-step latest-only transactional checkpoint",
+  "repair_task": "job-98178f76-c76f-4558-b600-62b33d8658a4",
+  "full_8gpu_acceptance": "runs automatically before production; status tracked separately"
 }

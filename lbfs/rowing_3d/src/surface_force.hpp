@@ -35,16 +35,25 @@ HD inline bool surface_interpolate_traction(Field f,Vec x,Vec n,SurfaceTraction&
         traction_add(t,surface_cell_traction(f,b[0]+i,b[1]+j,b[2]+k,n),(i?q[0]:1-q[0])*(j?q[1]:1-q[1])*(k?q[2]:1-q[2]));
     return true;
 }
+// Probe spacing is defined at the marker on the GLOBAL mesh. It must not
+// depend on the rank selected to evaluate either probe.
+HD inline bool surface_probe_locations(Grid g,Marker m,Vec& x2,Vec& x3){
+    Real h=0;
+    for(int a=0;a<3;++a){int b=g.lower_center(a,m.x[a]);if(b<0)return false;Real w=g.width(a,b);h=w>h?w:h;}
+    x2={m.x.x+2*h*m.n.x,m.x.y+2*h*m.n.y,m.x.z+2*h*m.n.z};
+    x3={m.x.x+3*h*m.n.x,m.x.y+3*h*m.n.y,m.x.z+3*h*m.n.z};return true;
+}
+HD inline bool surface_inside_box(Grid g,Vec x,const int* lo,const int* hi){
+    for(int a=0;a<3;++a)if(x[a]<g.face(a,lo[a])||x[a]>=g.face(a,hi[a]))return false;
+    return true;
+}
+HD inline bool surface_probe_covered(Grid g,Vec x){
+    for(int a=0;a<3;++a){int b=g.lower_center(a,x[a]);if(b<1||b+2>=g.count(a))return false;}
+    return true;
+}
 HD inline bool surface_exterior_traction(Field f,Marker m,SurfaceTraction& t){
-    int b[3];Real h=0;
-    for(int a=0;a<3;++a){b[a]=f.g.lower_center(a,m.x[a]);if(b[a]<0)return false;Real w=f.g.width(a,b[a]);h=w>h?w:h;}
-    // Two probes on the fluid side of the CAD surface. Derivative stencils
-    // can still overlap the diffuse IB layer; do not claim exact wall stress. Linear
-    // extrapolation returns the surface traction, not traction at an offset.
-    // Offset sensitivity must be checked on CFD; this is not exact wall stress.
-    Vec x2{m.x.x+2*h*m.n.x,m.x.y+2*h*m.n.y,m.x.z+2*h*m.n.z};
-    Vec x3{m.x.x+3*h*m.n.x,m.x.y+3*h*m.n.y,m.x.z+3*h*m.n.z};
-    SurfaceTraction a,bv;
-    if(!surface_interpolate_traction(f,x2,m.n,a)||!surface_interpolate_traction(f,x3,m.n,bv))return false;
-    traction_add(t,a,3);traction_add(t,bv,-2);return true;
+    Vec x2,x3;if(!surface_probe_locations(f.g,m,x2,x3))return false;
+    SurfaceTraction a,b;
+    if(!surface_interpolate_traction(f,x2,m.n,a)||!surface_interpolate_traction(f,x3,m.n,b))return false;
+    traction_add(t,a,3);traction_add(t,b,-2);return true;
 }

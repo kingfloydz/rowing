@@ -16,9 +16,11 @@ python3 tools/run.py --prepare-only
 python3 tools/run.py --end-s 0.01 --output /your/storage/smoke
 # 完整三周期11.6秒；日志写入输出目录solver.log
 python3 tools/run.py --output /your/storage/policy7400_full
+# 从最新完整检查点恢复到新的输出目录
+python3 tools/run.py --restart /your/storage/policy7400_full/output/checkpoint_latest --output /your/storage/policy7400_resumed
 ```
 
-运行脚本只要求八张本地GPU，不限制型号；当前实现是单进程控制单节点八卡，不能用八个单卡节点替代。拒绝覆盖已有运行目录。输入与二进制哈希记录可追溯。检查点每50000步（2.5秒）输出一次。
+运行脚本只要求八张本地GPU，不限制型号；当前实现是单进程控制单节点八卡，不能用八个单卡节点替代。拒绝覆盖已有运行目录。输入与二进制哈希记录可追溯。检查点每10000步（0.5秒）保存到`output/checkpoint_latest`。先写好并同步新一份，再原子切换CURRENT指针、删除旧一份；稳定状态仅保留最新续算点，写入过程中短暂需要两份空间。保存耗时见checkpoint_metrics.json。
 
 启智分布式训练：申请单实例八卡；工作空间选择分布式训练空间、项目选择熊晓滨项目组，使用个人镜像 `docker.sii.shaipower.online/inspire-studio/1:5`。预先将仓库和编译产物置于共享目录，执行上面的完整运行命令。不要将账号、Cookie或密码写入仓库。
 
@@ -34,6 +36,8 @@ python3 tools/run.py --output /your/storage/policy7400_full
 ## 算法及验证范围
 
 流体推进沿用clean r9版本：SSPRK(4,3)、单元LF-WENO相场对流、共享质量/动量输运、守恒有界修正、跨卡halo等现有模块。此工程是Lu 2025基础上的研究实现，不是作者代码或逐公式无差别复现。原代码来源哈希见baseline_manifest.json；表面受力推导及差别见docs/ALGORITHM.md。
+
+跨卡受力采样按探针实际坐标归属唯一核心GPU，保留原IB点的全局局部格宽、2h/3h坐标与3T2−2T3外推。仅复制全局轴坐标元数据；不增加全场halo。各卡累加探针加权贡献，力矩力臂仍在原IB点。
 
 载荷输出采用固体外侧Cauchy应力积分（压力、黏性/SGS及界面应力），世界坐标系，力矩绕各刚体原点；旧最后RK阶段的速度修正反力仅保留为诊断。表面应力探针误差仍需实验/网格收敛验证。
 
@@ -67,4 +71,4 @@ python3 cases/policy7400/build_markers.py
 
 `export_trajectory.py`会重新导出轨迹与measured_envelope.json；它不会自动把新策略包络应用到冻结网格。任何输入改动都需重新检查覆盖、IB间距、守恒和稳定性，并重新生成inputs.sha256.json。不要绕过哈希检查来混用不同策略输入。
 
-目录：src为完整求解器；tests为诊断；tools为运行/表面读取/IB几何工具；cases为可运行冻结算例；docs为理论及实测记录。未包含远端结果、检查点、编译产物、策略权重、论文PDF或登录凭据。
+目录：src为完整求解器；tests为诊断；tools为运行/表面读取/IB几何工具；cases为可运行冻结算例；docs为理论及实测记录。未包含远端结果、检查点、编译产物、策略权重、论文PDF或登录凭据。当前修复验证见docs/PROBE_CHECKPOINT_FIX.md。

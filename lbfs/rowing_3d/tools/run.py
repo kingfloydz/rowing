@@ -22,7 +22,8 @@ def main():
     ap.add_argument('--end-s',type=float)
     ap.add_argument('--prepare-only',action='store_true')
     ap.add_argument('--x-cuts',default='303,625,952')
-    ap.add_argument('--checkpoint-every',type=int,default=50000)
+    ap.add_argument('--checkpoint-every',type=int,default=10000)
+    ap.add_argument('--restart',type=Path,help='checkpoint_latest directory, or a legacy rank-file directory')
     a=ap.parse_args();case=a.case.resolve();prepare(case)
     if a.prepare_only:return
     solver=a.solver.resolve();assert solver.is_file(),solver
@@ -38,7 +39,8 @@ def main():
     output=a.output.resolve();output.mkdir(parents=True,exist_ok=False)
     config=output/'case.cfg';config.write_text('\n'.join(k+' '+v for k,v in cfg.items())+'\n')
     env={k:v for k,v in os.environ.items() if not k.startswith('LU_')}
-    env.update(LU_COLUMN_PHASE_REPAIR='1',LU_PENCIL_X_CUTS=a.x_cuts,LU_CHECKPOINT_EVERY=str(a.checkpoint_every))
+    env.update(LU_COLUMN_PHASE_REPAIR='1',LU_PENCIL_X_CUTS=a.x_cuts,LU_CHECKPOINT_EVERY=str(a.checkpoint_every),LU_CHECKPOINT_FROM=str(a.checkpoint_every))
+    if a.restart is not None:env['LU_RESTART_CHECKPOINT']=str(a.restart.resolve())
     cmd=[str(solver),str(config),'--multi-gpu','8','--decomp','xy','--output',str(output/'output')]
     (output/'launch.json').write_text(json.dumps(dict(command=cmd,gpu_models=names,solver_sha256=hashlib.sha256(solver.read_bytes()).hexdigest(),environment={k:v for k,v in env.items() if k.startswith('LU_')}),indent=2))
     with (output/'solver.log').open('w') as log:

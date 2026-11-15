@@ -115,6 +115,18 @@ public:
     bool accumulate_policy_force=true;
     Buffer<double> surface_force_sums{73}; // total,p,viscous,capillary: 18 each; invalid probes
     std::vector<double> surface_force_world;
+    // Only global axis coordinates are replicated, no global fluid arrays.
+    std::unique_ptr<Buffer<Real>> surface_global_axes;
+    std::vector<Real> surface_axis_host;
+    Grid surface_global_grid{0,0,0,0};
+    bool surface_route_probes=false;
+    void configure_surface_probe_grid(const std::array<std::vector<Real>,3>& axes){
+        std::vector<Real> packed;surface_global_grid={int(axes[0].size())-1,int(axes[1].size())-1,int(axes[2].size())-1,g.h};
+        for(int a=0;a<3;++a){surface_global_grid.face_offset[a]=int(packed.size());packed.insert(packed.end(),axes[a].begin(),axes[a].end());}
+        surface_axis_host=packed;surface_global_axes.reset(new Buffer<Real>(packed.size()));surface_global_axes->upload(packed);
+        surface_global_grid.metric_host=surface_axis_host.data();surface_global_grid.metric_device=surface_global_axes->data();
+        surface_route_probes=true;surface_force_time=-1;
+    }
     double surface_force_time=-1;
     double policy_sample_time=0,last_ib_force_time=0;
     // Replicated markers are evaluated on each slab. Only core cells own force
@@ -1168,11 +1180,27 @@ public:
         int i0=ib_partitioned?core_i0:0,i1=ib_partitioned?core_i1:g.nx;
         int j0=ib_partitioned?core_j0:0,j1=ib_partitioned?core_j1:g.ny;
         int k0=ib_partitioned?core_k0:0,k1=ib_partitioned?core_k1:g.nz;
+        bool routed=surface_route_probes;Grid global=surface_global_grid;
         parallel_for(marker_count,[=] HD(size_t l){
             Marker m=policy_world_marker(ms[l],pp,true,0);
-            if(m.x.x<gr.face(0,i0)||m.x.x>=gr.face(0,i1)||m.x.y<gr.face(1,j0)||m.x.y>=gr.face(1,j1)||m.x.z<gr.face(2,k0)||m.x.z>=gr.face(2,k1))return;
-            SurfaceTraction t;
-            if(!surface_exterior_traction(f,m,t)){atomic_plus(out+72,1.);return;}
+            int lo[3]={i0,j0,k0},hi[3]={i1,j1,k1};SurfaceTraction t;
+            if(routed){
+                Vec probes[2];bool any=false;
+                if(!surface_probe_locations(global,m,probes[0],probes[1])){atomic_plus(out+72,1.);return;}
+                int glo[3]={0,0,0},ghi[3]={global.nx,global.ny,global.nz};
+                for(int probe=0;probe<2;++probe){
+                    if(!surface_inside_box(global,probes[probe],glo,ghi)){atomic_plus(out+72,1.);return;}
+                    if(!surface_inside_box(gr,probes[probe],lo,hi))continue;
+                    any=true;
+                    SurfaceTraction value;
+                    if(!surface_interpolate_traction(f,probes[probe],m.n,value)){atomic_plus(out+72,1.);return;}
+                    traction_add(t,value,probe==0?Real(3):Real(-2));
+                }
+                if(!any)return;
+            }else{
+                if(!surface_inside_box(gr,m.x,lo,hi))return;
+                if(!surface_exterior_traction(f,m,t)){atomic_plus(out+72,1.);return;}
+            }
             Vec force[4]={{t.pressure.x+t.viscous.x+t.capillary.x,t.pressure.y+t.viscous.y+t.capillary.y,t.pressure.z+t.viscous.z+t.capillary.z},t.pressure,t.viscous,t.capillary};
             Vec r{m.x.x-pp[m.part].position.x,m.x.y-pp[m.part].position.y,m.x.z-pp[m.part].position.z};
             for(int c=0;c<4;++c){double fx=double(force[c].x)*m.area,fy=double(force[c].y)*m.area,fz=double(force[c].z)*m.area;int o=c*18+m.part*6;

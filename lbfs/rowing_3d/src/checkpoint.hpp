@@ -1,10 +1,12 @@
 #pragma once
+#include "checkpoint_store.hpp"
 // Diagnostic restart at a completed RK step. Same Real type, axes, rank
 // decomposition and prescribed-motion inputs are required. Not a remesher.
 inline void multi_gpu_checkpoint(const std::string& folder,const std::vector<MultiGpuRank>& ranks,bool reading) {
-    if(!reading)make_directory(folder);
+    std::string resolved=reading?checkpoint_resolve(folder):folder;
+    if(!reading)make_directory(resolved);
     for(const auto& r:ranks){cuda_check(cudaSetDevice(r.device));auto& s=*r.solver;
-        std::string path=folder+"/rank_"+std::to_string(r.device)+".checkpoint";
+        std::string path=resolved+"/rank_"+std::to_string(r.device)+".checkpoint";
         std::vector<uint64_t> shape={0x4c55435030303031ull,sizeof(Real),uint64_t(ranks.size()),uint64_t(s.g.nx),uint64_t(s.g.ny),uint64_t(s.g.nz),uint64_t(r.core0),uint64_t(r.core1),uint64_t(r.halo0)};
         bool pencil=s.core_i0>0||s.core_j0>0||(s.core_i1>=0&&s.core_i1<s.g.nx)||(s.core_j1>=0&&s.core_j1<s.g.ny);
         if(pencil){shape[0]=0x4c55435030303032ull;
