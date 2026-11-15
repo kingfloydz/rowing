@@ -1,0 +1,218 @@
+{
+  "markers": 486521,
+  "sha256": "68aee7026ece6da5a5e975cd5fd9be738a33ec9b2fc7bc67259cc342e353f458",
+  "model_sha256": "540859916ecfe531ffd86ccc1b51ae619173f5a6b1c9fb37f5e734e7d6f06abc",
+  "surfaces": [
+    {
+      "name": "rowing/shell_white_visual",
+      "part": 0,
+      "spacing_m": 0.006,
+      "kept": 229940,
+      "removed_high": 0,
+      "removed_inner_triangles": 105,
+      "area_m2": 7.763378304616289,
+      "orientation": {
+        "flipped_triangles": [],
+        "flipped_area_m2": 0.0,
+        "closed": false,
+        "boundary_edges": 2,
+        "nonmanifold_edges": 1,
+        "signed_volume_m3": 0.2428829975580402
+      }
+    },
+    {
+      "name": "rowing/deck_blue_visual",
+      "part": 0,
+      "spacing_m": 0.006,
+      "kept": 81038,
+      "removed_high": 0,
+      "removed_inner_triangles": 219,
+      "area_m2": 2.702257521590948,
+      "orientation": {
+        "flipped_triangles": [],
+        "flipped_area_m2": 0.0,
+        "closed": true,
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "signed_volume_m3": 0.03532650618764988
+      }
+    },
+    {
+      "name": "rowing/rigger_visual",
+      "part": 0,
+      "spacing_m": 0.006,
+      "kept": 21377,
+      "removed_high": 0,
+      "removed_inner_triangles": 0,
+      "area_m2": 0.712520804141707,
+      "orientation": {
+        "flipped_triangles": [],
+        "flipped_area_m2": 0.0,
+        "closed": false,
+        "boundary_edges": 80,
+        "nonmanifold_edges": 4,
+        "signed_volume_m3": 0.024651168722795325
+      }
+    },
+    {
+      "name": "rowing/cockpit_visual",
+      "part": 0,
+      "kept": 0,
+      "reason": "boat interior/rails omitted"
+    },
+    {
+      "name": "rowing/rails_visual",
+      "part": 0,
+      "kept": 0,
+      "reason": "boat interior/rails omitted"
+    },
+    {
+      "name": "rowing/fin_visual",
+      "part": 0,
+      "spacing_m": 0.006,
+      "kept": 3824,
+      "removed_high": 0,
+      "removed_inner_triangles": 0,
+      "area_m2": 0.06744702021597208,
+      "orientation": {
+        "flipped_triangles": [],
+        "flipped_area_m2": 0.0,
+        "closed": true,
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "signed_volume_m3": 9.01965022023361e-05
+      }
+    },
+    {
+      "name": "rowing/port_shaft_visual",
+      "part": 1,
+      "spacing_m": 0.0035,
+      "kept": 23911,
+      "removed_high": 12623,
+      "removed_inner_triangles": 0,
+      "area_m2": 0.2611420003115379,
+      "orientation": {
+        "flipped_triangles": [],
+        "flipped_area_m2": 0.0,
+        "closed": false,
+        "boundary_edges": 0,
+        "nonmanifold_edges": 114,
+        "signed_volume_m3": 0.004564965643098262
+      }
+    },
+    {
+      "name": "rowing/port_grip_visual",
+      "part": 1,
+      "spacing_m": 0.006,
+      "kept": 0,
+      "removed_high": 2018,
+      "removed_inner_triangles": 0,
+      "area_m2": 0.0,
+      "orientation": {
+        "flipped_triangles": [],
+        "flipped_area_m2": 0.0,
+        "closed": true,
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "signed_volume_m3": 0.00020930519989149527
+      }
+    },
+    {
+      "name": "rowing/port_blade_visual",
+      "part": 1,
+      "spacing_m": 0.00175,
+      "kept": 51702,
+      "removed_high": 0,
+      "removed_inner_triangles": 0,
+      "area_m2": 0.15309755294740238,
+      "orientation": {
+        "flipped_triangles": [],
+        "flipped_area_m2": 0.0,
+        "closed": true,
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "signed_volume_m3": 0.0001892034437182659
+      }
+    },
+    {
+      "name": "rowing/starboard_shaft_visual",
+      "part": 2,
+      "spacing_m": 0.0035,
+      "kept": 23027,
+      "removed_high": 13507,
+      "removed_inner_triangles": 0,
+      "area_m2": 0.25103632989723185,
+      "orientation": {
+        "flipped_triangles": [],
+        "flipped_area_m2": 0.0,
+        "closed": false,
+        "boundary_edges": 0,
+        "nonmanifold_edges": 114,
+        "signed_volume_m3": 0.004564965643098274
+      }
+    },
+    {
+      "name": "rowing/starboard_grip_visual",
+      "part": 2,
+      "spacing_m": 0.006,
+      "kept": 0,
+      "removed_high": 2018,
+      "removed_inner_triangles": 0,
+      "area_m2": 0.0,
+      "orientation": {
+        "flipped_triangles": [],
+        "flipped_area_m2": 0.0,
+        "closed": true,
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "signed_volume_m3": 0.0002093051998914957
+      }
+    },
+    {
+      "name": "rowing/starboard_blade_visual",
+      "part": 2,
+      "spacing_m": 0.00175,
+      "kept": 51702,
+      "removed_high": 0,
+      "removed_inner_triangles": 0,
+      "area_m2": 0.15309755294740252,
+      "orientation": {
+        "flipped_triangles": [],
+        "flipped_area_m2": 0.0,
+        "closed": true,
+        "boundary_edges": 0,
+        "nonmanifold_edges": 0,
+        "signed_volume_m3": 0.00018920344371826136
+      }
+    }
+  ],
+  "hull_ray_audit": {
+    "rays": 14370,
+    "hits": 13022,
+    "changed_first_hits": 0,
+    "max_first_hit_difference_m": 0,
+    "note": "Dense independent ray audit; not a proof over every exterior ray.",
+    "restored_exterior_triangles": [
+      1189,
+      1190,
+      1191,
+      1193,
+      1195,
+      1196,
+      1197,
+      1200,
+      1201,
+      1202,
+      1203,
+      1204,
+      1205,
+      1206,
+      1207,
+      1208
+    ],
+    "initial_candidate_changed_hits": 509,
+    "initial_candidate_max_difference_m": 0.03538676270419128
+  },
+  "selection": "new CAD + old audited selection rules; retain blades completely; exclude hidden interior, cockpit/rails, provably high handles; fixed 0.4m high omission",
+  "limitation": "Initial-water clearance does not prove maximum wave height. CAD exterior ray classification is not watertight Boolean union."
+}

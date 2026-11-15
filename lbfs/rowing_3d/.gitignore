@@ -1,0 +1,8 @@
+build*/
+__pycache__/
+*.pyc
+runs/
+output/
+cases/*/source_snapshot/
+cases/*/policy_markers_exterior.csv
+cases/*/replay/model.mjb

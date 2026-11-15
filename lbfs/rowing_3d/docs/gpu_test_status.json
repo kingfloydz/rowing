@@ -1,0 +1,365 @@
+{
+  "build_results.json": [
+    {
+      "name": "compile_gpu_test",
+      "returncode": 0,
+      "wall_s": 147.55831933021545
+    },
+    {
+      "name": "surface_force_gpu_0",
+      "returncode": 0,
+      "wall_s": 0.7315192222595215
+    },
+    {
+      "name": "surface_force_gpu_1",
+      "returncode": 0,
+      "wall_s": 0.7027876377105713
+    },
+    {
+      "name": "surface_force_gpu_2",
+      "returncode": 0,
+      "wall_s": 0.6775267124176025
+    },
+    {
+      "name": "surface_force_gpu_3",
+      "returncode": 0,
+      "wall_s": 0.676215410232544
+    },
+    {
+      "name": "surface_force_gpu_4",
+      "returncode": 0,
+      "wall_s": 0.6379084587097168
+    },
+    {
+      "name": "surface_force_gpu_5",
+      "returncode": 0,
+      "wall_s": 0.6632959842681885
+    },
+    {
+      "name": "surface_force_gpu_6",
+      "returncode": 0,
+      "wall_s": 0.6848726272583008
+    },
+    {
+      "name": "surface_force_gpu_7",
+      "returncode": 0,
+      "wall_s": 0.6430706977844238
+    },
+    {
+      "name": "compile_interpolation",
+      "returncode": 0,
+      "wall_s": 0.6449532508850098
+    },
+    {
+      "name": "interpolation",
+      "returncode": 0,
+      "wall_s": 0.11893081665039062
+    },
+    {
+      "name": "compile_solver",
+      "returncode": 0,
+      "wall_s": 193.61011791229248
+    }
+  ],
+  "build_complete.json": {
+    "status": "passed",
+    "solver_sha256": "1b0c7595f246c61f13b61ded931d398763110c0cdd06527527992276ffa8d284"
+  },
+  "active_test.json": {
+    "case": "force500hz",
+    "started_unix": 1794558368.9538136,
+    "command": [
+      "/inspire/qb-ilm/project/xiongxiaobin/ky26212/policy7400_mesh_r3_20261113/solver",
+      "/inspire/qb-ilm/project/xiongxiaobin/ky26212/policy7400_mesh_r3_20261113/force500hz/case.cfg",
+      "--multi-gpu",
+      "8",
+      "--decomp",
+      "xy",
+      "--output",
+      "/inspire/qb-ilm/project/xiongxiaobin/ky26212/policy7400_mesh_r3_20261113/force500hz/output"
+    ]
+  },
+  "full_results.json": [
+    {
+      "case": "force100hz",
+      "returncode": 0,
+      "wall_s": 217.62286639213562,
+      "dt_s": 5e-05,
+      "end_s": 0.01,
+      "force_hz": 100.0
+    },
+    {
+      "case": "force500hz",
+      "returncode": 0,
+      "wall_s": 216.27220034599304,
+      "dt_s": 5e-05,
+      "end_s": 0.01,
+      "force_hz": 500.0
+    }
+  ],
+  "force100hz": {
+    "tail": [
+      "rank=2 step=180 phi=[-0,1] umax=0.00423358",
+      "rank=3 step=180 phi=[0,1] umax=0.000960775",
+      "rank=4 step=180 phi=[0,1] umax=0.000857907",
+      "rank=5 step=180 phi=[0,1] umax=0.00210586",
+      "rank=6 step=180 phi=[0,1] umax=0.00231995",
+      "rank=7 step=180 phi=[0,1] umax=0.00138868",
+      "rank=0 step=200 phi=[0,1] umax=0.000985405",
+      "rank=1 step=200 phi=[0,1] umax=0.0024834",
+      "rank=2 step=200 phi=[0,1] umax=0.00469771",
+      "rank=3 step=200 phi=[0,1] umax=0.00109846",
+      "rank=4 step=200 phi=[0,1] umax=0.000994405",
+      "rank=5 step=200 phi=[0,1] umax=0.00232023",
+      "rank=6 step=200 phi=[0,1] umax=0.00256648",
+      "rank=7 step=200 phi=[0,1] umax=0.00153702"
+    ],
+    "halo_metrics.json": {
+      "decomposition": "4x2x1",
+      "exchange_seconds": 3.36976,
+      "wall_seconds": 211.254
+    },
+    "column_repair_metrics.json": {
+      "seconds": 5.28595,
+      "corrected_columns": 470667437,
+      "accumulated_abs_phase_volume_roundoff_lattice": 0.095867
+    },
+    "multi_gpu_metrics.json": {
+      "case": "force100hz",
+      "devices": 8,
+      "steps": 200,
+      "wall_seconds": 211.254,
+      "compute_seconds_max_rank": 198.884,
+      "field_output_seconds": 0,
+      "force_output_seconds": 0.0221373,
+      "output_seconds_total": 0.0221377,
+      "output_wall_fraction": 0.000104792,
+      "halo_cells": 12,
+      "core_cells_min": 75749740,
+      "core_cells_max": 76602681,
+      "resident_cells_min": 80659800,
+      "resident_cells_max": 83277222,
+      "field_output": "one_global_uint16_file_per_frame",
+      "force_output": "one_combined_csv_per_frame_plus_rank_diagnostics"
+    },
+    "force_files": 1,
+    "last_force": [
+      {
+        "kind": "hull",
+        "id": "0",
+        "x_m": "0.0001077341075870208",
+        "y_m": "2.912067066063173e-05",
+        "z_m": "-0.004380099941045046",
+        "fx_N": "-11.75551112225311",
+        "fy_N": "-19.52615624747275",
+        "fz_N": "977.5088765184803",
+        "mx_Nm": "-1.473318799903045",
+        "my_Nm": "-9.66063920748355",
+        "mz_Nm": "-11.35570787611575"
+      },
+      {
+        "kind": "port_oar",
+        "id": "1",
+        "x_m": "-0.0009097834487050737",
+        "y_m": "0.7900505964529972",
+        "z_m": "0.3080616809811846",
+        "fx_N": "-0.1034157700099407",
+        "fy_N": "-0.003855048235276229",
+        "fz_N": "0.2710110125426108",
+        "mx_Nm": "0.04540220322906202",
+        "my_Nm": "-0.02897953291664124",
+        "mz_Nm": "0.08100168180636433"
+      },
+      {
+        "kind": "starboard_oar",
+        "id": "2",
+        "x_m": "-0.0009310933735452885",
+        "y_m": "-0.789948712483599",
+        "z_m": "0.3181702568336737",
+        "fx_N": "-0.01371892991500702",
+        "fy_N": "0.07003392870166295",
+        "fz_N": "0.344323688544996",
+        "mx_Nm": "-0.03596312156052626",
+        "my_Nm": "-0.0600422183964473",
+        "mz_Nm": "0.1741609068536484"
+      }
+    ]
+  },
+  "force500hz": {
+    "tail": [
+      "rank=2 step=180 phi=[0,1] umax=0.00423358",
+      "rank=3 step=180 phi=[0,1] umax=0.000960773",
+      "rank=4 step=180 phi=[0,1] umax=0.000857908",
+      "rank=5 step=180 phi=[0,1] umax=0.00210586",
+      "rank=6 step=180 phi=[0,1] umax=0.00231995",
+      "rank=7 step=180 phi=[0,1] umax=0.00138868",
+      "rank=0 step=200 phi=[0,1] umax=0.000985406",
+      "rank=1 step=200 phi=[0,1] umax=0.0024834",
+      "rank=2 step=200 phi=[0,1] umax=0.00469771",
+      "rank=3 step=200 phi=[0,1] umax=0.00109846",
+      "rank=4 step=200 phi=[0,1] umax=0.000994405",
+      "rank=5 step=200 phi=[0,1] umax=0.00232023",
+      "rank=6 step=200 phi=[0,1] umax=0.00256647",
+      "rank=7 step=200 phi=[0,1] umax=0.00153702"
+    ],
+    "halo_metrics.json": {
+      "decomposition": "4x2x1",
+      "exchange_seconds": 3.37692,
+      "wall_seconds": 210.697
+    },
+    "column_repair_metrics.json": {
+      "seconds": 5.28607,
+      "corrected_columns": 470653700,
+      "accumulated_abs_phase_volume_roundoff_lattice": 0.0958688
+    },
+    "multi_gpu_metrics.json": {
+      "case": "force500hz",
+      "devices": 8,
+      "steps": 200,
+      "wall_seconds": 210.697,
+      "compute_seconds_max_rank": 198.222,
+      "field_output_seconds": 0,
+      "force_output_seconds": 0.108408,
+      "output_seconds_total": 0.108412,
+      "output_wall_fraction": 0.000514541,
+      "halo_cells": 12,
+      "core_cells_min": 75749740,
+      "core_cells_max": 76602681,
+      "resident_cells_min": 80659800,
+      "resident_cells_max": 83277222,
+      "field_output": "one_global_uint16_file_per_frame",
+      "force_output": "one_combined_csv_per_frame_plus_rank_diagnostics"
+    },
+    "force_files": 5,
+    "last_force": [
+      {
+        "kind": "hull",
+        "id": "0",
+        "x_m": "0.0001077341075870208",
+        "y_m": "2.912067066063173e-05",
+        "z_m": "-0.004380099941045046",
+        "fx_N": "-11.75551085541584",
+        "fy_N": "-19.52615810888852",
+        "fz_N": "977.5088722528517",
+        "mx_Nm": "-1.473319110565923",
+        "my_Nm": "-9.660643695602047",
+        "mz_Nm": "-11.35570458279756"
+      },
+      {
+        "kind": "port_oar",
+        "id": "1",
+        "x_m": "-0.0009097834487050737",
+        "y_m": "0.7900505964529972",
+        "z_m": "0.3080616809811846",
+        "fx_N": "-0.103415765551977",
+        "fy_N": "-0.003855063899689926",
+        "fz_N": "0.2710109856699796",
+        "mx_Nm": "0.04540218234747378",
+        "my_Nm": "-0.02897951081610671",
+        "mz_Nm": "0.08100170176562731"
+      },
+      {
+        "kind": "starboard_oar",
+        "id": "2",
+        "x_m": "-0.0009310933735452885",
+        "y_m": "-0.789948712483599",
+        "z_m": "0.3181702568336737",
+        "fx_N": "-0.01371896201144332",
+        "fy_N": "0.07003389648049557",
+        "fz_N": "0.3443236473973588",
+        "mx_Nm": "-0.03596310696027769",
+        "my_Nm": "-0.06004219930339249",
+        "mz_Nm": "0.17416086610704"
+      }
+    ]
+  },
+  "balance_x_303_625_952": {
+    "tail": [
+      "rank=2 step=180 phi=[0,1] umax=0.00423358",
+      "rank=3 step=180 phi=[0,1] umax=0.000960775",
+      "rank=4 step=180 phi=[0,1] umax=0.000857907",
+      "rank=5 step=180 phi=[0,1] umax=0.00210586",
+      "rank=6 step=180 phi=[0,1] umax=0.00231995",
+      "rank=7 step=180 phi=[0,1] umax=0.000975362",
+      "rank=0 step=200 phi=[0,1] umax=0.000985408",
+      "rank=1 step=200 phi=[0,1] umax=0.0024834",
+      "rank=2 step=200 phi=[0,1] umax=0.00469771",
+      "rank=3 step=200 phi=[0,1] umax=0.00109846",
+      "rank=4 step=200 phi=[0,1] umax=0.000994404",
+      "rank=5 step=200 phi=[0,1] umax=0.00232023",
+      "rank=6 step=200 phi=[0,1] umax=0.00256648",
+      "rank=7 step=200 phi=[0,1] umax=0.00111884"
+    ],
+    "halo_metrics.json": {
+      "decomposition": "4x2x1",
+      "exchange_seconds": 3.3869,
+      "wall_seconds": 202.608
+    },
+    "column_repair_metrics.json": {
+      "seconds": 5.39651,
+      "corrected_columns": 470646642,
+      "accumulated_abs_phase_volume_roundoff_lattice": 0.0958681
+    },
+    "multi_gpu_metrics.json": {
+      "case": "force500hz",
+      "devices": 8,
+      "steps": 200,
+      "wall_seconds": 202.608,
+      "compute_seconds_max_rank": 189.832,
+      "field_output_seconds": 0,
+      "force_output_seconds": 0.107319,
+      "output_seconds_total": 0.107319,
+      "output_wall_fraction": 0.000529689,
+      "halo_cells": 12,
+      "core_cells_min": 71595722,
+      "core_cells_max": 80028999,
+      "resident_cells_min": 75929750,
+      "resident_cells_max": 87515883,
+      "field_output": "one_global_uint16_file_per_frame",
+      "force_output": "one_combined_csv_per_frame_plus_rank_diagnostics"
+    },
+    "force_files": 5,
+    "last_force": [
+      {
+        "kind": "hull",
+        "id": "0",
+        "x_m": "0.0001077341075870208",
+        "y_m": "2.912067066063173e-05",
+        "z_m": "-0.004380099941045046",
+        "fx_N": "-11.7555114389545",
+        "fy_N": "-19.52615888405949",
+        "fz_N": "977.5088787258694",
+        "mx_Nm": "-1.473319119676765",
+        "my_Nm": "-9.660637610829871",
+        "mz_Nm": "-11.35570550162734"
+      },
+      {
+        "kind": "port_oar",
+        "id": "1",
+        "x_m": "-0.0009097834487050737",
+        "y_m": "0.7900505964529972",
+        "z_m": "0.3080616809811846",
+        "fx_N": "-0.1034157919302124",
+        "fy_N": "-0.003855026995766619",
+        "fz_N": "0.2710110105594969",
+        "mx_Nm": "0.04540220412004646",
+        "my_Nm": "-0.02897952905391241",
+        "mz_Nm": "0.08100171960745027"
+      },
+      {
+        "kind": "starboard_oar",
+        "id": "2",
+        "x_m": "-0.0009310933735452885",
+        "y_m": "-0.789948712483599",
+        "z_m": "0.3181702568336737",
+        "fx_N": "-0.01371893993166125",
+        "fy_N": "0.07003391639026937",
+        "fz_N": "0.3443236779203316",
+        "mx_Nm": "-0.03596311712275962",
+        "my_Nm": "-0.06004220816899473",
+        "mz_Nm": "0.1741608674313714"
+      }
+    ]
+  },
+  "gpu": "0, 0, 1\n1, 0, 1\n2, 0, 1\n3, 0, 1\n4, 0, 1\n5, 0, 1\n6, 0, 1\n7, 0, 1\n"
+}

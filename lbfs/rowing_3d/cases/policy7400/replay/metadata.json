@@ -1,0 +1,24 @@
+{
+  "checkpoint": "model_7400.pt (external, SHA256 recorded)",
+  "sha256": "597e69a9850ddb60d8f13d664c96d3651314b7f85ab29f65471027e96845c248",
+  "source_commit": "82e68ab63d02336b43daeb59cd407e2671c132e0",
+  "device": "cpu",
+  "seed": 42,
+  "step_dt": 0.002,
+  "control_dt": 0.02,
+  "simulated_seconds": 11.600000000000001,
+  "terminated": false,
+  "samples": 5800,
+  "water_level_m": -0.12027640640735626,
+  "force_profile": {
+    "schema_version": 1,
+    "status": "engineering_prior",
+    "blade_cd_max": 2.0,
+    "blade_cl_max": 0.9,
+    "blade_skin_cd": 0.01,
+    "candidate_disabled_reason": "Source audit: velocity-only last-stage IBM reaction omits phase-remap momentum and prescribed-body interior correction."
+  },
+  "settings_available": false,
+  "note": "Pinned new repository; deterministic play.py wrapper; no auto-reset; read-only qpos/qvel capture after each 2ms physical step. Missing training settings means full training provenance is not certified.",
+  "wall_seconds": 69.6473655999871
+}

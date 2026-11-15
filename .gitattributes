@@ -1,0 +1,3 @@
+# Frozen solver/input hashes are byte-based; preserve original line endings.
+lbfs/rowing_3d/cases/** -text whitespace=cr-at-eol
+lbfs/rowing_3d/src/** -text whitespace=cr-at-eol

@@ -1,0 +1,23 @@
+{
+  "frequency_hz": 500,
+  "interval_s": 0.002,
+  "steps_between_outputs": 40,
+  "measured_extra_output_fraction": 0.0004083742793035872,
+  "wall_change_fraction": -0.0026366364660550534,
+  "end_load_differences": {
+    "hull": {
+      "max_abs_force_difference_N": 4.2656286041165e-06,
+      "max_abs_moment_difference_Nm": 4.488118497292248e-06
+    },
+    "port_oar": {
+      "max_abs_force_difference_N": 2.687263117584493e-08,
+      "max_abs_moment_difference_Nm": 2.210053453091665e-08
+    },
+    "starboard_oar": {
+      "max_abs_force_difference_N": 4.114763718643388e-08,
+      "max_abs_moment_difference_Nm": 4.074660839292754e-08
+    }
+  },
+  "test_end_s": 0.01,
+  "long_run_stability_validated": false
+}

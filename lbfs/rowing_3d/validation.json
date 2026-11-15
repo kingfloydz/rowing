@@ -1,0 +1,87 @@
+{
+  "status": "gpu_unit_tests_and_200_step_full_mesh_smoke_passed",
+  "source_sha256": {
+    "ale_motion.hpp": "2a0d77b0bf5a4461b12bc6b0728a57ae03956781161739af815dc996e7ec4be3",
+    "backend.hpp": "878ce11086519bd5cb73e5cda876cc727a468c43306a701559049e82d9087dcc",
+    "checkpoint.hpp": "5617551e54140bdf86f7e10023d8eed746bfc2a65d09e8d5a6b54bcb5109024e",
+    "column_phase_repair.hpp": "88ea84a463dae96bb1f2cc4b82007e58833317d9c53741e4ca8dc8de86588f2d",
+    "driver.hpp": "1c4411f3c91af9ce1f97552cc002d69f0f8834a90d30feb3acb4d5d8870cf9e2",
+    "ib_support.hpp": "3489cd871082ef686799d3f6388cef00330f034ded1232e3f51e82958606f2c8",
+    "kernel_timing.hpp": "a894c99f31f35e6d203faab3571cf5488346f2b0229ce3a8ef6989f1b1fbbf38",
+    "main.cpp": "9e2e59707a607ef0a979764f7d25d812d312c3c296b5ced04ed26ed81e5cc82a",
+    "main.cu": "9e2e59707a607ef0a979764f7d25d812d312c3c296b5ced04ed26ed81e5cc82a",
+    "metric_grid.hpp": "b647b130b192ceb56d0c5a74cd0297d6c546753f491ce54eb85d6cdd67ded305",
+    "metric_mesh_host.hpp": "c6d1fdccb423ba4d711f6a5cac2cfc81d9f956956c6f6cefed227de58fa2b2b3",
+    "metric_operators.hpp": "fc29e4edf9eaa36732ad96322056e12206ccd4853c51e5d09a9e9bc3edc477cc",
+    "metric_stress_vector.hpp": "546ae636b235bffd89de6dfff10a10af1a630af53d2d0b3d3ba3cc26c72f7979",
+    "multi_gpu_driver.hpp": "be6f5c4dbfae8ad35844380adeadf8b04d80c3c8b6d0f02629eac290d2893884",
+    "multi_gpu_phase_repair.hpp": "32e1eaef2ceac3baf83e23e42d208efb1a0f217144a418bb94c457ad4cb443a3",
+    "numerics.hpp": "c7e2ff1f764e7dd5893691c25fedae7f1e5925e1e6e55f81545838c2be9506ff",
+    "parallel_force_reduce.hpp": "a9e943e0fdcdfba336a1f6d772dd577205576affd4871a3c1efe651cedd9235c",
+    "pencil_halo.hpp": "57638a0d11fbe0c236bd7824fb936d9663194afd28ea5293a2430b6cfa485b09",
+    "phase_audit.hpp": "5929dc79c217042b50b1f2313ac4fe37db19d2415f27b2fce2766dc30b0a365e",
+    "rk_scheme.hpp": "71704774c0ebcfeb0c54c022c904cc2e4efb79cb05f2c9ef1fc2245b5d213432",
+    "slab_partition.hpp": "57a48c0d7aa3c9d59fb2924060981566a51fea3703b673b32aa356459c9faf7f",
+    "solver.hpp": "96e411bde99b4f0ff29a9e2097a6f8531376ded46791957d23097b1660c8f496",
+    "step_time.hpp": "5d937b1405c5bcd0f0809e9ec43e58da8427b99b0f57ff5596852a67e46f0f72",
+    "surface.hpp": "0abb6b034e4cca110fcd7fcc93c10eb8e9c5617d38cbc6128eb1cc4ec6f10f8d",
+    "surface_force.hpp": "e61119ef615cbce97252f591521908a4c61d613cfbac20b32689c46e46fc0b0a",
+    "tensor_poisson_gpu.hpp": "8bd8bc70ffd4dd60648513e4636cd33b0c56262c25f42f4041547c76211e4149"
+  },
+  "changed_from_r9": [
+    "multi_gpu_driver.hpp",
+    "solver.hpp",
+    "surface_force.hpp"
+  ],
+  "cpu_ctest": "4/4 passed",
+  "gpu_test": "8/8 H100 surface-force tests passed; -O3 sm90 solver built",
+  "motion_test": "actual 11.6s CSV at 25us substeps and knots passed",
+  "force_method": "one-sided exterior stress; requires CFD offset/convergence validation",
+  "full_mesh_test": {
+    "cells": 608918295,
+    "dt_s": 5e-05,
+    "steps": 200,
+    "runs": [
+      {
+        "case": "force100hz",
+        "returncode": 0,
+        "wall_s": 217.62286639213562,
+        "dt_s": 5e-05,
+        "end_s": 0.01,
+        "force_hz": 100.0
+      },
+      {
+        "case": "force500hz",
+        "returncode": 0,
+        "wall_s": 216.27220034599304,
+        "dt_s": 5e-05,
+        "end_s": 0.01,
+        "force_hz": 500.0
+      }
+    ]
+  },
+  "force_frequency": {
+    "frequency_hz": 500,
+    "interval_s": 0.002,
+    "steps_between_outputs": 40,
+    "measured_extra_output_fraction": 0.0004083742793035872,
+    "wall_change_fraction": -0.0026366364660550534,
+    "end_load_differences": {
+      "hull": {
+        "max_abs_force_difference_N": 4.2656286041165e-06,
+        "max_abs_moment_difference_Nm": 4.488118497292248e-06
+      },
+      "port_oar": {
+        "max_abs_force_difference_N": 2.687263117584493e-08,
+        "max_abs_moment_difference_Nm": 2.210053453091665e-08
+      },
+      "starboard_oar": {
+        "max_abs_force_difference_N": 4.114763718643388e-08,
+        "max_abs_moment_difference_Nm": 4.074660839292754e-08
+      }
+    },
+    "test_end_s": 0.01,
+    "long_run_stability_validated": false
+  },
+  "solver_sha256": "1b0c7595f246c61f13b61ded931d398763110c0cdd06527527992276ffa8d284"
+}
