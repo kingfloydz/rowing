@@ -1,0 +1,117 @@
+{
+  "status.json": {
+    "phase": "production",
+    "started_unix": 1794753062.4866369,
+    "command": [
+      "/inspire/qb-ilm/project/xiongxiaobin/ky26212/policy7400_production_r2_20261115/solver",
+      "/inspire/qb-ilm/project/xiongxiaobin/ky26212/policy7400_production_r2_20261115/case.cfg",
+      "--multi-gpu",
+      "8",
+      "--decomp",
+      "xy",
+      "--output",
+      "/inspire/qb-ilm/project/xiongxiaobin/ky26212/policy7400_production_r2_20261115/output"
+    ]
+  },
+  "gpu_models.json": [
+    "NVIDIA H100 80GB HBM3",
+    "NVIDIA H100 80GB HBM3",
+    "NVIDIA H100 80GB HBM3",
+    "NVIDIA H100 80GB HBM3",
+    "NVIDIA H100 80GB HBM3",
+    "NVIDIA H100 80GB HBM3",
+    "NVIDIA H100 80GB HBM3",
+    "NVIDIA H100 80GB HBM3"
+  ],
+  "smoke_result.json": {
+    "phase": "smoke",
+    "returncode": 0,
+    "wall_s": 110.15356278419495
+  },
+  "restart_smoke_result.json": {
+    "phase": "restart_smoke",
+    "returncode": 0,
+    "wall_s": 21.09761929512024
+  },
+  "smoke_output/multi_gpu_metrics.json": {
+    "case": "policy7400_routed_checkpoint_latest",
+    "devices": 8,
+    "steps": 80,
+    "wall_seconds": 103.547,
+    "compute_seconds_max_rank": 76.3173,
+    "field_output_seconds": 0,
+    "force_output_seconds": 0.0412066,
+    "output_seconds_total": 0.0412067,
+    "output_wall_fraction": 0.000397952,
+    "halo_cells": 12,
+    "core_cells_min": 71595722,
+    "core_cells_max": 80028999,
+    "resident_cells_min": 75929750,
+    "resident_cells_max": 87515883,
+    "field_output": "one_global_uint16_file_per_frame",
+    "force_output": "one_combined_csv_per_frame_plus_rank_diagnostics"
+  },
+  "smoke_output/checkpoint_metrics.json": {
+    "count": 2,
+    "seconds": 22.7063,
+    "latest_time_s": 0.004
+  },
+  "restart_smoke_output/multi_gpu_metrics.json": {
+    "case": "policy7400_routed_checkpoint_latest",
+    "devices": 8,
+    "steps": 82,
+    "wall_seconds": 3.52944,
+    "compute_seconds_max_rank": 1.91757,
+    "field_output_seconds": 0,
+    "force_output_seconds": 0,
+    "output_seconds_total": 2.217e-06,
+    "output_wall_fraction": 6.28146e-07,
+    "halo_cells": 12,
+    "core_cells_min": 71595722,
+    "core_cells_max": 80028999,
+    "resident_cells_min": 75929750,
+    "resident_cells_max": 87515883,
+    "field_output": "one_global_uint16_file_per_frame",
+    "force_output": "one_combined_csv_per_frame_plus_rank_diagnostics"
+  },
+  "checkpoint_test_files_cleaned_after_successful_read": true,
+  "production_tail": [],
+  "restart_smoke_tail": [
+    "rank=4 step=81 phi=[0,1] umax=0.000265917",
+    "rank=5 step=81 phi=[0,1] umax=0.00105564",
+    "rank=6 step=81 phi=[0,1] umax=0.00114331",
+    "rank=7 step=81 phi=[0,1] umax=0.000417311",
+    "rank=0 step=82 phi=[0,1] umax=0.000267489",
+    "rank=1 step=82 phi=[0,1] umax=0.000479438",
+    "rank=2 step=82 phi=[0,1] umax=0.000967276",
+    "rank=3 step=82 phi=[0,1] umax=0.00041609",
+    "rank=4 step=82 phi=[0,1] umax=0.000269906",
+    "rank=5 step=82 phi=[0,1] umax=0.0010696",
+    "rank=6 step=82 phi=[0,1] umax=0.00115763",
+    "rank=7 step=82 phi=[0,1] umax=0.000422072"
+  ],
+  "same_004s_load_difference": {
+    "hull": {
+      "force_N": 4.867504571848258e-06,
+      "moment_Nm": 3.5867967183023097e-06
+    },
+    "port_oar": {
+      "force_N": 1.5889509430433435e-08,
+      "moment_Nm": 2.763458798946128e-08
+    },
+    "starboard_oar": {
+      "force_N": 2.0547581330854214e-08,
+      "moment_Nm": 2.2267994892466447e-08
+    }
+  },
+  "platform_status": {
+    "job_id": "job-98178f76-c76f-4558-b600-62b33d8658a4",
+    "status": "job_running",
+    "timeline": {
+      "created": "1794752769000",
+      "resource_prepared": "1794752816000",
+      "run": "1794752941000"
+    },
+    "logic_compute_group_name": "\u5f00\u53d1\u533a-H100-cuda12.8\u7248\u672c-183\u6838"
+  }
+}

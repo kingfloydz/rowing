@@ -1,5 +1,5 @@
 {
-  "status": "probe_routing_and_latest_checkpoint_repair_cpu_gpu_tests_passed",
+  "status": "repair_validated_full_mesh_production_started",
   "source_sha256": {
     "ale_motion.hpp": "2a0d77b0bf5a4461b12bc6b0728a57ae03956781161739af815dc996e7ec4be3",
     "backend.hpp": "878ce11086519bd5cb73e5cda876cc727a468c43306a701559049e82d9087dcc",
@@ -87,5 +87,5 @@
   "solver_sha256": "bbe8281e505cfc53eef220272a1414e558a6edcb1802d5532201ea6c8e5d6fc2",
   "repair": "Probe-owned surface stress; 10000-step latest-only transactional checkpoint",
   "repair_task": "job-98178f76-c76f-4558-b600-62b33d8658a4",
-  "full_8gpu_acceptance": "runs automatically before production; status tracked separately"
+  "full_8gpu_acceptance": "Passed 80 full-mesh steps, two latest-checkpoint generations, old generation removed, latest checkpoint read and two resumed steps; production running"
 }
