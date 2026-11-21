@@ -37,6 +37,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--checkpoint-file',type=Path,required=True)
     parser.add_argument('--device',default=None)
+    parser.add_argument('--water-model', choices=('training','nominal','legacy'),
+                        help='Water coupling: episode DR, nominal compact model, or original Warp model')
     parser.add_argument('--force-profile',help='CFD profile JSON; use prior to reproduce the original force law')
     parser.add_argument('--num-envs',type=int,default=1)
     parser.add_argument('--host',default='0.0.0.0')
@@ -65,6 +67,10 @@ def main():
         torch.cuda.set_device(device)
     cfg = env_cfg(args.num_envs,play=True)
     cfg.actions['h2'].force_profile = args.force_profile
+    if args.water_model and args.force_profile and args.water_model != 'legacy':
+        parser.error('--force-profile applies to the legacy water model')
+    if args.water_model or args.force_profile:
+        cfg.actions['h2'].water_model = args.water_model or 'legacy'
     cfg.seed = args.seed
     cfg.viewer.body_name = 'rowing/boat'
     cfg.viewer.distance = 8.0

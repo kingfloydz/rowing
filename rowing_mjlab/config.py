@@ -26,7 +26,7 @@ def env_cfg(num_envs=2048,play=False):
         # Retain the repository 2ms timestep for stiff welds; control is 50Hz.
         sim=SimulationCfg(njmax=512,nconmax=128,contact_sensor_maxmatch=256,
                           mujoco=MujocoCfg(timestep=0.002,integrator='implicitfast',iterations=50)),
-        actions={'h2':mdp.RowingActionCfg(entity_name='rowing')},
+        actions={'h2':mdp.RowingActionCfg(entity_name='rowing',water_model='nominal' if play else 'training')},
         observations={
             'actor':ObservationGroupCfg(terms={
                 'proprio':ObservationTermCfg(func=mdp.onboard_proprio,
@@ -44,6 +44,7 @@ def env_cfg(num_envs=2048,play=False):
             'hydrodynamics':EventTermCfg(func=mdp.install_hydrodynamics,mode='startup'),
         },
         rewards={
+            'recovery_immersion':RewardTermCfg(func=mdp.recovery_immersion_cost,weight=-1.0),
             'forward_speed':RewardTermCfg(func=mdp.boat_forward_speed,weight=0.6),
             'lateral_velocity':RewardTermCfg(func=mdp.boat_lateral_velocity_cost,weight=-1.0),
             'angular_velocity':RewardTermCfg(func=mdp.curriculum_angular_velocity_cost,weight=-0.5),

@@ -15,7 +15,7 @@ from .curriculum import PenaltyCurriculum
 
 
 class RowingState:
-    def __init__(self,env,hull_radiation=True,blade_inertia=True,force_profile=None):
+    def __init__(self,env,hull_radiation=True,blade_inertia=True,force_profile=None,water_model="training"):
         self.env = env
         model = env.sim.mj_model
         device = env.device
@@ -53,13 +53,23 @@ class RowingState:
         self.initial_trunk = trunk_vertical_angle(
             torch.tensor(initial_data.xmat[self.torso].reshape(3,3).copy(), device=device, dtype=torch.float32),
             torch.tensor(initial_data.xmat[self.boat].reshape(3,3).copy(), device=device, dtype=torch.float32))
+        if water_model not in ("training","nominal","legacy"):
+            raise ValueError(f"Unknown water model {water_model}")
+        compact = water_model != "legacy" and force_profile is None
         self.hydro = WarpHydrodynamics(model,env.num_envs,device,prefix='rowing/',
-            hull_radiation=hull_radiation,blade_inertia=blade_inertia,force_profile=force_profile)
+            hull_radiation=hull_radiation,blade_inertia=blade_inertia,force_profile="prior" if compact else force_profile,
+            compact_shear=1.4321480723539217 if compact else None)
         provenance = json.loads((ROOT/'data/rowing_reference_provenance.json').read_text())
         wp.to_torch(self.hydro.water)[:,0] = provenance['water_level_m_at_repository_reset']
         self.water_level = wp.to_torch(self.hydro.water)[:,0]
         self.blade_area = BladeAreaReference(model,self.ref,
             provenance['water_level_m_at_repository_reset'],device,prefix='rowing/')
+        self.live_water = None
+        if compact:
+            from .live_water import LiveWater
+            if self.hydro.radiation is not None:
+                self.hydro.radiation.set_scales(radiation=0.)
+            self.live_water = LiveWater(self,randomize=water_model=="training")
         self.loads = wp.to_torch(self.hydro.loads)
         # Resolve entity-local indices independently from model joint order.
         entity = env.scene['rowing']
@@ -75,6 +85,7 @@ class RowingActionCfg(ActionTermCfg):
     hull_radiation: bool = True
     blade_inertia: bool = True
     force_profile: str | None = None
+    water_model: str = "training"
 
     def build(self,env):
         return RowingAction(self,env)
@@ -84,7 +95,7 @@ class RowingAction(ActionTerm):
     def __init__(self,cfg,env):
         super().__init__(cfg,env)
         env.rowing = RowingState(env,hull_radiation=cfg.hull_radiation,blade_inertia=cfg.blade_inertia,
-                                force_profile=cfg.force_profile)
+                                force_profile=cfg.force_profile,water_model=cfg.water_model)
         self.state = env.rowing
         self._raw = torch.zeros(env.num_envs,self.action_dim,device=env.device)
         self.targets = self.state.q0[self.state.h2_q].expand(env.num_envs,-1).clone()
@@ -111,6 +122,8 @@ class RowingAction(ActionTerm):
         # Head columns retain the repository target; no policy action reaches them.
 
     def apply_actions(self):
+        if self.state.live_water is not None:
+            self.state.live_water.update()
         self._entity.set_joint_position_target(self.targets,joint_ids=self.state.entity_joint_ids)
 
     def reset(self,env_ids=None):
@@ -118,6 +131,8 @@ class RowingAction(ActionTerm):
         self._raw[ids] = 0
         self.targets[ids] = self.state.q0[self.state.h2_q]
         self.state.hydro.reset(env_ids)
+        if self.state.live_water is not None:
+            self.state.live_water.reset(env_ids)
 
 
 def install_hydrodynamics(env,env_ids=None):
@@ -353,3 +368,14 @@ def track_blade_area(env):
 
 def blade_area_rmse_m2(env):
     return blade_area_error(env).square().mean(-1).sqrt()
+
+def recovery_immersion_cost(env):
+    s=env.rowing
+    curriculum=s.penalty_curriculum
+    if curriculum.completed_iterations < curriculum.threshold:
+        return torch.zeros_like(s.water_level)
+    phase=s.reference()[0]
+    # reference20 sweep reversals at 0.435 and 0.060 (next cycle).
+    progress=(phase-.435).remainder(1.)/.625
+    wet=s.blade_area.wetted_fraction(env.sim.data,s.water_level)
+    return ((progress>.10)&(progress<.90))*wet.mean(-1)

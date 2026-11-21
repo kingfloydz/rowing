@@ -32,6 +32,8 @@ def synchronize_normalizers(models, world):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--water-model', choices=('training','nominal','legacy'),
+                        help='Water coupling: episode DR, nominal compact model, or original Warp model')
     parser.add_argument('--force-profile',help='CFD profile JSON; use prior for the original force law')
     parser.add_argument('--device', default='cuda:0')
     parser.add_argument('--num-envs', type=int, default=1024, help='Environments per GPU')
@@ -59,6 +61,10 @@ def main():
     configure_torch_backends()
     cfg = env_cfg(args.num_envs)
     cfg.actions['h2'].force_profile = args.force_profile
+    if args.water_model and args.force_profile and args.water_model != 'legacy':
+        parser.error('--force-profile applies to the legacy water model')
+    if args.water_model or args.force_profile:
+        cfg.actions['h2'].water_model = args.water_model or 'legacy'
     cfg.seed = 42 + rank
     settings = asdict(rl_cfg(args.num_envs))
     settings['seed'] = 42 + rank

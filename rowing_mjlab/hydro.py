@@ -96,6 +96,8 @@ def integrate_chunks(
     force = wp.vec3(0.0)
     torque = wp.vec3(0.0)
     weighted_point = wp.vec3(0.0)
+    cd_force = wp.vec3(0.0)
+    cd_torque = wp.vec3(0.0)
     total_area = float(0.0)
     low = float(1.0e20)
     high = float(-1.0e20)
@@ -157,6 +159,11 @@ def integrate_chunks(
                     # Match the cubic waterline transition used by blade
                     # added inertia during entry and extraction.
                     f_drag *= sstep((triangle_depth+blade_wetting_depth)/(2.0*blade_wetting_depth))
+                    if result.shape[2] > 12:
+                        drag = blade_force_coefficients(vel,ex,chord,area,rho,wp.vec3(blade_coefficients[0],0.,0.))
+                        drag *= sstep((triangle_depth+blade_wetting_depth)/(2.0*blade_wetting_depth))
+                        cd_force += drag
+                        cd_torque += wp.cross(center-com,drag)
                 force += f_drag
                 torque += wp.cross(center-com,f_drag)
                 weight = area
@@ -178,6 +185,9 @@ def integrate_chunks(
     for k in range(3):
         result[world,chunk,k] = force[k]
         result[world,chunk,k+3] = torque[k]
+        if result.shape[2] > 12:
+            result[world,chunk,k+12] = cd_force[k]
+            result[world,chunk,k+15] = cd_torque[k]
         result[world,chunk,k+7] = weighted_point[k]
     result[world,chunk,6] = total_area
     result[world,chunk,10] = low
@@ -258,6 +268,12 @@ def reduce_chunks(
                 u = wp.dot(vel,ex)
                 drag = hull_drag(u,high-low,area,water[world,1],nodes,coefs,
                                  constants[0],constants[1],constants[2],constants[3],constants[4])
+                if constants.shape[0] > 5:
+                    re = wp.max(wp.abs(u)* (high-low)/1.e-6,1.)
+                    lg = wp.log(re)/wp.log(10.)
+                    blend = sstep(lg-5.)
+                    cf = (1.+constants[4])*((1.-blend)*1.328/wp.sqrt(re)+blend*.075/wp.pow(wp.max(lg,5.)-2.,2.))
+                    drag += (constants[5]-1.)*.5*water[world,1]*area*u*u*cf
                 f = -wp.sign(u)*drag*ex
             else:
                 f = fin_force(vel,ex,ey,area,(high-low)*(high-low)/area,water[world,1])
@@ -272,10 +288,27 @@ def reduce_chunks(
         loads[world,slot,k+3] = local_t[k]
 
 
+@wp.kernel
+def apply_correction(bodies: wp.array(dtype=int), rot: wp.array2d(dtype=wp.mat33),
+                     pos: wp.array2d(dtype=wp.vec3), com: wp.array2d(dtype=wp.vec3),
+                     correction: wp.array3d(dtype=float), loads: wp.array3d(dtype=float),
+                     applied: wp.array2d(dtype=wp.spatial_vector)):
+    w, s = wp.tid()
+    b = bodies[2*s]
+    f = wp.vec3(correction[w,s,0],correction[w,s,1],correction[w,s,2])
+    t = wp.vec3(correction[w,s,3],correction[w,s,4],correction[w,s,5])+wp.cross(pos[w,b]-com[w,b],f)
+    applied[w,b] += wp.spatial_vector(f[0],f[1],f[2],t[0],t[1],t[2])
+    fl = wp.transpose(rot[w,b])*f
+    tl = wp.transpose(rot[w,b])*t
+    for k in range(3):
+        loads[w,s,k] += fl[k]
+        loads[w,s,k+3] += tl[k]
+
+
 class WarpHydrodynamics:
     """Owns persistent buffers; callback is compatible with mjlab CUDA capture."""
     def __init__(self, model, nworld, device, prefix="", repository=ROOT, hull_radiation=False, blade_inertia=False,
-                 force_profile=None):
+                 force_profile=None, compact_shear=None):
         from pathlib import Path
         repository = Path(repository)
         # Fitted drag/lift are conditional on the existing added-inertia model.
@@ -285,8 +318,11 @@ class WarpHydrodynamics:
         self.force_profile = load_force_profile(force_profile,repository)
         if not blade_inertia and self.force_profile.get('required_blade_inertia'):
             raise ValueError('CFD-calibrated force profile requires blade inertia')
+        self.compact = compact_shear is not None
         self.blade_coefficients = wp.vec3(*[float(self.force_profile[k]) for k in
             ('blade_cd_max','blade_cl_max','blade_skin_cd')])
+        if self.compact:
+            self.blade_coefficients = wp.vec3(self.blade_coefficients[0],self.blade_coefficients[1],0.)
         surfaces = [load_closed_surface(repository/'boat_meshes'/f'{name}.stl')[0]
                     for name in ('shell_white','fin')]
         for side in ('port','starboard'):
@@ -319,12 +355,16 @@ class WarpHydrodynamics:
         self.roots = wp.array(model.body_rootid,dtype=int,device=device)
         self.nodes = wp.array(law.fn,dtype=float,device=device)
         self.coefs = wp.array(law.interpolator.c,dtype=float,device=device)
-        self.constants = wp.array([law.cr[0],law.cr[-1],*law.end_slopes,law.form_factor],dtype=float,device=device)
+        self.constants = wp.array([law.cr[0],law.cr[-1],*law.end_slopes,law.form_factor]+([] if not self.compact else [compact_shear]),dtype=float,device=device)
         water = np.zeros((nworld,5),dtype=np.float32)
         water[:,1] = 1000.0
         self.water = wp.array(water,dtype=float,device=device)
-        self.chunks = wp.zeros((nworld,self.nchunks,12),dtype=float,device=device)
+        self.chunks = wp.zeros((nworld,self.nchunks,18 if self.compact else 12),dtype=float,device=device)
         self.loads = wp.zeros((nworld,3,6),dtype=float,device=device)
+        self.blade_chunks = [slice(*ranges[i]) for i in (3,5)]
+        if self.compact:
+            self.correction = wp.zeros_like(self.loads)
+            self.explicit = wp.zeros_like(self.loads)
         self.radiation = None
         if hull_radiation:
             from .radiation import HullRadiation
@@ -352,6 +392,10 @@ class WarpHydrodynamics:
             self.chunks,self.ranges,self.bodies,self.roots,data.xmat,data.xipos,
             data.cvel,data.subtree_com,self.water,self.nodes,self.coefs,self.constants,
             self.loads,data.xfrc_applied],device=self.device)
+        if self.compact:
+            wp.copy(self.explicit,self.loads)
+            wp.launch(apply_correction,(self.nworld,3),inputs=[self.bodies,data.xmat,data.xpos,data.xipos,
+                      self.correction,self.loads,data.xfrc_applied],device=self.device)
         if self.radiation is not None:
             self.radiation(model,data,self.water,self.loads)
         if self.blade_inertia is not None:

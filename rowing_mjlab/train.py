@@ -15,6 +15,8 @@ def main():
     parser.add_argument('--iterations',type=int,default=10000)
     parser.add_argument('--seed',type=int,default=42)
     parser.add_argument('--resume',type=Path)
+    parser.add_argument('--water-model', choices=('training','nominal','legacy'),
+                        help='Water coupling: episode DR, nominal compact model, or original Warp model')
     parser.add_argument('--force-profile',help='CFD profile JSON; use prior for the original force law')
     parser.add_argument('--log-dir',type=Path)
     parser.add_argument('--compile',action=argparse.BooleanOptionalAction,default=True)
@@ -43,6 +45,10 @@ def main():
     cfg.actions['h2'].hull_radiation = args.hull_radiation
     cfg.actions['h2'].blade_inertia = args.blade_inertia
     cfg.actions['h2'].force_profile = args.force_profile
+    if args.water_model and args.force_profile and args.water_model != 'legacy':
+        parser.error('--force-profile applies to the legacy water model')
+    if args.water_model or args.force_profile:
+        cfg.actions['h2'].water_model = args.water_model or 'legacy'
     cfg.seed = args.seed
     agent = rl_cfg(args.num_envs)
     agent.seed = args.seed

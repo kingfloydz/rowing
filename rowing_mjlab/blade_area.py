@@ -57,14 +57,17 @@ class BladeAreaReference:
         area = ((c[0]*delta+c[1])*delta+c[2])*delta+c[3]
         return self.initial+blend[...,None]*(area-self.initial)
 
-    def actual(self,data,water_level):
-        axis = data.xmat[:,self.boat].reshape(-1,3,3)[:,:,0]
+    def wetted_fraction(self,data,water_level):
         result = []
         for body,tri,areas in zip(self.bodies,self.triangles,self.areas):
-            rot = data.xmat[:,body].reshape(-1,3,3)
-            heights = torch.einsum('nj,fvj->nfv',rot[:,2,:],tri)
+            vertical = data.xmat[:,body].reshape(-1,3,3)[:,2]
+            heights = torch.einsum('nj,fvj->nfv',vertical,tri)
             heights = heights+(data.xpos[:,body,2]-water_level)[:,None,None]
-            wetted = (wet_fraction(heights)*areas).sum(-1)
-            projection = (rot[:,:,0]*axis).sum(-1).abs()
-            result.append(wetted*projection)
-        return torch.stack(result,dim=-1)
+            result.append((wet_fraction(heights)*areas).sum(-1))
+        return torch.stack(result,dim=-1)/self.full_area
+
+    def actual(self,data,water_level):
+        axis = data.xmat[:,self.boat].reshape(-1,3,3)[:,:,0]
+        normals = data.xmat[:,self.bodies].reshape(-1,2,3,3)[...,0]
+        projection = (normals*axis[:,None]).sum(-1).abs()
+        return self.wetted_fraction(data,water_level)*self.full_area*projection
